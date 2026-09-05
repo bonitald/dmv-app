@@ -1,5 +1,31 @@
 node_modules/
 .env
+.env*.local
 .DS_Store
 dist/
 build/
+
+# Expo
+.expo/
+web-build/
+expo-env.d.ts
+
+# Native (generated via `expo prebuild`, committed per CNG convention — see README)
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+.kotlin/
+
+# Metro
+.metro-health-check*
+
+# debug logs
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# typescript
+*.tsbuildinfo

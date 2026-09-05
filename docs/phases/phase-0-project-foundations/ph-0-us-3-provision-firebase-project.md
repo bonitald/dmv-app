@@ -3,7 +3,7 @@
 **ID:** ph-0-us-3
 **Layer:** Backend
 **Parent:** ph-0-us-2
-**Status:** Not Started
+**Status:** Done (2026-09-04) — completed manually via Firebase console; see `docs/phase-0-plan.md` Sections A/B.
 
 ## Story
 As a developer,
@@ -23,21 +23,24 @@ isolated from local development.
   plan for high-scale infra here.
 
 ## Acceptance Criteria
-- [ ] Given the app needs isolated environments, when the Firebase project(s) are created,
+- [x] Given the app needs isolated environments, when the Firebase project(s) are created,
   then dev/staging and prod are separate Firebase projects (not a single project with
   environment-prefixed collections), so a bug in dev/staging cannot touch prod data.
-- [ ] Given Firestore is enabled, when the database is created, then it starts in a locked
+  (`dmv-app-dev`, `dmv-app-prod`)
+- [x] Given Firestore is enabled, when the database is created, then it starts in a locked
   (deny-all) security-rules mode — no collection is open to public read/write by default;
   actual rules are defined per-collection starting in Phase 1.
-- [ ] Given Firebase Hosting is enabled, when checked, then it's provisioned but unused for
+- [x] Given Firebase Hosting is enabled, when checked, then it's provisioned but unused for
   MVP (the app is mobile-only per `docs/prd.md` Section 7) — noted as available for a future
   web/admin surface, not actively deployed to in this story.
-- [ ] Given Firebase Analytics is enabled, when the project is provisioned, then it's ready
+- [x] Given Firebase Analytics is enabled, when the project is provisioned, then it's ready
   to receive events once the app SDK is wired in (ph-0-us-4) — no custom events are defined
   in this story.
-- [ ] Given developers need local access, when a service account / API key is issued for
+- [x] Given developers need local access, when a service account / API key is issued for
   each environment, then it's scoped to that environment only and never checked into the
-  repo (`.env` pattern per ph-0-us-4).
+  repo (`.env` pattern per ph-0-us-4). Config files (`google-services.json`,
+  `GoogleService-Info.plist`) issued for both environments, held outside the repo pending
+  ph-0-us-4's `.env`/config wiring.
 
 ## Data and API
 - **Firestore schema changes**: None yet — database created empty; schema starts in Phase 1
@@ -61,11 +64,11 @@ isolated from local development.
   whatever the console's quick-start default is.
 
 ## Tasks
-- [ ] Create separate Firebase projects for dev/staging and prod.
-- [ ] Enable Firestore (native mode) on each, with security rules explicitly set to deny-all
+- [x] Create separate Firebase projects for dev/staging and prod.
+- [x] Enable Firestore (native mode) on each, with security rules explicitly set to deny-all
   by default rather than left on Firebase's test-mode default.
-- [ ] Enable Hosting (provisioned only, no deploy) and Analytics on each.
-- [ ] Issue environment-scoped API keys/config and hand them off for ph-0-us-4's `.env`
+- [x] Enable Hosting (provisioned only, no deploy) and Analytics on each.
+- [x] Issue environment-scoped API keys/config and hand them off for ph-0-us-4's `.env`
   wiring — not committed anywhere in this story.
 
 ## Questions

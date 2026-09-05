@@ -2,7 +2,8 @@
 
 **ID:** ph-0-us-1
 **Layer:** Frontend
-**Status:** Not Started
+**Status:** In Progress (2026-09-04) — scaffolded, `android/` generated via prebuild, TS clean;
+blocked on device/emulator verification and iOS native-dir generation, see Tasks below.
 
 ## Story
 As a developer,
@@ -56,13 +57,21 @@ modules Phase 6 (Driving Time Logger) will need.
   stays reproducible.
 
 ## Tasks
-- [ ] Run `npx create-expo-app` (or equivalent) to scaffold the project.
-- [ ] Run `expo prebuild` to generate native projects; commit per the repo's chosen
-  native-dir convention.
+- [x] Run `npx create-expo-app` (or equivalent) to scaffold the project.
+- [x] Run `expo prebuild` to generate native projects; commit per the repo's chosen
+  native-dir convention. **Partial**: `android/` generated and committed. `ios/` could not
+  be generated — Expo CLI's iOS prebuild step requires macOS or Linux and this repo is
+  worked on from Windows; documented as a known gap in README with the fix (run from
+  macOS/Linux, or use EAS Build per `docs/phase-0-plan.md` Section D).
 - [ ] Set up a custom dev client build (`expo run:ios` / `expo run:android` or EAS dev
-  client build) and confirm both platforms launch.
-- [ ] Add TypeScript config and confirm a clean `tsc` run.
-- [ ] Document the setup/run commands in the project README, since none exist yet.
+  client build) and confirm both platforms launch. **Not verified**: `expo-dev-client` is
+  installed and `npm run android`/`npm run ios` scripts point at `expo run:*`, but this
+  machine has the Android SDK without a JDK on PATH, so `expo run:android` hasn't actually
+  been executed/verified here. iOS is unrunnable from Windows regardless. Needs a
+  JDK (and ideally Android Studio's emulator) to close out.
+- [x] Add TypeScript config and confirm a clean `tsc` run. `npx tsc --noEmit` passes with
+  zero errors on the scaffold's own code.
+- [x] Document the setup/run commands in the project README, since none exist yet.
 
 ## Questions
 - None outstanding.
