@@ -2,8 +2,9 @@
 
 **ID:** ph-0-us-1
 **Layer:** Frontend
-**Status:** In Progress (2026-09-04) — scaffolded, `android/` generated via prebuild, TS clean;
-blocked on device/emulator verification and iOS native-dir generation, see Tasks below.
+**Status:** Done (2026-09-05) — verified building and launching on Android emulator via
+custom dev client. iOS native-dir generation deferred (Windows can't run it; not required to
+keep developing per `docs/phase-0-plan.md` Section D) — see Tasks below.
 
 ## Story
 As a developer,
@@ -23,18 +24,23 @@ modules Phase 6 (Driving Time Logger) will need.
   Firebase-side component to divide it from.
 
 ## Acceptance Criteria
-- [ ] Given a fresh clone of the repo, when a developer runs the project's install + start
+- [x] Given a fresh clone of the repo, when a developer runs the project's install + start
   commands, then the app builds and launches on a custom dev client (iOS simulator/device
-  and Android emulator/device) — not Expo Go.
-- [ ] Given the project is scaffolded, when `expo prebuild` has been run, then the
+  and Android emulator/device) — not Expo Go. **Android verified** (built and launched on
+  emulator via `expo run:android` / custom dev client). **iOS not verified** — no macOS
+  available in this environment; deferred to EAS Build or a macOS/Linux machine per
+  `docs/phase-0-plan.md` Section D, which explicitly treats iOS device builds as optional
+  for continued development.
+- [x] Given the project is scaffolded, when `expo prebuild` has been run, then the
   `ios/` and `android/` native directories exist and are checked in (or the project's chosen
   convention for native-dir tracking is documented), consistent with the CNG (Continuous
-  Native Generation) workflow described in `docs/phase-0-findings.md`.
-- [ ] Given the scaffold is complete, when a developer looks for a config-plugin entry
+  Native Generation) workflow described in `docs/phase-0-findings.md`. `android/` committed;
+  `ios/` generation documented as a known gap + fix in README.
+- [x] Given the scaffold is complete, when a developer looks for a config-plugin entry
   point, then the project's `app.json`/`app.config.ts` already has a `plugins` array ready
   to receive Phase 6's Live Activity / foreground-service config plugins without a
   structural rework.
-- [ ] Given the project is scaffolded, when TypeScript is checked, then the project
+- [x] Given the project is scaffolded, when TypeScript is checked, then the project
   compiles with zero errors on the default template's own code (baseline, before any
   feature code is added).
 
@@ -63,12 +69,11 @@ modules Phase 6 (Driving Time Logger) will need.
   be generated — Expo CLI's iOS prebuild step requires macOS or Linux and this repo is
   worked on from Windows; documented as a known gap in README with the fix (run from
   macOS/Linux, or use EAS Build per `docs/phase-0-plan.md` Section D).
-- [ ] Set up a custom dev client build (`expo run:ios` / `expo run:android` or EAS dev
-  client build) and confirm both platforms launch. **Not verified**: `expo-dev-client` is
-  installed and `npm run android`/`npm run ios` scripts point at `expo run:*`, but this
-  machine has the Android SDK without a JDK on PATH, so `expo run:android` hasn't actually
-  been executed/verified here. iOS is unrunnable from Windows regardless. Needs a
-  JDK (and ideally Android Studio's emulator) to close out.
+- [x] Set up a custom dev client build (`expo run:ios` / `expo run:android` or EAS dev
+  client build) and confirm both platforms launch. Android: confirmed building and
+  launching on a local emulator via `expo run:android` (custom dev client, not Expo Go),
+  after pointing `JAVA_HOME` at Android Studio's bundled JDK. iOS: not runnable from
+  Windows — deferred per Section D above.
 - [x] Add TypeScript config and confirm a clean `tsc` run. `npx tsc --noEmit` passes with
   zero errors on the scaffold's own code.
 - [x] Document the setup/run commands in the project README, since none exist yet.

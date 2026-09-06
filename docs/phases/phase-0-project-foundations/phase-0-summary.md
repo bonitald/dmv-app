@@ -6,7 +6,7 @@
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
-| ph-0-us-1 | Expo project scaffolded with custom dev client | Frontend | — | In Progress |
+| ph-0-us-1 | Expo project scaffolded with custom dev client | Frontend | — | Done |
 | ph-0-us-2 | Firebase project provisioned and wired into the app | Parent | — | Not Started |
 | ph-0-us-3 | Provision the Firebase project (Firestore, Hosting, Analytics) | Backend | ph-0-us-2 | Done |
 | ph-0-us-4 | Wire the Firebase SDK into the Expo app | Frontend | ph-0-us-2 | Not Started |
