@@ -1,18 +1,18 @@
 # Phase 0: Project Foundations — Summary
 
-## Status: Not Started
+## Status: In Progress — 7 of 8 stories done; only ph-0-us-8 remains.
 
 ## Stories
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
 | ph-0-us-1 | Expo project scaffolded with custom dev client | Frontend | — | Done |
-| ph-0-us-2 | Firebase project provisioned and wired into the app | Parent | — | Not Started |
+| ph-0-us-2 | Firebase project provisioned and wired into the app | Parent | — | Done |
 | ph-0-us-3 | Provision the Firebase project (Firestore, Hosting, Analytics) | Backend | ph-0-us-2 | Done |
-| ph-0-us-4 | Wire the Firebase SDK into the Expo app | Frontend | ph-0-us-2 | In Progress |
-| ph-0-us-5 | Persistent anonymous device identifier on first launch | Parent | — | Not Started |
+| ph-0-us-4 | Wire the Firebase SDK into the Expo app | Frontend | ph-0-us-2 | Done |
+| ph-0-us-5 | Persistent anonymous device identifier on first launch | Parent | — | Done |
 | ph-0-us-6 | Firestore schema and security rules scoped to device identity | Backend | ph-0-us-5 | Done |
-| ph-0-us-7 | Sign in anonymously and persist device identity on first launch | Frontend | ph-0-us-5 | Not Started |
+| ph-0-us-7 | Sign in anonymously and persist device identity on first launch | Frontend | ph-0-us-5 | Done |
 | ph-0-us-8 | Basic navigation shell across core sections | Frontend | — | Not Started |
 
 ## Notes

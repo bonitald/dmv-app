@@ -3,13 +3,10 @@
 **ID:** ph-0-us-4
 **Layer:** Frontend
 **Parent:** ph-0-us-2
-**Status:** In Progress (2026-09-08) — SDK wired and verified end-to-end on Android emulator;
-still blocked on the final "Firestore write succeeds" half of AC4. ph-0-us-6 (rules) is now
-done and deployed to dev, but the smoke test writes to a scratch `_smoke_test/` collection
-from an unauthenticated client (no `signInAnonymously()` yet — that's ph-0-us-7), so it's
-still correctly outside `firestore.rules`' `users/{uid}` allow rule and still gets
-`permission-denied`. That's still expected, not a bug — full closure needs ph-0-us-7. See
-Tasks/Test Notes below.
+**Status:** Done (2026-09-07) — SDK wired and fully verified end-to-end on Android emulator.
+With ph-0-us-6 (rules, deployed to dev) and ph-0-us-7 (anonymous sign-in) both done, the
+smoke test now writes to `users/{uid}/_smoke_test/...` as the signed-in device and succeeds
+("Firebase OK" shown on screen), closing out AC4 completely.
 
 ## Story
 As a developer,
@@ -48,15 +45,12 @@ at the right Firebase project per build environment.
   justify separate `.env.development`/`.env.production` files on top of that. Flagging this
   as a deliberate scope call, not an oversight — revisit if a later story needs actual env
   var secrets (e.g. non-Firebase API keys).
-- [~] Given the SDK is wired up, when a developer calls a basic Firestore read/write (e.g. a
+- [x] Given the SDK is wired up, when a developer calls a basic Firestore read/write (e.g. a
   smoke-test write to a scratch collection) and logs a test Analytics event, then both
-  succeed against the dev project, confirming the wiring works end-to-end. **Analytics: verified**
-  (`logEvent` call completes without error). **Firestore: blocked, as expected** — the
-  smoke-test write to `_smoke_test/ph-0-us-4` gets `[firestore/permission-denied]` because
-  Firestore is still locked deny-all per ph-0-us-3's AC (rules aren't defined until
-  ph-0-us-6). This confirms the SDK is correctly wired to the real dev project (a
-  misconfigured project would fail differently, e.g. `not-found`/network error, not a rules
-  rejection) — full read/write success is deferred to ph-0-us-6/7 once rules exist.
+  succeed against the dev project, confirming the wiring works end-to-end. Fully verified
+  live on the Android emulator: the smoke test (now under `users/{uid}/_smoke_test/...`,
+  using the anonymous session from ph-0-us-7) both writes to Firestore and logs an Analytics
+  event successfully — "Firebase OK (development, uid ...)" rendered on screen.
 
 ## UI/UX Notes
 - **Screens/flows**: No user-facing UI in this story — purely SDK initialization/config.

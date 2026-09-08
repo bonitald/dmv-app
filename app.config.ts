@@ -47,7 +47,11 @@ const config: ExpoConfig = {
   web: {
     favicon: './assets/favicon.png',
   },
-  plugins: ['@react-native-firebase/app', '@react-native-firebase/analytics'],
+  plugins: [
+    '@react-native-firebase/app',
+    '@react-native-firebase/analytics',
+    '@react-native-firebase/auth',
+  ],
 };
 
 export default config;

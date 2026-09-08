@@ -3,7 +3,8 @@
 **ID:** ph-0-us-5
 **Layer:** Parent
 **Children:** ph-0-us-6 (Backend), ph-0-us-7 (Frontend)
-**Status:** Not Started
+**Status:** Done (2026-09-07) — both children (ph-0-us-6, ph-0-us-7) done and verified
+end-to-end on Android emulator.
 
 ## Story
 As a teen user,
@@ -23,13 +24,15 @@ across sessions on this device without any account-creation friction.
   can cause silent data loss (see ph-0-us-7's acceptance criteria).
 
 ## Acceptance Criteria
-- [ ] Given a user opens the app for the very first time, when it launches, then a device
+- [x] Given a user opens the app for the very first time, when it launches, then a device
   identifier is created and persisted with no visible signup/login step in front of it.
-- [ ] Given the identifier exists, when the user returns to the app on subsequent sessions
-  (same install), then the same identifier is reused, not regenerated.
-- [ ] Given the identifier is meant to link data across the app, when any per-user record is
+- [x] Given the identifier exists, when the user returns to the app on subsequent sessions
+  (same install), then the same identifier is reused, not regenerated. Verified via
+  force-stop + relaunch on the emulator.
+- [x] Given the identifier is meant to link data across the app, when any per-user record is
   written in a later phase (practice test attempts, driving sessions, test outcome), then it
-  can be scoped to this identifier in Firestore.
+  can be scoped to this identifier in Firestore. Enforced by `firestore.rules`'
+  `users/{uid}/{document=**}` rule; every later phase's per-user collections nest under it.
 
 ## Dependencies
 - **Blocked by**: ph-0-us-2 (Firebase must be wired before device-scoped data can be
