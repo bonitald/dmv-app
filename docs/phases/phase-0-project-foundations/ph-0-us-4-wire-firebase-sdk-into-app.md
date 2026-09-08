@@ -3,10 +3,13 @@
 **ID:** ph-0-us-4
 **Layer:** Frontend
 **Parent:** ph-0-us-2
-**Status:** In Progress (2026-09-07) — SDK wired and verified end-to-end on Android emulator;
-blocked on ph-0-us-6 for the final "Firestore write succeeds" half of AC4 (Firestore is
-still deny-all per ph-0-us-3, so the smoke-test write correctly gets `permission-denied` —
-that's expected, not a bug). See Tasks/Test Notes below.
+**Status:** In Progress (2026-09-08) — SDK wired and verified end-to-end on Android emulator;
+still blocked on the final "Firestore write succeeds" half of AC4. ph-0-us-6 (rules) is now
+done and deployed to dev, but the smoke test writes to a scratch `_smoke_test/` collection
+from an unauthenticated client (no `signInAnonymously()` yet — that's ph-0-us-7), so it's
+still correctly outside `firestore.rules`' `users/{uid}` allow rule and still gets
+`permission-denied`. That's still expected, not a bug — full closure needs ph-0-us-7. See
+Tasks/Test Notes below.
 
 ## Story
 As a developer,

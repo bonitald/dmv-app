@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "dev": "dmv-app-dev",
+    "staging": "dmv-app-dev",
+    "prod": "dmv-app-prod",
+    "default": "dmv-app-dev"
+  }
+}

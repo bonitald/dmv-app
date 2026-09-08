@@ -14,8 +14,15 @@
     "react-native": "0.86.3"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@jest/globals": "^30.5.1",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
     "cross-env": "^10.1.0",
+    "firebase": "^12.18.0",
+    "firebase-tools": "^15.29.0",
+    "jest": "^30.5.1",
+    "ts-jest": "^29.4.12",
     "typescript": "~6.0.3"
   },
   "scripts": {
@@ -24,11 +31,16 @@
     "android:prod": "cross-env APP_ENV=production expo run:android",
     "ios": "expo run:ios",
     "ios:prod": "cross-env APP_ENV=production expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test:rules": "firebase emulators:exec --only firestore \"jest --config jest.rules.config.js\""
   },
   "private": true,
   "allowScripts": {
     "@firebase/util@1.15.2": true,
-    "protobufjs@7.6.6": true
+    "protobufjs@7.6.6": true,
+    "@firebase/util@1.15.3": true,
+    "@parcel/watcher@2.6.0": true,
+    "re2@1.24.0": true,
+    "unrs-resolver@1.12.2": true
   }
 }

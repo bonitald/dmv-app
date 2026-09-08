@@ -3,7 +3,9 @@
 **ID:** ph-0-us-6
 **Layer:** Backend
 **Parent:** ph-0-us-5
-**Status:** Not Started
+**Status:** Done (2026-09-08) — rules written, verified with 4 passing emulator tests, and
+deployed to `dmv-app-dev`. Prod deploy intentionally deferred to the release checklist, per
+this story's own scope.
 
 ## Story
 As a developer,
@@ -27,17 +29,21 @@ can be written and read only by the device that owns it.
   device ID would have had, but with the added benefit of real server-side enforcement.
 
 ## Acceptance Criteria
-- [ ] Given a user's device has signed in anonymously, when any Firestore document under a
+- [x] Given a user's device has signed in anonymously, when any Firestore document under a
   per-user path (e.g. `users/{uid}/...`) is read or written, then rules allow it only when
-  `request.auth.uid == uid` — never a broader read/write.
-- [ ] Given a device has not yet signed in anonymously, when it attempts any Firestore
-  operation, then it is rejected — no anonymous-read fallback for per-user data.
-- [ ] Given the `users/{uid}` document is created, when it's first written, then it holds
+  `request.auth.uid == uid` — never a broader read/write. See `firestore.rules`; verified by
+  `firestore-tests/rules.test.ts`'s same-user-allowed / cross-user-denied cases.
+- [x] Given a device has not yet signed in anonymously, when it attempts any Firestore
+  operation, then it is rejected — no anonymous-read fallback for per-user data. Verified by
+  the "device that has not signed in anonymously is rejected outright" test.
+- [x] Given the `users/{uid}` document is created, when it's first written, then it holds
   only minimal fields needed by this phase (e.g. `createdAt`) — no fields belonging to later
-  phases' data are pre-created here.
-- [ ] Given Firestore rules are deployed, when tested against the Firebase emulator's rules
+  phases' data are pre-created here. This story only defines the rule/schema convention; no
+  document is actually created client-side until ph-0-us-7, so nothing is pre-created.
+- [x] Given Firestore rules are deployed, when tested against the Firebase emulator's rules
   test suite, then cross-user access attempts (device A reading/writing under device B's
-  `uid`) are explicitly verified to fail.
+  `uid`) are explicitly verified to fail. 4/4 tests pass locally via `npm run test:rules`
+  (`firebase emulators:exec`), and the rules are now deployed to `dmv-app-dev`.
 
 ## Data and API
 - **Firestore schema changes**: New top-level `users` collection, one document per anonymous
@@ -67,14 +73,25 @@ can be written and read only by the device that owns it.
   against.
 
 ## Tasks
-- [ ] Enable Anonymous Authentication as a sign-in provider in the Firebase console for each
-  environment.
-- [ ] Write Firestore security rules enforcing `request.auth.uid == uid` on the `users/{uid}`
-  path (and its future subcollections).
-- [ ] Set up the Firebase emulator's rules test suite with at least one same-user-allowed and
-  one cross-user-denied test case.
-- [ ] Deploy rules to dev/staging; confirm prod rules deploy is part of the release checklist
-  (not deployed to prod as part of this story).
+- [x] Enable Anonymous Authentication as a sign-in provider in the Firebase console for each
+  environment. Done by the user in `docs/phase-0-plan.md` Section B, for both dev and prod.
+- [x] Write Firestore security rules enforcing `request.auth.uid == uid` on the `users/{uid}`
+  path (and its future subcollections). See `firestore.rules`.
+- [x] Set up the Firebase emulator's rules test suite with at least one same-user-allowed and
+  one cross-user-denied test case. `firestore-tests/rules.test.ts` has 4 cases: same-user
+  read/write allowed, cross-user write denied, cross-user read denied, unauthenticated
+  denied. Run via `npm run test:rules` (spins up the Firestore emulator via
+  `firebase emulators:exec`, no manual emulator start needed). Added `firebase.json`,
+  `.firebaserc` (dev/staging/prod project aliases — staging aliases to the dev project since
+  no separate staging Firebase project exists yet), `firestore.indexes.json` (empty), and a
+  scoped `jest.rules.config.js` + `firestore-tests/tsconfig.json` so this test suite doesn't
+  collide with whatever test setup the app itself eventually adds.
+- [x] Deploy rules to dev/staging; confirm prod rules deploy is part of the release checklist
+  (not deployed to prod as part of this story). Deployed to `dmv-app-dev` via
+  `npx firebase-tools deploy --only firestore:rules --project dev`
+  (`.firebaserc`'s `staging` alias also points at `dmv-app-dev`, so this covers both until a
+  real staging project exists). Prod (`dmv-app-prod`) intentionally untouched — deploying
+  there belongs on the release checklist, not this story.
 
 ## Questions
 - None outstanding.

@@ -1,0 +1,15 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ph-0-us-6: baseline per-user scoping. Every later phase's per-user data
+    // (test attempts, driving sessions, test outcomes) lives under this same
+    // users/{uid} path rather than introducing a separate identity scheme, so this
+    // single rule is the enforcement point for all of it.
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Everything else stays deny-all (ph-0-us-3's locked-by-default baseline).
+  }
+}
