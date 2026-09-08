@@ -1,6 +1,6 @@
 # Phase 0: Project Foundations — Summary
 
-## Status: In Progress — 7 of 8 stories done; only ph-0-us-8 remains.
+## Status: Done — all 8 stories complete.
 
 ## Stories
 
@@ -13,7 +13,7 @@
 | ph-0-us-5 | Persistent anonymous device identifier on first launch | Parent | — | Done |
 | ph-0-us-6 | Firestore schema and security rules scoped to device identity | Backend | ph-0-us-5 | Done |
 | ph-0-us-7 | Sign in anonymously and persist device identity on first launch | Frontend | ph-0-us-5 | Done |
-| ph-0-us-8 | Basic navigation shell across core sections | Frontend | — | Not Started |
+| ph-0-us-8 | Basic navigation shell across core sections | Frontend | — | Done |
 
 ## Notes
 - ph-0-us-1 and ph-0-us-8 have no Backend/Frontend split — both are pure client-side setup
@@ -27,3 +27,15 @@
   see ph-0-us-6's Context section for why (server-side enforceability via
   `request.auth.uid`). This is the identifier every later phase's per-user Firestore data
   (test attempts, driving sessions, test outcomes) will be scoped under.
+- **Navigation**: React Navigation (not Expo Router) — see ph-0-us-8's Tasks for why. Not a
+  hard lock-in, just the lower-disruption choice given `App.tsx`'s existing `AuthProvider`
+  wiring; revisit if a later phase's needs (e.g. deep linking) push toward Expo Router.
+- **Design system**: `src/theme/tokens.ts` mirrors the locked design canvas
+  (`docs/design/mockups.md`) — "Teal & Coral" palette, Outfit + Plus Jakarta Sans type, 4px
+  spacing/radius scale. All new screens/components should pull from these tokens rather than
+  hand-picking colors/sizes; if the canvas's locked choices change, migrate `tokens.ts` (and
+  grep for any hardcoded values that drifted from it) rather than letting the two diverge.
+- **Known gaps carried out of Phase 0, not blockers**: ph-0-us-1's iOS native project
+  (`ios/`) isn't generated (needs macOS/Linux or EAS Build — this repo is worked from
+  Windows); ph-0-us-7's offline/no-connection path is implemented but not device-tested
+  (no airplane-mode run performed).

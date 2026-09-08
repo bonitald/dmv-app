@@ -51,6 +51,8 @@ const config: ExpoConfig = {
     '@react-native-firebase/app',
     '@react-native-firebase/analytics',
     '@react-native-firebase/auth',
+    'expo-font',
+    'expo-splash-screen',
   ],
 };
 

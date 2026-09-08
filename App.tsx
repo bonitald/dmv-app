@@ -1,10 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from 'expo-font';
 import Constants from 'expo-constants';
 import { getApp } from '@react-native-firebase/app';
 import { getFirestore, doc, setDoc, serverTimestamp } from '@react-native-firebase/firestore';
 import { AuthProvider, useAuth } from './src/auth/AuthProvider';
+import { RootNavigator } from './src/navigation/RootNavigator';
+import { colors, fontsToLoad, radius, spacing, typography } from './src/theme/tokens';
+
+SplashScreen.preventAutoHideAsync();
 
 // ph-0-us-4/ph-0-us-6/ph-0-us-7 smoke test: confirms Firestore + Analytics are wired to the
 // right Firebase project *and* that the signed-in device can read/write its own users/{uid}
@@ -24,13 +30,13 @@ async function runFirebaseSmokeTest(uid: string): Promise<string> {
 function NoConnectionScreen({ onRetry }: { onRetry: () => void }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>No connection</Text>
-      <Text style={styles.debug}>
+      <Text style={typography.h1}>No connection</Text>
+      <Text style={[typography.body, styles.message]}>
         DMV Prep needs a connection the first time you open it. Check your connection and try
         again.
       </Text>
-      <Pressable style={styles.button} onPress={onRetry}>
-        <Text style={styles.buttonText}>Try again</Text>
+      <Pressable style={styles.button} onPress={onRetry} accessibilityRole="button">
+        <Text style={[typography.bodySemibold, styles.buttonText]}>Try again</Text>
       </Pressable>
     </View>
   );
@@ -59,7 +65,7 @@ function AppContent() {
   if (status === 'loading') {
     return (
       <View style={styles.container}>
-        <StatusBar style="auto" />
+        <StatusBar style="dark" />
       </View>
     );
   }
@@ -67,22 +73,41 @@ function AppContent() {
   if (status === 'error') {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Something went wrong</Text>
-        {__DEV__ && <Text style={styles.debug}>{error}</Text>}
+        <Text style={typography.h1}>Something went wrong</Text>
+        {__DEV__ && <Text style={[typography.small, styles.message]}>{error}</Text>}
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      {__DEV__ && <Text style={styles.debug}>{smokeTestStatus}</Text>}
-      <StatusBar style="auto" />
+    <View style={{ flex: 1 }}>
+      <RootNavigator />
+      {__DEV__ && (
+        <View style={styles.debugBanner} pointerEvents="none">
+          <Text style={typography.small}>{smokeTestStatus}</Text>
+        </View>
+      )}
     </View>
   );
 }
 
 export default function App() {
+  const [fontsLoaded, fontsError] = useFonts(fontsToLoad);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontsError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontsError]);
+
+  useEffect(() => {
+    onLayoutRootView();
+  }, [onLayoutRootView]);
+
+  if (!fontsLoaded && !fontsError) {
+    return null;
+  }
+
   return (
     <AuthProvider>
       <AppContent />
@@ -93,31 +118,36 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: spacing.space5,
+    gap: spacing.space2,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  debug: {
-    marginTop: 12,
-    fontSize: 12,
-    color: '#888',
-    paddingHorizontal: 24,
+  message: {
     textAlign: 'center',
+    color: colors.inkSoft,
   },
   button: {
-    marginTop: 20,
-    backgroundColor: '#1a73e8',
-    paddingVertical: 10,
-    paddingHorizontal: 24,
-    borderRadius: 6,
+    marginTop: spacing.space5,
+    backgroundColor: colors.primary,
+    paddingVertical: spacing.space3,
+    paddingHorizontal: spacing.space6,
+    borderRadius: radius.button,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: '600',
+    color: colors.surface,
+  },
+  debugBanner: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: colors.surface,
+    paddingVertical: spacing.space1,
+    paddingHorizontal: spacing.space3,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+    zIndex: 10,
   },
 });
