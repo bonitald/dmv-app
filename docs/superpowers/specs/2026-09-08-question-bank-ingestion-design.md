@@ -40,6 +40,15 @@ truth for progress/resumability in Phase B.
 
 ### Phase B — Chunk Processing (looped, resumable)
 
+Each chunk is processed by a **fresh subagent dispatch** (a separate `Agent` tool call per
+chunk), never as sequential turns within one ongoing conversation. At 36 pages, context-window
+exhaustion isn't a real risk either way, but dispatching fresh per chunk keeps each chunk's
+context identical in shape regardless of position in the run — chunk 25 sees exactly the same
+thing chunk 1 does (its own page range's text plus the chunk's title/description from the plan),
+with no accumulated prior output to drift against. The actual risk at this scale is hallucination
+from thin source material on a given page, not context length — that's what the "don't fabricate
+beyond the source pages" self-check exists to catch, independent of how chunks are dispatched.
+
 For each chunk in the plan with `status: 'pending'` (in order):
 
 1. Re-read that chunk's page range (title + description from the plan give the subagent context
