@@ -49,6 +49,7 @@
     "test:rules": "firebase emulators:exec --only firestore \"jest --config jest.rules.config.js\"",
     "test:question-bank": "firebase emulators:exec --only firestore \"jest --config jest.scripts.config.js\"",
     "qb:write-chunk-plan": "tsx scripts/question-bank/write-chunk-plan.ts",
+    "qb:read-chunk-plan": "tsx scripts/question-bank/read-chunk-plan.ts",
     "qb:update-chunk-status": "tsx scripts/question-bank/update-chunk-status.ts",
     "qb:write-questions": "tsx scripts/question-bank/write-questions.ts"
   },
