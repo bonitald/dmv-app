@@ -111,6 +111,9 @@ ingestionRuns/{runId}
     {
       chunkId: string
       title: string            // e.g. "Right-of-Way at Intersections"
+      description: string      // what this chunk covers — a fresh Phase B dispatch has no
+                                // memory of Phase A's reasoning, so this must be persisted,
+                                // not just passed in-conversation
       pageStart: number
       pageEnd: number
       status: 'pending' | 'done' | 'error'
