@@ -70,6 +70,36 @@ This should be driven as a **loop within one Claude Code session** using the SDK
 iterative-dispatch pattern: one task per chunk, dispatched (or processed inline) in sequence,
 each task's completion advancing to the next until the plan is exhausted or the user stops it.
 
+## Execution mechanics
+
+Two implementation details the phases above depend on:
+
+**Reading the PDF.** Subagents read pages directly via Claude Code's built-in `Read` tool, which
+supports PDFs natively (up to 20 pages per call — so Phase A's full 36-page read is two calls;
+Phase B's per-chunk reads are typically one call each). No PDF-parsing library or pre-extraction
+step is needed.
+
+**Writing to Firestore.** A subagent has no direct Firestore-write tool — it can only shell out
+via `Bash`. Firestore's security rules (`firestore.rules`) already deny-all client access outside
+`users/{uid}`, which is correct and unrelated to this pipeline: ingestion writes go through the
+**Admin SDK**, which bypasses security rules entirely, authenticated via **Application Default
+Credentials** (`gcloud auth application-default login`, already set up) rather than a downloaded
+service account key.
+
+This means adding:
+
+- `firebase-admin` as a new devDependency.
+- A `scripts/question-bank/` CLI with small, single-purpose entry points that each subagent
+  invokes via `Bash`, e.g.:
+  - `write-chunk-plan <path-to-json>` — writes the Phase A `ingestionRuns/{runId}` doc.
+  - `update-chunk-status <runId> <chunkId> <status> [questionsGenerated|error]` — Phase B's
+    per-chunk status update.
+  - `write-questions <path-to-json>` — batch-writes one chunk's generated `questions/{id}` docs.
+
+Each subagent writes its generated content to a JSON file (in the session scratchpad) and calls
+the relevant script with that file's path — keeping the actual Firestore/Admin SDK code in one
+small, testable place rather than asking subagents to construct writes inline.
+
 ## Data schema
 
 ```
