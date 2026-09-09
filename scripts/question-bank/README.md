@@ -37,6 +37,18 @@ Input JSON shape:
 
 Prints the generated `runId` to stdout — record it, every later command needs it.
 
+## `qb:read-chunk-plan` (resuming an interrupted run)
+
+```bash
+npm run qb:read-chunk-plan -- <runId>
+```
+
+Prints the full `ingestionRuns/<runId>` document as JSON — `sourceDoc`, overall `status`, and
+every chunk's `status`/`questionsGenerated`/`error`. If a driving session (or a Claude Code
+session) is interrupted partway through the handbook, run this first: it tells you exactly
+which chunks are still `pending` versus `done`/`error`, so Phase B dispatches can resume at the
+first non-`done` chunk instead of restarting from the beginning or requiring hand-tracked state.
+
 ## `qb:update-chunk-status` (Phase B, once per chunk)
 
 ```bash
