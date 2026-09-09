@@ -64,14 +64,25 @@ Create `scripts/question-bank/tsconfig.json`:
 Create `jest.scripts.config.js`:
 
 ```js
+const path = require('path');
+
 /** Jest config for scripts/question-bank/ — separate from jest.rules.config.js and whatever
- * the app itself eventually uses (e.g. jest-expo), which need different presets. */
+ * the app itself eventually uses (e.g. jest-expo), which need different presets.
+ *
+ * Uses `roots` and native `path.join` instead of the `<rootDir>` token in `testMatch`/
+ * `transform`: if this repo is ever checked out under a path with a dot-prefixed segment
+ * (e.g. a worktree under `.claude/worktrees/<name>`), Jest's `<rootDir>` token substitution
+ * corrupts the resulting string on Windows — it treats the backslash before the dot as a
+ * glob escape and skips converting it, silently merging two path segments into one and
+ * matching zero test files. Computing paths natively here avoids that bug entirely
+ * (confirmed by hitting exactly this failure while setting up this plan's own worktree). */
 module.exports = {
   testEnvironment: 'node',
-  rootDir: '.',
-  testMatch: ['<rootDir>/scripts/question-bank/**/*.test.ts'],
+  rootDir: __dirname,
+  roots: [path.join(__dirname, 'scripts', 'question-bank')],
+  testMatch: ['**/*.test.ts'],
   transform: {
-    '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/scripts/question-bank/tsconfig.json' }],
+    '^.+\\.ts$': ['ts-jest', { tsconfig: path.join(__dirname, 'scripts', 'question-bank', 'tsconfig.json') }],
   },
 };
 ```
