@@ -25,16 +25,16 @@
 
 ---
 
-## Phase 0: Project Foundations — Not Started
+## Phase 0: Project Foundations — Done
 
 No content dependency; this is the scaffold everything else builds on.
 
-- [ ] As a developer, I have an Expo-managed React Native project scaffolded (via `expo prebuild`
+- [x] As a developer, I have an Expo-managed React Native project scaffolded (via `expo prebuild`
   + custom dev client, not Expo Go — required later for the driving-timer native modules per
   `phase-0-findings.md`), so subsequent phases have somewhere to build.
-- [ ] As a developer, I have a Firebase project provisioned (Firestore, Hosting, Analytics) and
+- [x] As a developer, I have a Firebase project provisioned (Firestore, Hosting, Analytics) and
   wired into the app via environment config, so later phases can read/write real data.
-- [ ] As a teen user, the app assigns me a persistent anonymous device identifier on first launch
+- [x] As a teen user, the app assigns me a persistent anonymous device identifier on first launch
   (no signup/login screen), so my practice history, driving log, and pass/fail report can be
   linked together across sessions on this device.
   - Decided: implemented via Firebase Anonymous Authentication (`signInAnonymously()`), not a
@@ -43,7 +43,7 @@ No content dependency; this is the scaffold everything else builds on.
   - Known limitation carried from `prd.md` Section 9: this identity does not survive a reinstall
     or device switch. Flag this limitation in-app if/when it becomes user-visible (e.g. before
     driving-log export) rather than silently losing data.
-- [ ] As a developer, I have basic navigation (tab or stack) between Study, Practice Tests,
+- [x] As a developer, I have basic navigation (tab or stack) between Study, Practice Tests,
   Driving Log, and Progress/Outcome sections, so later phases have a home to land in.
 
 ---
@@ -190,9 +190,9 @@ Depends on: Phase 4, 5, 6, 7 (a usable end-to-end app to put in front of testers
 
 ---
 
-**Where things stand overall**: no phases have started; the app does not exist yet beyond
-`docs/prd.md` and the completed Phase-0-findings spike on the driving-timer indicator
-(`docs/phase-0-findings.md`). Firebase is the chosen backend (no separate backend build-out
+**Where things stand overall**: Phase 0 (project foundations) is done — the Expo project is
+scaffolded, Firebase is wired in, anonymous auth is implemented, and basic navigation exists.
+Phases 1–8 have not started. Firebase is the chosen backend (no separate backend build-out
 phases needed — see the note at the top of this doc). Several phases carry open questions
 inherited from `prd.md` Section 9 (auth persistence, notification mechanism, driving-log field
 requirements, beta distribution mechanism) that should be resolved before or during that phase
