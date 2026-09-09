@@ -1,11 +1,11 @@
-import { readFileSync } from 'node:fs';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getDb } from './adminApp';
+import { readJsonFile } from './readJsonFile';
 import { validateChunkPlan } from './validate';
 import type { ChunkRecord, IngestionRunRecord } from './types';
 
 export async function writeChunkPlan(jsonPath: string): Promise<string> {
-  const raw = JSON.parse(readFileSync(jsonPath, 'utf-8'));
+  const raw = readJsonFile(jsonPath);
   const plan = validateChunkPlan(raw);
 
   const chunks: ChunkRecord[] = plan.chunks.map((chunk) => ({

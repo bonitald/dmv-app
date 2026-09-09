@@ -6,7 +6,11 @@ content. Subagents invoke these via `Bash` — they do not have direct Firestore
 
 All three commands authenticate via Application Default Credentials
 (`gcloud auth application-default login`) against the `dmv-app-dev` Firestore project by
-default. Override the project with `GOOGLE_CLOUD_PROJECT=<project-id>`.
+default. Override the project with `GOOGLE_CLOUD_PROJECT=<project-id>`. Never point
+`GOOGLE_CLOUD_PROJECT` at `dmv-app-prod` when running these scripts or their tests.
+
+Run this package's own test suite with `npm run test:question-bank` (starts the Firestore
+emulator and runs the full `jest.scripts.config.js` suite against it).
 
 ## `qb:write-chunk-plan` (Phase A, run once)
 
@@ -36,9 +40,13 @@ Prints the generated `runId` to stdout — record it, every later command needs 
 ## `qb:update-chunk-status` (Phase B, once per chunk)
 
 ```bash
+npm run qb:update-chunk-status -- <runId> <chunkId> pending
 npm run qb:update-chunk-status -- <runId> <chunkId> done --questionsGenerated 6
 npm run qb:update-chunk-status -- <runId> <chunkId> error --error "page 13 unreadable"
 ```
+
+`status` must be exactly one of `pending`, `done`, or `error` — `pending` is used to put a
+chunk back in flight (e.g. a manual retry).
 
 Marking the last remaining chunk `done` or `error` automatically flips the run's own `status`
 to `complete`.

@@ -56,6 +56,19 @@ describe('updateChunkStatus', () => {
     expect(snap.data()?.status).toBe('complete');
   });
 
+  it('reverts a complete run to processing when a chunk is retried back to pending', async () => {
+    const runId = await seedRun([
+      { ...baseChunk, status: 'done' },
+      { ...baseChunk, chunkId: 'c2', status: 'done' },
+    ]);
+    await getDb().collection('ingestionRuns').doc(runId).update({ status: 'complete' });
+
+    await updateChunkStatus(runId, 'c1', 'pending');
+
+    const snap = await getDb().collection('ingestionRuns').doc(runId).get();
+    expect(snap.data()?.status).toBe('processing');
+  });
+
   it('rejects an unknown chunkId', async () => {
     const runId = await seedRun([baseChunk]);
 

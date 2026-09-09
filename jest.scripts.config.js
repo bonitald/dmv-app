@@ -15,6 +15,7 @@ module.exports = {
   rootDir: __dirname,
   roots: [path.join(__dirname, 'scripts', 'question-bank')],
   testMatch: ['**/*.test.ts'],
+  globalSetup: path.join(__dirname, 'scripts', 'question-bank', 'jest.globalSetup.js'),
   transform: {
     '^.+\\.ts$': ['ts-jest', { tsconfig: path.join(__dirname, 'scripts', 'question-bank', 'tsconfig.json') }],
   },

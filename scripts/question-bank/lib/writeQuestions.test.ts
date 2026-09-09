@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -11,11 +12,16 @@ function writeTempJson(data: unknown): string {
   return filePath;
 }
 
+function uniqueConceptId(): string {
+  return `concept-${randomUUID()}`;
+}
+
 describe('writeQuestions', () => {
   it('writes questions with status derived from selfCheck.passed', async () => {
+    const conceptId = uniqueConceptId();
     const filePath = writeTempJson([
       {
-        conceptId: 'concept-1',
+        conceptId,
         chunkId: 'c1',
         sourceRef: 'p.5',
         type: 'fact',
@@ -25,7 +31,7 @@ describe('writeQuestions', () => {
         selfCheck: { passed: true, notes: '' },
       },
       {
-        conceptId: 'concept-1',
+        conceptId,
         chunkId: 'c1',
         sourceRef: 'p.5',
         type: 'scenario',
@@ -39,7 +45,7 @@ describe('writeQuestions', () => {
     const result = await writeQuestions(filePath);
     expect(result.written).toBe(2);
 
-    const snap = await getDb().collection('questions').where('conceptId', '==', 'concept-1').get();
+    const snap = await getDb().collection('questions').where('conceptId', '==', conceptId).get();
     const statuses = snap.docs.map((d) => d.data().status).sort();
     expect(statuses).toEqual(['flagged', 'pending_review']);
 
@@ -51,11 +57,12 @@ describe('writeQuestions', () => {
   });
 
   it('rejects an invalid questions file without writing anything', async () => {
-    const filePath = writeTempJson([{ conceptId: 'x' }]);
+    const conceptId = uniqueConceptId();
+    const filePath = writeTempJson([{ conceptId }]);
 
     await expect(writeQuestions(filePath)).rejects.toThrow();
 
-    const snap = await getDb().collection('questions').where('conceptId', '==', 'x').get();
+    const snap = await getDb().collection('questions').where('conceptId', '==', conceptId).get();
     expect(snap.empty).toBe(true);
   });
 });

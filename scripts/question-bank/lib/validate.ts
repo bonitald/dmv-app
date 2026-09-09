@@ -1,4 +1,4 @@
-import type { ChunkPlanInput, QuestionInput } from './types';
+import type { ChunkPlanInput, ChunkStatus, QuestionInput } from './types';
 
 export function validateChunkPlan(data: unknown): ChunkPlanInput {
   if (typeof data !== 'object' || data === null) {
@@ -95,4 +95,15 @@ export function validateQuestions(data: unknown): QuestionInput[] {
   });
 
   return data as QuestionInput[];
+}
+
+const VALID_CHUNK_STATUSES: ReadonlySet<string> = new Set(['pending', 'done', 'error']);
+
+export function validateChunkStatusArg(status: unknown): ChunkStatus {
+  if (typeof status !== 'string' || !VALID_CHUNK_STATUSES.has(status)) {
+    throw new Error(
+      `Invalid status "${String(status)}" — must be one of: pending, done, error`
+    );
+  }
+  return status as ChunkStatus;
 }

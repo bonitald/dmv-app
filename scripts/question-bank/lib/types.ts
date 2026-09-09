@@ -40,7 +40,7 @@ export type QuestionStatus = 'pending_review' | 'flagged' | 'approved' | 'reject
 
 export interface QuestionSelfCheck {
   passed: boolean;
-  notes: string;
+  notes?: string;
 }
 
 export interface QuestionInput {

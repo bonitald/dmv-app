@@ -38,7 +38,7 @@ export async function updateChunkStatus(
 
     tx.update(ref, {
       chunks: updatedChunks,
-      status: allSettled ? 'complete' : data.status,
+      status: allSettled ? 'complete' : 'processing',
     });
   });
 }

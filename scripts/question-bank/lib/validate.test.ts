@@ -1,4 +1,4 @@
-import { validateChunkPlan, validateQuestions } from './validate';
+import { validateChunkPlan, validateChunkStatusArg, validateQuestions } from './validate';
 
 describe('validateChunkPlan', () => {
   const validPlan = {
@@ -80,5 +80,19 @@ describe('validateQuestions', () => {
     expect(() =>
       validateQuestions([{ ...validQuestion, selfCheck: { passed: false, notes: '' } }])
     ).toThrow('no "selfCheck.notes"');
+  });
+});
+
+describe('validateChunkStatusArg', () => {
+  it.each(['pending', 'done', 'error'])('accepts "%s"', (status) => {
+    expect(validateChunkStatusArg(status)).toBe(status);
+  });
+
+  it('rejects an invalid status string', () => {
+    expect(() => validateChunkStatusArg('Done')).toThrow('Invalid status');
+  });
+
+  it('rejects a non-string value', () => {
+    expect(() => validateChunkStatusArg(undefined)).toThrow('Invalid status');
   });
 });
