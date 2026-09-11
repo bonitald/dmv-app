@@ -3,15 +3,15 @@
 ## aggressive-driving
 - aggressive-driving-criminal-acts (2 questions, status: approved)
 - aggressive-driving-definition (3 questions, status: approved)
-- aggressive-driving-qualifying-acts (3 questions, status: pending_review)
+- aggressive-driving-qualifying-acts (3 questions, status: approved)
 - protect-yourself-from-aggressive-drivers (2 questions, status: pending_review)
 - report-aggressive-drivers-star-csp (3 questions, status: pending_review)
 - self-assessment-aggressive-driver-risk (3 questions, status: pending_review)
 - tips-avoid-becoming-aggressive-driver (3 questions, status: pending_review)
 
 ## basic-driving-controls
-- backing-up-accelerate-steer-technique (3 questions, status: pending_review)
-- backing-up-brake-shift-reverse (3 questions, status: pending_review)
+- backing-up-accelerate-steer-technique (3 questions, status: approved)
+- backing-up-brake-shift-reverse (3 questions, status: approved)
 - backing-up-check-behind-first (3 questions, status: pending_review)
 - backing-up-hand-body-position (3 questions, status: pending_review)
 - backing-up-mirrors-limitation (3 questions, status: pending_review)
