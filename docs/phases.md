@@ -57,9 +57,15 @@ Depends on: Phase 0 (Firebase wiring).
   items), matching `prd.md` Section 7's data entities.
 - [ ] As a content author, I can add/update questions in Firestore without an app release, so the
   question bank can grow after launch.
-- [ ] As a teen user, question and flashcard content is cached locally on device after first
-  download, so I can study offline once content has been fetched once (per `prd.md`'s offline
-  assumption, Section 7/10 — confirm this is still wanted before building the caching layer).
+- [ ] As a teen user, once I start a practice test, that test's specific question set is fetched
+  via a server-assembled call and cached locally on my device, so I can continue that test
+  uninterrupted if I go offline mid-test. Scoped narrowly to the in-progress test's questions
+  only — **not** the full question bank — to prevent a client from bulk-extracting question-bank
+  content via direct Firestore reads or wholesale local caching. Question delivery to the client
+  goes through a callable Cloud Function (server picks/returns a limited set), not a direct
+  Firestore query, to close that extraction path at the read layer, not just in the cache.
+  General flashcard-mode (Phase 2) offline caching is explicitly out of scope for this phase —
+  revisit if/when Phase 2 needs it.
 - [ ] As a product owner, the initial question bank is paraphrased/generated from the CO DMV
   handbook, not copied verbatim, per the legal note in `prd.md` Section 8. Content authoring
   itself is outside this phase's engineering scope but the schema must support a `source
