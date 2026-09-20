@@ -72,14 +72,38 @@
     unchanged.
 
 ## careless-reckless-and-distracted-driving
-- distracted-driving-definition (3 questions, status: pending_review)
-- distracted-vs-reckless-legal-distinction (2 questions, status: pending_review)
-- distraction-prevention-tips (3 questions, status: pending_review)
-- impairment-plus-distraction-risk (2 questions, status: pending_review)
-- mobile-device-manual-use-law (3 questions, status: pending_review)
-- reckless-driving-definition (3 questions, status: pending_review)
-- reckless-driving-points-penalty (3 questions, status: pending_review)
-- texting-careless-penalty (3 questions, status: pending_review)
+- distracted-driving-definition (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook says/according to" framing
+    removed and near-verbatim definition clauses paraphrased; content unchanged.
+- distracted-vs-reckless-legal-distinction (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — "based on the handbook" framing removed from stem;
+    content unchanged.
+- distraction-prevention-tips (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook-citation framing removed and
+    near-verbatim tip wording paraphrased; content unchanged.
+- impairment-plus-distraction-risk (2 questions, status: approved)
+  - NOTE: both questions reworded during review — "according to the handbook" framing removed
+    and near-verbatim "ability to manage multiple tasks" clause paraphrased; content unchanged.
+- mobile-device-manual-use-law (3 questions, status: flagged)
+  - ISSUE: question FGSnPBSGsgY4SRosJZ2F asks specifically when MANUAL use of a mobile device
+    is allowed, but its correct answer says "only with a hands-free device, or in an emergency
+    situation" — using a hands-free device is by definition NOT manual use, so it can't satisfy
+    a "manual use" exception. Handbook p.27: device use in general is barred unless hands-free or
+    an emergency, but manual use specifically (texting, tapping the screen) is only excused in an
+    emergency. Needs a content-team decision: either narrow correctAnswer to "Only in an
+    emergency situation," or broaden the question to ask about mobile device use generally
+    rather than manual use specifically. The other 2 questions in this concept were reworded for
+    verbatim phrasing (same hands-free/manual-use nuance was tightened in one of them without
+    changing its correct bottom-line answer) and approved.
+- reckless-driving-definition (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "the Colorado Driver Handbook" citation removed
+    from stem and a 10+ word near-verbatim definition paraphrased; content unchanged.
+- reckless-driving-points-penalty (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim legal phrase paraphrased; content
+    unchanged.
+- texting-careless-penalty (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — answer choices reused the handbook's exact
+    "fined or charged with a misdemeanor" phrase; content unchanged.
 
 ## changing-lanes-and-passing
 - bicyclist-3-foot-buffer (3 questions, status: pending_review)
