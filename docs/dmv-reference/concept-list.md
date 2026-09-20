@@ -106,18 +106,42 @@
     "fined or charged with a misdemeanor" phrase; content unchanged.
 
 ## changing-lanes-and-passing
-- bicyclist-3-foot-buffer (3 questions, status: pending_review)
-- blind-spot-definition (3 questions, status: pending_review)
-- illegal-passing-behaviors (3 questions, status: pending_review)
-- lane-change-checks (3 questions, status: pending_review)
-- lane-change-signal-timing (3 questions, status: pending_review)
-- no-pass-200ft-oncoming (2 questions, status: pending_review)
-- no-pass-near-intersection-railroad (2 questions, status: pending_review)
-- no-pass-obstructed-view (3 questions, status: pending_review)
-- no-pass-solid-yellow (2 questions, status: pending_review)
-- one-vehicle-at-a-time (2 questions, status: pending_review)
-- passing-left-right-rule (3 questions, status: pending_review)
-- passing-procedure (3 questions, status: pending_review)
+- bicyclist-3-foot-buffer (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — a 13-word verbatim handbook sentence paraphrased;
+    content unchanged.
+- blind-spot-definition (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim blind-spot descriptions
+    paraphrased; content unchanged.
+- illegal-passing-behaviors (3 questions, status: approved)
+  - NOTE: 3 questions reworded during review — verbatim handbook clauses (school bus stop arm,
+    exceeding speed limit, marked no-passing zone) paraphrased; content unchanged.
+- lane-change-checks (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the handbook's blind-spot-check
+    or mirror-check clause verbatim or near-verbatim; content unchanged.
+- lane-change-signal-timing (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — both repeated the handbook's "3 seconds or 200
+    feet" clause verbatim; content unchanged.
+- no-pass-200ft-oncoming (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem mirrored handbook sentence structure around
+    the 200-foot rule; content unchanged.
+- no-pass-near-intersection-railroad (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem lifted "feet of an intersection or railroad
+    crossing" verbatim; content unchanged.
+- no-pass-obstructed-view (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer was an exact unmodified quote of the
+    handbook's curve/hill bullet; content unchanged.
+- no-pass-solid-yellow (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem closely tracked handbook wording; content
+    unchanged.
+- one-vehicle-at-a-time (2 questions, status: approved)
+  - NOTE: both questions reworded during review — both reused the handbook's "one vehicle at a
+    time" idiom verbatim; content unchanged.
+- passing-left-right-rule (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim passing-on-right and
+    off-pavement-passing clauses paraphrased; content unchanged.
+- passing-procedure (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer was the handbook sentence with only
+    synonym swaps; content unchanged.
 
 ## construction-zone-driving
 - doubled-fines-work-zone (3 questions, status: pending_review)
