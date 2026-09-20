@@ -391,21 +391,24 @@ Only windshield-wipers-check and steering-system-check each had one question lef
 - windshield-wipers-check (3 questions, status: approved)
 
 ## hills-curves-and-night-driving
-- curves-accelerate-after-middle (2 questions, status: pending_review)
-- curves-slow-before-entering (3 questions, status: pending_review)
-- hills-curves-hidden-obstructions (3 questions, status: pending_review)
-- hills-slow-to-crest (2 questions, status: pending_review)
-- night-bike-motorcycle-single-light (2 questions, status: pending_review)
-- night-dim-500ft-oncoming (3 questions, status: pending_review)
-- night-headlights-required (3 questions, status: pending_review)
-- night-high-beam-rural-use (2 questions, status: pending_review)
-- night-increase-following-distance (2 questions, status: pending_review)
-- night-low-beam-200ft-following (2 questions, status: pending_review)
-- night-no-driving-with-parking-lights-only (2 questions, status: pending_review)
-- night-oncoming-glare-technique (2 questions, status: pending_review)
-- night-parked-vehicle-lights (3 questions, status: pending_review)
-- night-slow-in-poorly-lit-areas (2 questions, status: pending_review)
-- night-watch-for-unlit-vehicles (2 questions, status: pending_review)
+NOTE (chunk-wide): 21 of 35 questions reworded during review — near-verbatim answer clauses (or,
+for one question, a near-verbatim stem) paraphrased; facts and numeric distances were correct
+throughout. 14 questions approved as-is.
+- curves-accelerate-after-middle (2 questions, status: approved)
+- curves-slow-before-entering (3 questions, status: approved)
+- hills-curves-hidden-obstructions (3 questions, status: approved)
+- hills-slow-to-crest (2 questions, status: approved)
+- night-bike-motorcycle-single-light (2 questions, status: approved)
+- night-dim-500ft-oncoming (3 questions, status: approved)
+- night-headlights-required (3 questions, status: approved)
+- night-high-beam-rural-use (2 questions, status: approved)
+- night-increase-following-distance (2 questions, status: approved)
+- night-low-beam-200ft-following (2 questions, status: approved)
+- night-no-driving-with-parking-lights-only (2 questions, status: approved)
+- night-oncoming-glare-technique (2 questions, status: approved)
+- night-parked-vehicle-lights (3 questions, status: approved)
+- night-slow-in-poorly-lit-areas (2 questions, status: approved)
+- night-watch-for-unlit-vehicles (2 questions, status: approved)
 
 ## how-you-can-lose-your-license
 - license-loss-child-support (3 questions, status: pending_review)
