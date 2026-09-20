@@ -187,15 +187,31 @@
     protected-persons list paraphrased; content unchanged.
 
 ## defensive-driving-and-scanning
-- cell-phone-handheld-law (3 questions, status: pending_review)
-- check-mirrors-frequency (3 questions, status: pending_review)
-- look-ahead-distance (3 questions, status: pending_review)
-- look-to-the-sides (3 questions, status: pending_review)
-- proper-hand-position (3 questions, status: pending_review)
-- scanning-overview (3 questions, status: pending_review)
-- seatbelt-buckle-up (3 questions, status: pending_review)
-- texting-while-driving-law (3 questions, status: pending_review)
-- turning-technique (3 questions, status: pending_review)
+- cell-phone-handheld-law (3 questions, status: approved)
+- check-mirrors-frequency (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook recommend" framing removed
+    and a near-verbatim lane-change/hill mirror-check clause paraphrased; content unchanged.
+- look-ahead-distance (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — handbook framing removed and near-verbatim
+    "10 seconds ahead" clause paraphrased; content unchanged.
+- look-to-the-sides (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim answer clauses paraphrased,
+    one also had "what does the handbook say" framing removed; content unchanged.
+- proper-hand-position (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — handbook framing removed and a near-verbatim
+    "palm of your hand" clause paraphrased; content unchanged.
+- scanning-overview (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "look left, right, then left again" clauses paraphrased; content unchanged.
+- seatbelt-buckle-up (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "all people in the vehicle" clauses paraphrased; content unchanged.
+- texting-while-driving-law (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim exception clause paraphrased;
+    content unchanged.
+- turning-technique (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "slide through your fingers" clause paraphrased; content unchanged.
 
 ## driver-fitness-vision-hearing-fatigue
 - earphones-exceptions (3 questions, status: pending_review)
