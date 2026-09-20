@@ -49,14 +49,27 @@
     from the handbook; content unchanged.
 
 ## bicyclist-laws-and-etiquette
-- avoid-horn-near-bicyclists (3 questions, status: pending_review)
-- bicyclist-hand-signals (4 questions, status: pending_review)
-- bicyclist-side-by-side (3 questions, status: pending_review)
-- bicyclist-stop-as-yield-law (3 questions, status: pending_review)
-- bike-lane-intersection-row (3 questions, status: pending_review)
-- bike-lane-motorist-restrictions (3 questions, status: pending_review)
-- dutch-reach (3 questions, status: pending_review)
-- three-foot-passing-rule (4 questions, status: pending_review)
+- avoid-horn-near-bicyclists (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook advises/says" framing removed
+    and near-verbatim answer clauses paraphrased; content unchanged.
+- bicyclist-hand-signals (4 questions, status: approved)
+  - NOTE: 1 question reworded during review — framing/verbatim-clause fix; content unchanged.
+- bicyclist-side-by-side (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim answer clauses paraphrased;
+    content unchanged.
+- bicyclist-stop-as-yield-law (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem and answer both copied the handbook almost
+    word-for-word; content unchanged.
+- bike-lane-intersection-row (3 questions, status: approved)
+- bike-lane-motorist-restrictions (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "what does the handbook say" framing removed
+    and near-verbatim answer clauses paraphrased; content unchanged.
+- dutch-reach (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "the handbook recommend" framing removed from
+    question stem; content unchanged.
+- three-foot-passing-rule (4 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim answer clause paraphrased; content
+    unchanged.
 
 ## careless-reckless-and-distracted-driving
 - distracted-driving-definition (3 questions, status: pending_review)
