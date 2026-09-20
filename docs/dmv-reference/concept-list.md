@@ -293,16 +293,37 @@
     program" clause paraphrased; content unchanged.
 
 ## emergency-collision-avoidance
-- animal-crossing-slow-down (3 questions, status: pending_review)
-- animal-sudden-evasive-action-risk (3 questions, status: pending_review)
-- run-off-road-vs-head-on (3 questions, status: pending_review)
-- speeding-up-to-avoid-collision (3 questions, status: pending_review)
-- stopping-with-abs (3 questions, status: pending_review)
-- stopping-without-abs (3 questions, status: pending_review)
-- three-options-avoid-collision (3 questions, status: pending_review)
-- turning-quicker-than-stopping (4 questions, status: pending_review)
-- turning-with-abs (3 questions, status: pending_review)
-- turning-without-abs (3 questions, status: pending_review)
+- animal-crossing-slow-down (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — handbook framing removed and near-verbatim
+    "slow down and look for animals" clause paraphrased; content unchanged.
+- animal-sudden-evasive-action-risk (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "retaining control of the vehicle" clause paraphrased; content unchanged.
+- run-off-road-vs-head-on (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and a near-verbatim
+    answer clause paraphrased; content unchanged.
+- speeding-up-to-avoid-collision (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "once the danger has passed" / escape-scenario clauses paraphrased; content unchanged.
+- stopping-with-abs (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim ABS braking-pressure clause and a
+    "brake pedal pushing back" phrase paraphrased; content unchanged.
+- stopping-without-abs (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim non-ABS braking clauses
+    paraphrased; content unchanged.
+- three-options-avoid-collision (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "according to the Colorado Driver Handbook"
+    framing removed; content unchanged.
+- turning-quicker-than-stopping (4 questions, status: approved)
+  - NOTE: all 4 questions reworded during review — near-verbatim clauses paraphrased, 3 also
+    had sourceRef corrected from p.29 to p.28; content unchanged.
+- turning-with-abs (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim "turn your vehicle while
+    braking without skidding" clause paraphrased and sourceRef corrected from p.29 to p.28;
+    content unchanged.
+- turning-without-abs (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim clauses describing the non-ABS
+    turning procedure and turning hazards paraphrased; content unchanged.
 
 ## freeway-entering-and-driving
 - accel-ramp-purpose (3 questions, status: pending_review)
