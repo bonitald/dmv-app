@@ -326,17 +326,43 @@
     turning procedure and turning hazards paraphrased; content unchanged.
 
 ## freeway-entering-and-driving
-- accel-ramp-purpose (3 questions, status: pending_review)
-- deceleration-lane-exit (3 questions, status: pending_review)
-- entering-ramp-procedure (3 questions, status: pending_review)
-- exit-tips (3 questions, status: pending_review)
-- metered-ramps (3 questions, status: pending_review)
-- move-over-merging-traffic (3 questions, status: pending_review)
-- no-median-island (3 questions, status: pending_review)
-- no-stop-accel-lane-yield (3 questions, status: pending_review)
-- passing-lane-leftmost (3 questions, status: pending_review)
-- rightmost-lane-slower (3 questions, status: pending_review)
-- solid-white-line-merge (3 questions, status: pending_review)
+NOTE (chunk-wide): every question in this chunk has 3 answer choices, while all other chunks
+reviewed so far have 4. Review agents proposed padding in a 4th distractor; that was NOT applied
+(it goes beyond rewording), so the original 3-choice structure was kept. Decide whether to
+standardize choice counts across the bank.
+- accel-ramp-purpose (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim "match freeway speed" clauses
+    paraphrased; content unchanged.
+- deceleration-lane-exit (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim slow-down/signal-distance
+    clauses paraphrased; content unchanged.
+- entering-ramp-procedure (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim signal/look/accelerate/merge
+    sequence paraphrased; content unchanged.
+- exit-tips (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim exit-tip bullets paraphrased;
+    content unchanged.
+- metered-ramps (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim ramp-signal clauses
+    paraphrased; content unchanged.
+- move-over-merging-traffic (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim "make room for vehicles
+    entering" clause paraphrased; content unchanged.
+- no-median-island (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — verbatim "across, over or within any median
+    or island" clause paraphrased; content unchanged.
+- no-stop-accel-lane-yield (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim clause paraphrased; content
+    unchanged.
+- passing-lane-leftmost (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    passing-lane list paraphrased; content unchanged.
+- rightmost-lane-slower (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — handbook phrasing/framing removed; content
+    unchanged.
+- solid-white-line-merge (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim "until the solid white line
+    has ended" clause paraphrased; content unchanged.
 
 ## health-emotions-distractions-and-vehicle-checks
 - brake-system-check (3 questions, status: pending_review)
