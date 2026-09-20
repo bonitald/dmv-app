@@ -248,14 +248,29 @@
 - thc-level-no-impairment-correlation (3 questions, status: approved)
 
 ## dui-dwai-definitions-and-bac
-- bac-elimination-rate (3 questions, status: pending_review)
-- bac-factors (3 questions, status: pending_review)
-- bac-threshold-cdl (3 questions, status: pending_review)
-- bac-threshold-general (3 questions, status: pending_review)
-- bac-threshold-under-21 (3 questions, status: pending_review)
-- dui-conviction-basis (3 questions, status: pending_review)
-- dwai-vs-dui-definition (3 questions, status: pending_review)
-- standard-drink-equivalence (3 questions, status: pending_review)
+- bac-elimination-rate (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "according to the handbook" framing removed;
+    content unchanged.
+- bac-factors (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — 2 had handbook framing removed, 1 had a
+    verbatim distractor phrase paraphrased; content unchanged.
+- bac-threshold-cdl (3 questions, status: approved)
+- bac-threshold-general (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "0.08% or higher" tightened to "Over 0.08%" to
+    match the handbook's strict-inequality wording exactly (minor correctness fix, same
+    threshold).
+- bac-threshold-under-21 (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — both incorrectly labeled the under-21 0.02%
+    figure a "per se" threshold; the handbook reserves that term for the 0.08% general
+    threshold only, so the mislabel was removed (minor correctness fix, same numeric value).
+- dui-conviction-basis (3 questions, status: approved)
+- dwai-vs-dui-definition (3 questions, status: approved)
+  - NOTE: 3 questions reworded during review — one had a dropped word in the "DWAI" acronym
+    expansion (corrected to match the handbook's exact statutory term), two had near-verbatim
+    "impaired to the slightest degree" clauses paraphrased.
+- standard-drink-equivalence (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the handbook's standard-drink
+    definition near-verbatim; content unchanged.
 
 ## dui-penalties-and-underage-dui
 - dui-1st-offense-penalties (3 questions, status: pending_review)
