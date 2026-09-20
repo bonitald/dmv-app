@@ -365,26 +365,30 @@ standardize choice counts across the bank.
     has ended" clause paraphrased; content unchanged.
 
 ## health-emotions-distractions-and-vehicle-checks
-- brake-system-check (3 questions, status: pending_review)
-- cellphone-passenger-distraction (3 questions, status: pending_review)
-- distraction-definition (3 questions, status: pending_review)
-- emotions-driving (3 questions, status: pending_review)
-- engine-poor-tune-consequences (3 questions, status: pending_review)
-- exhaust-system-danger (3 questions, status: pending_review)
-- headrest-adjustment (3 questions, status: pending_review)
-- health-conditions-doctor (3 questions, status: pending_review)
-- horn-check (3 questions, status: pending_review)
-- lights-check (3 questions, status: pending_review)
-- loose-objects-safety (3 questions, status: pending_review)
-- minor-health-issues (3 questions, status: pending_review)
-- mirror-adjustment-driver-side (3 questions, status: pending_review)
-- mirror-adjustment-passenger-side (3 questions, status: pending_review)
-- pre-trip-adjustments (3 questions, status: pending_review)
-- steering-system-check (3 questions, status: pending_review)
-- suspension-system-check (3 questions, status: pending_review)
-- tire-wear-effects (3 questions, status: pending_review)
-- vehicle-poor-condition-consequences (3 questions, status: pending_review)
-- windshield-wipers-check (3 questions, status: pending_review)
+NOTE (chunk-wide): 58 of 60 questions reworded during review — nearly all had "according to the
+handbook"-style stem framing and/or near-verbatim answer text; facts were correct throughout.
+Only windshield-wipers-check and steering-system-check each had one question left as-is.
+- brake-system-check (3 questions, status: approved)
+- cellphone-passenger-distraction (3 questions, status: approved)
+- distraction-definition (3 questions, status: approved)
+- emotions-driving (3 questions, status: approved)
+- engine-poor-tune-consequences (3 questions, status: approved)
+- exhaust-system-danger (3 questions, status: approved)
+- headrest-adjustment (3 questions, status: approved)
+- health-conditions-doctor (3 questions, status: approved)
+- horn-check (3 questions, status: approved)
+- lights-check (3 questions, status: approved)
+- loose-objects-safety (3 questions, status: approved)
+- minor-health-issues (3 questions, status: approved)
+- mirror-adjustment-driver-side (3 questions, status: approved)
+  - NOTE: one question also had a distractor that referenced "the handbook" replaced.
+- mirror-adjustment-passenger-side (3 questions, status: approved)
+- pre-trip-adjustments (3 questions, status: approved)
+- steering-system-check (3 questions, status: approved)
+- suspension-system-check (3 questions, status: approved)
+- tire-wear-effects (3 questions, status: approved)
+- vehicle-poor-condition-consequences (3 questions, status: approved)
+- windshield-wipers-check (3 questions, status: approved)
 
 ## hills-curves-and-night-driving
 - curves-accelerate-after-middle (2 questions, status: pending_review)
