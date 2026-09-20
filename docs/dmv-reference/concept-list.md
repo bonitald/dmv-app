@@ -158,15 +158,33 @@
     content unchanged.
 
 ## crash-reporting-and-move-over-law
-- crash-accident-alert-status (3 questions, status: pending_review)
-- crash-duties-incapacitated-driver (3 questions, status: pending_review)
-- crash-duties-insurance-proof (3 questions, status: pending_review)
-- crash-duties-stop-render-aid (3 questions, status: pending_review)
-- crash-parked-car (3 questions, status: pending_review)
-- move-it-law-conditions (3 questions, status: pending_review)
-- move-it-law-no-penalty (3 questions, status: pending_review)
-- move-over-law-requirement (3 questions, status: pending_review)
-- move-over-law-who-protected (3 questions, status: pending_review)
+- crash-accident-alert-status (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim definition/procedure clauses
+    paraphrased; content unchanged.
+- crash-duties-incapacitated-driver (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim clauses paraphrased; content
+    unchanged.
+- crash-duties-insurance-proof (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim "at the scene or at the police
+    station" clause paraphrased; content unchanged.
+- crash-duties-stop-render-aid (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — two distractor choices lifted handbook language
+    verbatim; content unchanged.
+- crash-parked-car (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused "call law enforcement and leave
+    a note" verbatim or near-verbatim; content unchanged.
+- move-it-law-conditions (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem and answer both copied a 16+ word handbook
+    run almost verbatim; content unchanged.
+- move-it-law-no-penalty (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the "will not penalize you for
+    moving your car" clause verbatim or near-verbatim; content unchanged.
+- move-over-law-requirement (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the "20 mph below the posted
+    speed limit" clause verbatim, one also had a near-verbatim stem; content unchanged.
+- move-over-law-who-protected (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim reproduction of the
+    protected-persons list paraphrased; content unchanged.
 
 ## defensive-driving-and-scanning
 - cell-phone-handheld-law (3 questions, status: pending_review)
