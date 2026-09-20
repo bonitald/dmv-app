@@ -326,10 +326,10 @@
     turning procedure and turning hazards paraphrased; content unchanged.
 
 ## freeway-entering-and-driving
-NOTE (chunk-wide): every question in this chunk has 3 answer choices, while all other chunks
-reviewed so far have 4. Review agents proposed padding in a 4th distractor; that was NOT applied
-(it goes beyond rewording), so the original 3-choice structure was kept. Decide whether to
-standardize choice counts across the bank.
+NOTE (chunk-wide): every question in this chunk originally had 3 answer choices, while every
+other chunk has 4. A fourth (clearly incorrect) distractor was added to each of the 33 questions
+so the whole bank now uses 4 choices. The original three choices and the correct answer's
+position were left unchanged.
 - accel-ramp-purpose (3 questions, status: approved)
   - NOTE: 2 questions reworded during review — near-verbatim "match freeway speed" clauses
     paraphrased; content unchanged.
