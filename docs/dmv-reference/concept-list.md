@@ -411,19 +411,22 @@ throughout. 14 questions approved as-is.
 - night-watch-for-unlit-vehicles (2 questions, status: approved)
 
 ## how-you-can-lose-your-license
-- license-loss-child-support (3 questions, status: pending_review)
-- license-loss-dui-conviction (3 questions, status: pending_review)
-- license-loss-fail-reexam (3 questions, status: pending_review)
-- license-loss-fail-report-crash-dmv (3 questions, status: pending_review)
-- license-loss-fail-report-crash-scene (3 questions, status: pending_review)
-- license-loss-false-application-info (3 questions, status: pending_review)
-- license-loss-lend-license (3 questions, status: pending_review)
-- license-loss-no-insurance-proof (3 questions, status: pending_review)
-- license-loss-point-accumulation (3 questions, status: pending_review)
-- license-loss-refuse-chemical-test (3 questions, status: pending_review)
-- license-loss-underage-alcohol (3 questions, status: pending_review)
-- license-loss-unpaid-judgment (3 questions, status: pending_review)
-- license-loss-vehicular-homicide (3 questions, status: pending_review)
+NOTE (chunk-wide): 26 of 39 questions reworded during review — stems/answers reused the
+handbook's "suspended, revoked or canceled" and bulleted-list wording near-verbatim, or used
+"listed as" framing; facts were correct throughout. 13 questions approved as-is.
+- license-loss-child-support (3 questions, status: approved)
+- license-loss-dui-conviction (3 questions, status: approved)
+- license-loss-fail-reexam (3 questions, status: approved)
+- license-loss-fail-report-crash-dmv (3 questions, status: approved)
+- license-loss-fail-report-crash-scene (3 questions, status: approved)
+- license-loss-false-application-info (3 questions, status: approved)
+- license-loss-lend-license (3 questions, status: approved)
+- license-loss-no-insurance-proof (3 questions, status: approved)
+- license-loss-point-accumulation (3 questions, status: approved)
+- license-loss-refuse-chemical-test (3 questions, status: approved)
+- license-loss-underage-alcohol (3 questions, status: approved)
+- license-loss-unpaid-judgment (3 questions, status: approved)
+- license-loss-vehicular-homicide (3 questions, status: approved)
 
 ## lane-controls-and-special-lanes
 - bike-lane-right-of-way (3 questions, status: pending_review)
