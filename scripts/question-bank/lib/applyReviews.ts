@@ -8,6 +8,9 @@ export interface ReviewResult {
   sourceRef?: string;
   reviewNotes?: string;
   reviewedBy: string;
+  text?: string;
+  choices?: string[];
+  correctAnswer?: string;
 }
 
 export async function applyReviews(results: ReviewResult[]): Promise<{ updated: number }> {
@@ -25,6 +28,15 @@ export async function applyReviews(results: ReviewResult[]): Promise<{ updated: 
     };
     if (result.sourceRef) {
       update.sourceRef = result.sourceRef;
+    }
+    if (result.text) {
+      update.text = result.text;
+    }
+    if (result.choices) {
+      update.choices = result.choices;
+    }
+    if (result.correctAnswer) {
+      update.correctAnswer = result.correctAnswer;
     }
     batch.update(ref, update);
   }

@@ -4,23 +4,49 @@
 - aggressive-driving-criminal-acts (2 questions, status: approved)
 - aggressive-driving-definition (3 questions, status: approved)
 - aggressive-driving-qualifying-acts (3 questions, status: approved)
-- protect-yourself-from-aggressive-drivers (2 questions, status: pending_review)
-- report-aggressive-drivers-star-csp (3 questions, status: pending_review)
-- self-assessment-aggressive-driver-risk (3 questions, status: pending_review)
-- tips-avoid-becoming-aggressive-driver (3 questions, status: pending_review)
+- protect-yourself-from-aggressive-drivers (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice paraphrased too closely to the
+    handbook's exact wording; content was already correct, only phrasing changed.
+- report-aggressive-drivers-star-csp (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice was a verbatim handbook sentence;
+    content unchanged.
+- self-assessment-aggressive-driver-risk (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one quoted the handbook near-verbatim in the
+    question stem, one had a near-verbatim answer choice; content unchanged.
+- tips-avoid-becoming-aggressive-driver (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — "what does the handbook recommend/advise"
+    meta-references removed and near-verbatim answer clauses paraphrased; content unchanged.
 
 ## basic-driving-controls
 - backing-up-accelerate-steer-technique (3 questions, status: approved)
 - backing-up-brake-shift-reverse (3 questions, status: approved)
-- backing-up-check-behind-first (3 questions, status: pending_review)
-- backing-up-hand-body-position (3 questions, status: pending_review)
-- backing-up-mirrors-limitation (3 questions, status: pending_review)
-- hand-position-grip-technique (3 questions, status: pending_review)
-- hand-position-steering-wheel (3 questions, status: pending_review)
-- moving-vehicle-procedure (3 questions, status: pending_review)
-- starting-engine-brake-foot (3 questions, status: pending_review)
-- steering-direction-rule (3 questions, status: pending_review)
-- stopping-vehicle-procedure (3 questions, status: pending_review)
+- backing-up-check-behind-first (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice was near-verbatim handbook text;
+    content unchanged.
+- backing-up-hand-body-position (3 questions, status: approved)
+  - NOTE: 2 of 3 questions reworded during review — answer choices were near word-for-word
+    copies of the handbook's backing-up instructions; content unchanged.
+- backing-up-mirrors-limitation (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one had a "according to the handbook" framing
+    plus a verbatim clause, one had a near-verbatim answer choice; content unchanged.
+- hand-position-grip-technique (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice was an exact verbatim handbook
+    sentence; content unchanged.
+- hand-position-steering-wheel (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — both referenced "the handbook" directly in the
+    question stem rather than asking a normal driving-knowledge question; answer choices
+    unchanged (not verbatim).
+- moving-vehicle-procedure (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one was an exact verbatim handbook sentence,
+    one was near-identical; content unchanged.
+- starting-engine-brake-foot (3 questions, status: approved)
+- steering-direction-rule (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the handbook's distinctive
+    "in the direction you want the vehicle to move" clause verbatim or near-verbatim; content
+    unchanged.
+- stopping-vehicle-procedure (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice reused an 8-word verbatim clause
+    from the handbook; content unchanged.
 
 ## bicyclist-laws-and-etiquette
 - avoid-horn-near-bicyclists (3 questions, status: pending_review)
