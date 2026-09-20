@@ -273,12 +273,24 @@
     definition near-verbatim; content unchanged.
 
 ## dui-penalties-and-underage-dui
-- dui-1st-offense-penalties (3 questions, status: pending_review)
-- dwai-1st-offense-penalties (3 questions, status: pending_review)
-- second-dui-dwai-penalties (3 questions, status: pending_review)
-- third-plus-dui-dwai-penalties (3 questions, status: pending_review)
-- underage-alcohol-possession-revocation (3 questions, status: pending_review)
-- underage-dui-dwai-revocation (3 questions, status: pending_review)
+- dui-1st-offense-penalties (3 questions, status: approved)
+- dwai-1st-offense-penalties (3 questions, status: flagged)
+  - ISSUE: question yTC1ilhY4heSowNNRUDW is a scenario about a 17-year-old convicted of a first
+    DWAI, using jail-range figures (2-180 days) from handbook p.7's "Table 1: Possible Penalties
+    for Impaired Driving for 21 and Older." The handbook doesn't state that adult penalty ranges
+    apply unchanged to minors — its only stated under-21-specific consequences are license
+    revocation triggers (failing a court-ordered evaluation on a 1st conviction; automatic
+    revocation on a 2nd or 3rd). Needs a content-team decision: change the driver's age to 21+
+    so Table 1 applies cleanly, or rewrite to test the actual under-21 revocation rule instead.
+    The other 2 questions in this concept were reviewed and approved.
+- second-dui-dwai-penalties (3 questions, status: approved)
+- third-plus-dui-dwai-penalties (3 questions, status: approved)
+- underage-alcohol-possession-revocation (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim "buying or possessing alcohol"
+    clause paraphrased; content unchanged.
+- underage-dui-dwai-revocation (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim "court-ordered evaluation or
+    program" clause paraphrased; content unchanged.
 
 ## emergency-collision-avoidance
 - animal-crossing-slow-down (3 questions, status: pending_review)
