@@ -429,29 +429,37 @@ handbook's "suspended, revoked or canceled" and bulleted-list wording near-verba
 - license-loss-vehicular-homicide (3 questions, status: approved)
 
 ## lane-controls-and-special-lanes
-- bike-lane-right-of-way (3 questions, status: pending_review)
-- bike-lane-through-intersection (2 questions, status: pending_review)
-- center-turn-lane-other-lanes (2 questions, status: pending_review)
-- center-turn-lane-stopping (2 questions, status: pending_review)
-- center-turn-lane-usage (2 questions, status: pending_review)
-- hov-lane-identification (2 questions, status: pending_review)
-- restricted-lane-markings (2 questions, status: pending_review)
-- transit-lane-purpose (2 questions, status: pending_review)
-- unmarked-lane-positioning (3 questions, status: pending_review)
+NOTE (chunk-wide): 16 of 20 questions reworded during review — answers reused the handbook's
+special-lane sentences near-verbatim (one also had "according to the handbook" stem framing);
+facts were correct throughout. 4 questions approved as-is.
+- bike-lane-right-of-way (3 questions, status: approved)
+- bike-lane-through-intersection (2 questions, status: approved)
+- center-turn-lane-other-lanes (2 questions, status: approved)
+- center-turn-lane-stopping (2 questions, status: approved)
+- center-turn-lane-usage (2 questions, status: approved)
+- hov-lane-identification (2 questions, status: approved)
+- restricted-lane-markings (2 questions, status: approved)
+- transit-lane-purpose (2 questions, status: approved)
+- unmarked-lane-positioning (3 questions, status: approved)
 
 ## left-turns-and-turnabouts
-- forward-two-point-turnabout-procedure (3 questions, status: pending_review)
-- left-turn-blocking-intersection (2 questions, status: pending_review)
-- left-turn-crash-risk (3 questions, status: pending_review)
-- left-turn-wait-for-gap (3 questions, status: pending_review)
-- left-turn-wheels-straight (3 questions, status: pending_review)
-- reverse-two-point-turnabout-procedure (3 questions, status: pending_review)
-- three-point-turnabout-procedure (3 questions, status: pending_review)
-- three-point-turnabout-when-used (3 questions, status: pending_review)
-- two-point-turnabout-definition (2 questions, status: pending_review)
-- u-turn-alternative (2 questions, status: pending_review)
-- u-turn-definition (2 questions, status: pending_review)
-- u-turn-legality (3 questions, status: pending_review)
+NOTE (chunk-wide): 24 of 32 questions reworded during review — turnabout procedures and
+left-turn rules were reused near-verbatim from handbook p.16; facts and step order were correct
+throughout. 8 questions approved as-is.
+- forward-two-point-turnabout-procedure (3 questions, status: approved)
+- left-turn-blocking-intersection (2 questions, status: approved)
+- left-turn-crash-risk (3 questions, status: approved)
+- left-turn-wait-for-gap (3 questions, status: approved)
+- left-turn-wheels-straight (3 questions, status: approved)
+- reverse-two-point-turnabout-procedure (3 questions, status: approved)
+- three-point-turnabout-procedure (3 questions, status: approved)
+- three-point-turnabout-when-used (3 questions, status: approved)
+  - NOTE: one scenario stem also had the handbook's "two-point turnabout not possible" condition
+    added, since without it a two-point turnabout distractor was arguably also valid.
+- two-point-turnabout-definition (2 questions, status: approved)
+- u-turn-alternative (2 questions, status: approved)
+- u-turn-definition (2 questions, status: approved)
+- u-turn-legality (3 questions, status: approved)
 
 ## licensing-process-and-drive-test
 - licensing-drive-test-acceleration (2 questions, status: pending_review)
