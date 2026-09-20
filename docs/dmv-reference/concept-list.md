@@ -144,10 +144,18 @@
     synonym swaps; content unchanged.
 
 ## construction-zone-driving
-- doubled-fines-work-zone (3 questions, status: pending_review)
-- obey-flagger-and-work-zone-signs (3 questions, status: pending_review)
-- work-zone-rear-end-collision-avoidance (3 questions, status: pending_review)
-- work-zone-speed-limits (3 questions, status: pending_review)
+- doubled-fines-work-zone (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer was the handbook's own sentence with only
+    clause order flipped; content unchanged.
+- obey-flagger-and-work-zone-signs (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim answer clause paraphrased; content
+    unchanged.
+- work-zone-rear-end-collision-avoidance (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the handbook's "rear-end
+    collisions...inattentive driver" clause verbatim or near-verbatim; content unchanged.
+- work-zone-speed-limits (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim answer clauses paraphrased;
+    content unchanged.
 
 ## crash-reporting-and-move-over-law
 - crash-accident-alert-status (3 questions, status: pending_review)
