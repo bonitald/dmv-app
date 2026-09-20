@@ -94,17 +94,17 @@
 - vision-eye-exam-frequency (3 questions, status: pending_review)
 
 ## drugged-and-impaired-driving
-- consecutive-revocations (2 questions, status: pending_review)
-- drug-impairment-illegal-same-penalties (3 questions, status: pending_review)
-- express-consent-law (3 questions, status: pending_review)
-- ignition-interlock-function (3 questions, status: pending_review)
-- illegal-drugs-effects (3 questions, status: pending_review)
-- no-plea-bargain (2 questions, status: pending_review)
-- polydrug-impairment-definition (3 questions, status: pending_review)
-- prescription-otc-drug-impairment (3 questions, status: pending_review)
-- refusal-penalty (3 questions, status: pending_review)
-- thc-5ng-permissible-inference (3 questions, status: pending_review)
-- thc-level-no-impairment-correlation (3 questions, status: pending_review)
+- consecutive-revocations (2 questions, status: approved)
+- drug-impairment-illegal-same-penalties (3 questions, status: approved)
+- express-consent-law (3 questions, status: approved)
+- ignition-interlock-function (3 questions, status: approved)
+- illegal-drugs-effects (3 questions, status: approved)
+- no-plea-bargain (2 questions, status: approved)
+- polydrug-impairment-definition (3 questions, status: approved)
+- prescription-otc-drug-impairment (3 questions, status: approved)
+- refusal-penalty (3 questions, status: approved)
+- thc-5ng-permissible-inference (3 questions, status: approved)
+- thc-level-no-impairment-correlation (3 questions, status: approved)
 
 ## dui-dwai-definitions-and-bac
 - bac-elimination-rate (3 questions, status: pending_review)
@@ -404,16 +404,23 @@
 - roundabout-yield-no-large-vehicle (3 questions, status: pending_review)
 
 ## school-bus-stop-law
-- school-bus-20-foot-rule (3 questions, status: pending_review)
-- school-bus-caution-children (3 questions, status: pending_review)
-- school-bus-divided-median-exception (3 questions, status: pending_review)
-- school-bus-five-lane-center-turn-exception (3 questions, status: pending_review)
-- school-bus-four-lane-no-median-both-stop (3 questions, status: pending_review)
-- school-bus-illegal-not-stop (3 questions, status: pending_review)
-- school-bus-red-stop-arm (3 questions, status: pending_review)
-- school-bus-remain-stopped (3 questions, status: pending_review)
-- school-bus-two-lane-both-stop (3 questions, status: pending_review)
-- school-bus-yellow-warning-lights (3 questions, status: pending_review)
+- school-bus-20-foot-rule (3 questions, status: approved)
+- school-bus-caution-children (3 questions, status: flagged)
+  - ISSUE: question CPcnNCFCxfBOYWBODFF5 is a near-verbatim lift of the handbook's p.23 CAUTION
+    sentence ("Motorists should use extreme care when near a stopped school bus because children
+    are likely to dart from the bus's front or rear") with only minor word swaps — not a genuine
+    paraphrase, a legal/reuse concern per prd.md Section 8. Content is factually correct and the
+    concept is already adequately covered by question PZVepcsdjM5G4VZNOA9o (approved). Needs
+    rewriting with a genuinely different sentence structure before it can be approved. The other
+    2 questions in this concept were reviewed and approved.
+- school-bus-divided-median-exception (3 questions, status: approved)
+- school-bus-five-lane-center-turn-exception (3 questions, status: approved)
+- school-bus-four-lane-no-median-both-stop (3 questions, status: approved)
+- school-bus-illegal-not-stop (3 questions, status: approved)
+- school-bus-red-stop-arm (3 questions, status: approved)
+- school-bus-remain-stopped (3 questions, status: approved)
+- school-bus-two-lane-both-stop (3 questions, status: approved)
+- school-bus-yellow-warning-lights (3 questions, status: approved)
 
 ## seasonal-mountain-and-rural-driving
 - bicyclist-fatalities-rural-alert (3 questions, status: pending_review)
