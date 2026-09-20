@@ -214,13 +214,25 @@
     "slide through your fingers" clause paraphrased; content unchanged.
 
 ## driver-fitness-vision-hearing-fatigue
-- earphones-exceptions (3 questions, status: pending_review)
-- earphones-prohibited (3 questions, status: pending_review)
-- fatigue-pull-over-when-drowsy (3 questions, status: pending_review)
-- fatigue-two-hour-segments (3 questions, status: pending_review)
-- hearing-decline-audiologist (3 questions, status: pending_review)
-- vision-corrective-lens-restriction (3 questions, status: pending_review)
-- vision-eye-exam-frequency (3 questions, status: pending_review)
+- earphones-exceptions (3 questions, status: approved)
+- earphones-prohibited (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim stem/answer clauses paraphrased;
+    content unchanged.
+- fatigue-pull-over-when-drowsy (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "pull off the road and rest" clause paraphrased; content unchanged.
+- fatigue-two-hour-segments (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook recommends/suggests" framing
+    removed; content unchanged.
+- hearing-decline-audiologist (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "hearing tested by an audiologist" clause paraphrased; content unchanged.
+- vision-corrective-lens-restriction (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim "glasses or contact lenses" clause
+    paraphrased; content unchanged.
+- vision-eye-exam-frequency (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook says/stress" framing removed;
+    content unchanged.
 
 ## drugged-and-impaired-driving
 - consecutive-revocations (2 questions, status: approved)
