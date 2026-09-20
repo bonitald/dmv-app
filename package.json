@@ -47,11 +47,14 @@
     "ios:prod": "cross-env APP_ENV=production expo run:ios",
     "web": "expo start --web",
     "test:rules": "firebase emulators:exec --only firestore \"jest --config jest.rules.config.js\"",
+    "test:functions": "firebase emulators:exec --only firestore \"npm --prefix functions test\"",
     "test:question-bank": "firebase emulators:exec --only firestore \"jest --config jest.scripts.config.js\"",
     "qb:write-chunk-plan": "tsx scripts/question-bank/write-chunk-plan.ts",
     "qb:read-chunk-plan": "tsx scripts/question-bank/read-chunk-plan.ts",
     "qb:update-chunk-status": "tsx scripts/question-bank/update-chunk-status.ts",
-    "qb:write-questions": "tsx scripts/question-bank/write-questions.ts"
+    "qb:write-questions": "tsx scripts/question-bank/write-questions.ts",
+    "qb:export-questions": "tsx scripts/question-bank/export-questions.ts",
+    "qb:apply-review": "tsx scripts/question-bank/apply-review.ts"
   },
   "private": true,
   "allowScripts": {
