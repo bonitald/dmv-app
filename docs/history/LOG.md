@@ -1,0 +1,16 @@
+### 2026-09-19
+- Initial state: Expo + TypeScript app is scaffolded (custom dev client, CNG workflow) with Firebase (`@react-native-firebase/*` native SDK) for Firestore/Auth/Analytics; `android/` is prebuilt and committed, `ios/` is not yet (Windows can't run the iOS prebuild step).
+- Initial state: App code so far is a skeleton — `src/auth/AuthProvider.tsx`, `src/navigation/RootNavigator.tsx`, a `PlaceholderScreen.tsx`, and `src/theme/tokens.ts` — phase 0/early-phase-1 user stories (auth wiring, navigation shell, base theme).
+- Initial state: `firestore.rules` + `firestore-tests/rules.test.ts` exist; a `scripts/question-bank/` ingestion CLI (chunk plan read/write, question writer, admin Firestore connection, full Jest coverage) is built out.
+- Initial state: PRD (`docs/prd.md`) and phased roadmap (`docs/phases.md`) are written; phase 0 (foundations) and phase 1 (question bank & content model) have planning docs, phase 2 (flashcard study mode) user stories were just broken out — but no flashcard/study-mode screens exist in `src/` yet, so phase 2 work hasn't started in code.
+- Initial state: Root `CLAUDE.md` still says "no application code" — that's stale and should be updated to reflect the real app/Firebase/scripts setup.
+- Set up `docs/history/LOG.md` and the global `project-history` skill for gap-analysis on resume.
+- Validated phase 1 status against actual code: us-2/us-6 confirmed complete, us-3/4/5 confirmed genuinely not started (no `functions/` dir, no test cache, no async-storage dep).
+- Closed ph-1-us-1: added rules tests locking in deny-all client reads of `questions`/`ingestionRuns`; marked us-1 Complete in its story doc and phase-1-summary.md.
+- Built ph-1-us-4: scaffolded `functions/` (first Cloud Function in the project) and implemented `assembleTest` — an authenticated, randomized, bounded-set callable that's now the only sanctioned read path for the `questions` collection. TDD'd via `npm run test:functions`; marked us-4 Complete.
+
+### 2026-09-20
+- Agent-assisted review of the question bank against DR_2337: 21 of 45 chunks (617 questions) done, ~55% reworded for verbatim handbook copying, 3 concepts flagged for content decisions; added qb:export-questions / qb:apply-review tooling; paused at user request.
+- Added the `cloud-function-documentation` project skill and retrofitted `functions/src/assembleTest.ts` with doc/inline comments (comments only; tsc passes, jest not run — needs emulator).
+- Reworked the first-run teen journey (baseline test vs. learn-first path, mini-quizzes, test-date countdown, optional account linking on anonymous auth): added a Goal/Supports-PRD note to every phase in `docs/phases.md`, a new Phase 9, and matching updates to `docs/prd.md`.
+- Revised Phase 1 stories: added ph-1-us-7 to us-11 (mini-quiz assembly, fixed 45-question baseline that doubles as the free test, topic catalog, flashcards, `scoreTest`), widened us-3, and updated the phase summary. Docs only — no code changed yet; open items include narrowing the `users/{uid}/**` rules wildcard.

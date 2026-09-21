@@ -1,6 +1,6 @@
 # Product Requirements Document: CO DMV Practice App
 
-_Last updated: 2026-08-28_
+_Last updated: 2026-09-20_
 
 ## 1. Overview
 - **Problem:** Teens preparing for the Colorado DMV written permit test lack a focused, low-friction way to study and self-test before going to the DMV — and most existing options reduce studying to rote flashcard/quiz recall rather than helping teens actually reason through road situations, which is closer to how CO's real test — and real driving — actually work.
@@ -12,14 +12,19 @@ _Last updated: 2026-08-28_
 - **MVP goal(s):**
   - Let a teen study via flashcards and take unlimited practice tests for free, with no signup friction.
   - Validate that the app actually helps teens pass the real DMV written test before introducing any paywall.
+  - Get a first-time teen oriented quickly: a one-time first-run choice between "test what I know" (baseline diagnostic) and "learn first" (concept learning path), then free movement between tests and concepts.
 - **Success metrics (first 1-3 months):**
   - Self-reported real-DMV-test pass rate among app users (primary metric — no target set yet).
+  - Secondary: per-user score improvement from the one-time baseline diagnostic to later practice tests, as a leading indicator that the app is teaching. The first-run route a teen picks is not a success metric (they can switch freely).
   - Revenue is deferred: monetization ($2,000/month target) becomes the goal of a later phase once pass rate is proven, not part of MVP success criteria.
 
 ## 3. Scope
 ### In scope (MVP)
 - Flashcard study mode covering CO DMV handbook content, with missed/weak cards resurfaced more often (simple spaced-repetition-style logic, not a fixed browse order).
 - Situational/scenario-style questions ("you're approaching a 4-way stop and another car arrives at the same time — who goes first?") woven into flashcards and practice tests alongside plain fact-recall questions — the core differentiator from generic quiz/flashcard apps, and closer to how CO's actual permit test phrases many items.
+- First-run onboarding: a one-time choice between two routes — (1) take a baseline diagnostic first, or (2) start the concept learning path. Also asks for an optional, editable tentative test date, shown as a countdown on the home screen. The choice is not binding: at any time the teen can start a practice test or jump to any concept.
+- Baseline diagnostic: a one-time, sectioned test that can be paused between sections, with a "keep going?" check to respect short attention spans. The question bank has 45 handbook topics (a topic is what the learning path calls a "concept"), so covering every topic with one question means about 45 questions; 3 sections of 15, one question per topic, grouped in handbook order. It is the **same fixed set for every user**, so retaking it never reveals more of the question bank. Scored and stored separately from regular practice tests so it serves as a starting point for measuring improvement. Completing it counts as the user's "free test": the app records that the user has used it (`freeTestUsedAt`) for the future subscription, but nothing is gated in the MVP. Results are shown per topic, indicative only: one question per topic supports got it / missed it, and "shaky" appears once mini-quiz scores exist.
+- Concept learning path: concepts organized in the order of the handbook PDF. Each concept is the concept's flashcards followed by a short mini-quiz of questions from that concept only. At the end the app recommends moving on or repeating, based on a score threshold (recommendation, not a gate), and the teen picks "Review Again", "Come Back Later, Continue to Next Concept", or "Mark Reviewed". Concepts are "reviewed", not "completed", and can be restarted at any time. Tracked per concept: not started / in progress / reviewed / needs revisit.
 - Multiple auto-generated practice tests (question sets), Colorado only, unlimited use — fully free.
 - Basic test-taking UI: timed or untimed, score at the end, review missed questions.
 - Real-DMV-test outcome tracking: let a user optionally log their scheduled test date and later self-report pass/fail, so pass-rate can be measured.
@@ -33,6 +38,7 @@ _Last updated: 2026-08-28_
 - Social/gamification features (leaderboards, streaks, sharing).
 - Push notifications / re-engagement campaigns (though a simple local reminder for the pass/fail follow-up may be needed — see open questions).
 - Detailed analytics dashboards beyond basic pass-rate tracking.
+- Post-MVP, alongside subscription: richer "lesson flow" per concept (paraphrased explanatory content, AI-generated video). For MVP a concept's "lesson" is just its flashcards.
 - Video-based hazard-perception training and tying study content to specific logged driving sessions (e.g. a "tonight's focus" tip pulled from the handbook) — both considered, but deferred: they're aimed at real driving-skill development rather than passing the written test, which is the MVP's scope, and the video approach in particular adds real content-production and technical overhead.
 
 ## 4. Users & Roles
@@ -51,6 +57,10 @@ _Last updated: 2026-08-28_
 | Pass-rate reporting (internal) | Aggregate self-reported pass/fail results to measure product quality | Must |
 | Driving time logger | Start/stop a supervised-driving session with a persistent visible active-session indicator; log each session; view cumulative total | Must |
 | Driving log export/print | Generate a printable/exportable summary of logged driving sessions for the in-person driving test | Must |
+| First-run onboarding + test-date countdown | One-time route choice (baseline first vs. learn first), optional tentative test date, countdown on the home screen | Must |
+| Baseline diagnostic | One-time sectioned test, pausable/resumable, scored separately, per-concept strong/shaky/likely-gap report | Must |
+| Concept learning path | Handbook-ordered concepts, each = flashcards + mini-quiz + recommendation; per-concept reviewed status, free navigation | Must |
+| Optional account linking | Upgrade the anonymous user to a real sign-in (email + auth ID only) to keep data across phones | Must |
 
 ## 6. Business Requirements
 - **Business model:** Free for MVP — no paywall, no purchases. Goal is to validate real-world pass rate first; monetization (pay-per-test / bundle / unlimited pass, target $2,000/month) is planned for a later phase once quality is proven.
@@ -63,20 +73,26 @@ _Last updated: 2026-08-28_
   - Question (text, choices, correct answer, topic/category, source reference)
   - Flashcard (may map 1:1 to questions or be a separate simpler content type)
   - Practice Test (a generated set of questions)
-  - Test Attempt (user's answers, score, timestamp)
+  - Test Attempt (user's answers, score, timestamp, and a type: baseline / practice / mini-quiz — baseline is scored separately and taken once per user)
+  - Concept Progress (per user per concept: status not started / in progress / reviewed / needs revisit, latest mini-quiz score, timestamp)
+  - Profile settings (tentative test date, first-run choice made)
   - Test Outcome (self-reported scheduled test date and pass/fail result, linked to a user/device)
   - Driving Session (start time, end time, duration, date, linked to a user/device)
-- **Auth:** Decided — Firebase Anonymous Authentication (`signInAnonymously()`), not a raw client-generated device ID. No purchases in MVP, so there's no pressure for a real account, but the identifier still needs to be enforceable server-side: an unauthenticated client-generated ID can't be verified by Firestore security rules, so any device could read/write another device's data by guessing/spoofing its ID. Anonymous auth gives a real `request.auth.uid` that rules can check, at no cost to the no-signup-friction goal — sign-in is silent and automatic, no UI shown to the user. Tradeoff is unchanged either way: the identity doesn't survive a reinstall or device switch (see Section 9).
+- **Auth:** Decided — Firebase Anonymous Authentication (`signInAnonymously()`) on first launch, plus **optional account linking** later. Not a raw client-generated device ID: an unauthenticated client-generated ID can't be verified by Firestore security rules, so any device could read/write another device's data by guessing/spoofing its ID. Anonymous auth gives a real `request.auth.uid` that rules can check, with silent, no-UI sign-in, keeping first use frictionless. Because teens often change phones (possibly mid test-cycle), the app also offers to link the anonymous user to a real sign-in — Firebase account linking keeps the same uid, so existing data carries over — prompted at a moment of value (e.g. after baseline results or before driving-log export), never as a wall. Linked identity collects **email and auth ID only** — no name or profile data. All progress lives server-side (Firestore) under the uid, not only on the device. The linked account is also the future anchor for purchase entitlements once monetization is added. Sign-in providers are an open question (Section 9).
 - **Integrations:** None required for MVP (no payment processor needed). Firebase Analytics for tracking practice-test usage and pass-rate outcomes. A PDF/print or share-sheet export tool for the driving log (e.g. generate a simple PDF/CSV and hand off to the OS share sheet — standard, low-risk addition). IAP (Apple/Google) deferred to the monetization phase.
 - **Hosting / infra:** Firebase.
 - **Offline support:** Not specified — reasonable MVP default is to bundle/cache question content locally so flashcards and tests work offline once downloaded; flagged as assumption below.
 
 ## 8. Non-Functional Requirements
 - **Scale:** Not specified — assume small (hundreds to low thousands of users) for MVP given the single-state, single-team scope.
-- **Compliance / legal:** Primary users are minors (~15-16). No account/PII collection is currently planned (device-based entitlements), which minimizes COPPA/privacy exposure — revisit if email/social login is added later. Question content is sourced from the Colorado DMV handbook (a public government publication); content should be paraphrased/generated rather than reproduced verbatim to stay clearly on the safe side of any reuse concerns. Apple/Google App Store review guidelines apply to the IAP paywall design (must be able to restore purchases, clear pricing disclosure).
+- **Compliance / legal:** Primary users are minors (~15-16). By default no PII is collected (anonymous auth); only if a teen opts into account linking do we hold an email address and auth ID (nothing else). That is still personal data about a minor, so review current Colorado and federal privacy rules for minors before launch, and note Apple requires in-app account deletion once accounts exist and Sign in with Apple if other social logins are offered. Question content is sourced from the Colorado DMV handbook (a public government publication); content should be paraphrased/generated rather than reproduced verbatim to stay clearly on the safe side of any reuse concerns. Apple/Google App Store review guidelines apply to the IAP paywall design (must be able to restore purchases, clear pricing disclosure).
 
 ## 9. Risks & Open Questions
-- Auth approach decided (Firebase Anonymous Authentication — see Section 7); the residual open question is only the accepted tradeoff: identity does not survive a reinstall or device switch, so pass/fail follow-up and the driving log are lost if a user reinstalls or switches devices — this matters given driving-log data is meant to be relied on for the real test. No mitigation is planned for MVP; flag this limitation in-app where it becomes user-relevant (e.g. before driving-log export) rather than silently losing data.
+- Auth approach decided (anonymous auth + optional account linking — see Section 7). Residual risk: a teen who never links loses their data on reinstall or device switch — this matters given driving-log data is meant to be relied on for the real test. Mitigated by prompting to link at high-value moments, especially before driving-log export.
+- Which sign-in providers to offer for linking (recommendation: Apple + Google, since teens typically have one and Apple requires Sign in with Apple if Google is offered; email link as an option). Not yet decided.
+- Mini-quiz recommendation threshold not yet defined (e.g. a proposed default of 80% correct = "recommend moving on").
+- Baseline diagnostic: progress is stored server-side so a paused baseline resumes on another device. Because anonymous auth issues a new uid on reinstall, a user could retake the baseline (the "free test") by reinstalling; tying the free-test flag to a linked account closes this when gating is added post-MVP.
+- Question pool depth per concept: mini-quizzes and "Review Again" need enough questions per concept that repeats are not just memorization.
 - How/when to prompt for the pass/fail follow-up: local notification tied to the user-entered test date? In-app prompt on next open? No mechanism yet defined.
 - No target set for pass rate or minimum sample size needed before considering the MVP "proven" and greenlighting monetization.
 - Persistent driving-timer indicator: spike complete, see [`phase-0-findings.md`](./phase-0-findings.md). Both platforms are buildable via Expo prebuild + config plugins (no bare RN eject needed). Remaining risk is narrower than originally scoped: iOS Live Activities have a known OS-level timer-freeze bug on some iOS 18 builds, so the recommendation is to build Android's foreground-service version as the reliable baseline and treat iOS Live Activity as best-effort, with an in-app-only timer as an acceptable fallback rather than a blocker.
@@ -97,6 +113,7 @@ start/stop timestamps immediately on both platforms so logged duration
 survives an app kill.
 
 ## 10. Assumptions
+- For MVP a concept's learning content is its flashcards only; richer lesson content (paraphrased explanations, AI video) is post-MVP, paired with a subscription.
 - Offline support (cached content) is assumed desirable for a study app but not explicitly requested — confirm before building.
 - Small initial user scale assumed based on single-state, self-serve, no-marketing-mentioned scope.
 - Questions will be authored/paraphrased from the CO handbook rather than copied verbatim, to stay safe legally even though the source is a public document.

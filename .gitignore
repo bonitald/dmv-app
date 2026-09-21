@@ -45,3 +45,6 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Cloud Functions build output
+functions/lib/

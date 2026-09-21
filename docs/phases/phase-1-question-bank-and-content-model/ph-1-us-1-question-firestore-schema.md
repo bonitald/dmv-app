@@ -2,7 +2,8 @@
 
 **ID:** ph-1-us-1
 **Layer:** Backend
-**Status:** Mostly Complete (schema exists and is populated; client-read rule still needed)
+**Status:** Complete (client-read path closed and locked in by tests; the third AC is exercised
+once ph-1-us-4 actually builds `assembleTest`)
 
 ## Story
 As a developer,
@@ -28,17 +29,19 @@ entities.
   (ph-1-us-4), which runs with Admin privileges server-side and returns only a scoped subset.
 
 ## Acceptance Criteria
-- [ ] Given the existing `questions/{id}` schema (conceptId, chunkId, sourceRef, type, text,
+- [x] Given the existing `questions/{id}` schema (conceptId, chunkId, sourceRef, type, text,
   choices, correctAnswer, status, selfCheck, reviewedBy, reviewedAt, reviewNotes, createdAt),
   when a new question is written by the ingestion pipeline, then it validates against
   `scripts/question-bank/lib/validate.ts` before being persisted (already true — no change
   needed here).
-- [ ] Given `firestore.rules` today, when any authenticated client attempts a direct read of
+- [x] Given `firestore.rules` today, when any authenticated client attempts a direct read of
   `questions/{id}` or a query against the `questions` collection, then the request is denied
   (already true — verify it stays true; do not add a direct client-read rule for `questions`).
+  Verified by the new `rules.test.ts` cases below.
 - [ ] Given the `assembleTest` Cloud Function (ph-1-us-4) is deployed, when it reads `questions`
   internally via the Admin SDK, then it succeeds regardless of the deny-all client rule (Admin
-  SDK bypasses security rules by design).
+  SDK bypasses security rules by design). Left unchecked — `assembleTest` doesn't exist yet
+  (ph-1-us-4 is Not Started), so this can't be verified until that story lands.
 
 ## Data and API
 - **Firestore schema**: no changes — `questions/{id}` and `ingestionRuns/{id}` as defined in
@@ -60,7 +63,7 @@ entities.
 - **Failure modes**: none new — this story is verification, not new code.
 
 ## Tasks
-- [ ] Add a test to `firestore-tests/rules.test.ts` asserting direct client reads of `questions`
+- [x] Add a test to `firestore-tests/rules.test.ts` asserting direct client reads of `questions`
   and `ingestionRuns` are denied (locks in the deny-all-by-default guarantee so a future change
   can't silently reopen it).
 

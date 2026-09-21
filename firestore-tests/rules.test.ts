@@ -57,3 +57,23 @@ test('a device that has not signed in anonymously is rejected outright', async (
 
   await assertFails(setDoc(doc(anon, 'users/alice-uid'), { createdAt: new Date() }));
 });
+
+// ph-1-us-1: locks in the deny-all-by-default guarantee for the question bank, so a future
+// rule change can't silently reopen direct client access to it.
+test('a signed-in device cannot read the questions collection', async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(doc(context.firestore(), 'questions/q1'), { text: 'What does a red light mean?' });
+  });
+
+  const alice = testEnv.authenticatedContext('alice-uid').firestore();
+  await assertFails(getDoc(doc(alice, 'questions/q1')));
+});
+
+test('a signed-in device cannot read the ingestionRuns collection', async () => {
+  await testEnv.withSecurityRulesDisabled(async (context) => {
+    await setDoc(doc(context.firestore(), 'ingestionRuns/run1'), { status: 'complete' });
+  });
+
+  const alice = testEnv.authenticatedContext('alice-uid').firestore();
+  await assertFails(getDoc(doc(alice, 'ingestionRuns/run1')));
+});

@@ -35,8 +35,28 @@ So that I'm not interrupted or lose progress partway through a test.
   question content is by legitimately starting a test through the `assembleTest` function
   (ph-1-us-4), which returns a bounded set, not the whole bank.
 
+## Scope update (2026-09-20)
+The same "cache only what one session needs" mechanism now serves three kinds of sessions, not
+just practice tests:
+- **Practice test** — as originally written.
+- **Concept mini-quiz** (ph-1-us-7) — small, short-lived; same cache and clear-on-finish rules.
+- **Baseline section** (ph-1-us-8) — cache only the *current section's* questions. Unlike a
+  practice test, an unfinished baseline is **not abandoned** when the user pauses: the baseline
+  is a fixed set, and the user's progress is stored server-side, so it can resume, possibly on
+  another phone. Local cache can be cleared safely when the section ends or the app is reset,
+  since the server is the source of truth.
+- Flashcards (ph-1-us-10) are not part of this story's cache; whether to cache them offline is a
+  Phase 2 decision.
+
+Additional acceptance criteria:
+- [ ] Given a user pauses a baseline between sections, when they return (any device), then the
+  local cache is rebuilt from the server's stored assignment rather than assumed to exist.
+- [ ] Given a paused baseline, when the local cache is cleared, then the baseline itself is not
+  treated as abandoned or lost.
+
 ## Dependencies
 - **Blocked by**: ph-1-us-1 (schema + deny-all read rule), ph-1-us-4, ph-1-us-5.
+- Related: ph-1-us-7 (topic mini-quiz), ph-1-us-8 (baseline).
 - Loosely related to Phase 3 (`Test Attempt` recording) — this story builds the underlying
   "assemble and cache a scoped question set" mechanism; Phase 3 is what actually drives *when*
   a test starts and records its outcome. Phase 1 builds the primitive; Phase 3 wires it into a
