@@ -72,7 +72,7 @@ Firestore, Jest + `ts-jest` against the Firestore emulator, `@firebase/rules-uni
 - Produces: `shuffle<T>(items: T[], random: () => number): T[]` — used by every later assembly
   task (`assembleMiniQuiz`, `startOrResumeBaseline`, `getFlashcards`).
 
-- [ ] **Step 1: Extract the shuffle function**
+- [x] **Step 1: Extract the shuffle function**
 
 Create `functions/src/shuffle.ts`:
 ```ts
@@ -93,7 +93,7 @@ export function shuffle<T>(items: T[], random: () => number): T[] {
 }
 ```
 
-- [ ] **Step 2: Remove the local copy from `assembleTest.ts` and import the shared one**
+- [x] **Step 2: Remove the local copy from `assembleTest.ts` and import the shared one**
 
 In `functions/src/assembleTest.ts`, delete the local `function shuffle<T>(...)` definition
 (lines 97-113 as currently written) and add near the top:
@@ -101,12 +101,12 @@ In `functions/src/assembleTest.ts`, delete the local `function shuffle<T>(...)` 
 import { shuffle } from './shuffle';
 ```
 
-- [ ] **Step 3: Run the existing function tests to confirm nothing broke**
+- [x] **Step 3: Run the existing function tests to confirm nothing broke**
 
 Run: `npm run test:functions`
 Expected: all existing `assembleTest.test.ts` tests still PASS (behavior unchanged, pure refactor).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add functions/src/shuffle.ts functions/src/assembleTest.ts
@@ -133,7 +133,7 @@ Closes the ph-1-us-11 "Persist assignments in `assembleTest`" follow-up task and
   `{ type: 'practice', questionIds: string[], createdAt: FieldValue, scored: false }` — same
   shape Task 4 writes with `type: 'mini-quiz'` and an added `chunkId` field.
 
-- [ ] **Step 1: Update the failing test for the new field first**
+- [x] **Step 1: Update the failing test for the new field first**
 
 In `functions/src/assembleTest.test.ts`, update the `'returns only the client-safe fields...'`
 test's expectation (currently asserts an exact object without `chunkId`):
@@ -178,12 +178,12 @@ Add a new test at the end of the `describe` block:
   });
 ```
 
-- [ ] **Step 2: Run tests to verify the new/updated assertions fail**
+- [x] **Step 2: Run tests to verify the new/updated assertions fail**
 
 Run: `npm run test:functions`
 Expected: FAIL — `chunkId` missing from the returned question, and no `testAssignments` doc.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `functions/src/assembleTest.ts`:
 1. Add `chunkId: string;` to the `AssembledQuestion` interface (after `type`).
@@ -208,18 +208,18 @@ In `functions/src/assembleTest.ts`:
    Firestore` import — split into two import statements or one combined import).
 5. Update the final `return` to use the hoisted `testId` instead of calling `randomUUID()` again.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npm run test:functions`
 Expected: PASS.
 
-- [ ] **Step 5: Update `functions/README.md`'s `assembleTest` section**
+- [x] **Step 5: Update `functions/README.md`'s `assembleTest` section**
 
 Add `chunkId` to the documented output JSON, and a line noting the function now also persists
 `users/{uid}/testAssignments/{testId}` (`{ type: 'practice', questionIds, createdAt, scored:
 false }`), consumed by `scoreTest` (ph-1-us-11).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add functions/src/assembleTest.ts functions/src/assembleTest.test.ts functions/README.md
@@ -243,7 +243,7 @@ being unwritable by clients (this is the "Rules gap" flagged in ph-1-us-8).
   become client-read-only (written only by Cloud Functions via the Admin SDK, which bypasses
   rules entirely). `topics/{chunkId}` becomes authenticated-read, no client write.
 
-- [ ] **Step 1: Write the failing rules tests**
+- [x] **Step 1: Write the failing rules tests**
 
 Add to `firestore-tests/rules.test.ts` (after the existing tests, before the final closing):
 ```ts
@@ -327,14 +327,14 @@ test('an unauthenticated device cannot read topics', async () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npm run test:rules`
 Expected: FAIL — the current wildcard rule still allows writes to `testAssignments`/
 `testAttempts`/`baseline`, and `topics` isn't matched by any rule (falls through to deny, so the
 two "cannot" topics tests already pass, but both "can read" topics tests fail).
 
-- [ ] **Step 3: Implement the narrowed rules**
+- [x] **Step 3: Implement the narrowed rules**
 
 Replace the full contents of `firestore.rules`:
 ```
@@ -379,13 +379,13 @@ service cloud.firestore {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npm run test:rules`
 Expected: PASS — all rules tests, including the pre-existing `users/{uid}` top-level ones (still
 covered by the new `match /users/{uid}`).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add firestore.rules firestore-tests/rules.test.ts
@@ -410,7 +410,7 @@ git commit -m "fix: narrow firestore.rules to explicit server-owned paths under 
   (`scoreTest`) reads the `testAssignments` doc this function writes (`type: 'mini-quiz'`,
   `chunkId`, `questionIds`, `createdAt`, `scored: false`).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `functions/src/assembleMiniQuiz.test.ts`:
 ```ts
@@ -549,12 +549,12 @@ describe('assembleMiniQuizForUser', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npm run test:functions`
 Expected: FAIL with "Cannot find module './assembleMiniQuiz'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `functions/src/assembleMiniQuiz.ts`:
 ```ts
@@ -689,12 +689,12 @@ export const assembleMiniQuiz = onCall((request) =>
 );
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npm run test:functions`
 Expected: PASS.
 
-- [ ] **Step 5: Register the export and document it**
+- [x] **Step 5: Register the export and document it**
 
 In `functions/src/index.ts`, add:
 ```ts
@@ -707,7 +707,7 @@ structure as the existing `assembleTest` section: auth requirement, input
 (topic-scoped, capped at 10, excludeIds best-effort repeat avoidance), and the
 `testAssignments` write.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add functions/src/assembleMiniQuiz.ts functions/src/assembleMiniQuiz.test.ts functions/src/index.ts functions/README.md
