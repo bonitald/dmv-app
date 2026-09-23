@@ -1902,7 +1902,7 @@ The largest task — grades all three session kinds. Depends on Task 2 (`testAss
   'review-again'|null, createdAt }` — this is the shape Phase 2/3/4 will read (not built yet;
   out of scope here).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `functions/src/scoreTest.test.ts`:
 ```ts
@@ -2119,12 +2119,12 @@ describe('scoreTestForUser', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npm run test:functions`
 Expected: FAIL with "Cannot find module './scoreTest'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `functions/src/scoreTest.ts`:
 ```ts
@@ -2363,12 +2363,12 @@ export const scoreTest = onCall((request) =>
 );
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npm run test:functions`
 Expected: PASS.
 
-- [ ] **Step 5: Register the export and document it**
+- [x] **Step 5: Register the export and document it**
 
 In `functions/src/index.ts`, add:
 ```ts
@@ -2381,7 +2381,7 @@ where each reads its assignment from, the mini-quiz recommendation threshold con
 baseline `testId` format (`baseline-{version}-{section}`) with a note that it's how this
 function tells a baseline submission apart from a practice/mini-quiz one.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add functions/src/scoreTest.ts functions/src/scoreTest.test.ts functions/src/index.ts functions/README.md
