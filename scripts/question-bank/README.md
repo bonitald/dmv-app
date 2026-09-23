@@ -89,3 +89,19 @@ Input JSON shape (array of questions — write all of one chunk's questions in a
 `status` is set automatically: `pending_review` if `selfCheck.passed` is `true`, `flagged`
 otherwise. Nothing written by this script is ever `approved` — that only happens via human
 review in the Firebase console.
+
+## `qb:publish-topics` (after review, repeatable)
+
+```bash
+npm run qb:publish-topics -- <runId>
+```
+
+Reads the ingestion run's chunk plan and writes one `topics/{chunkId}` doc per chunk (`title`,
+`description`, `order` from the chunk's `pageStart`, and `approvedQuestionCount` — a live count
+of that chunk's `approved` questions). This is the read-only topic catalog the app's flashcard
+browse UI and baseline assembly section ordering (ph-1-us-8, ph-1-us-9) consume.
+
+Safe to re-run at any time after more questions are reviewed/approved — it's idempotent, always
+recomputing `approvedQuestionCount` from the current `questions` collection rather than
+incrementing. It holds no question content by design: only title/description/order/count, so a
+client reading `topics/{chunkId}` can never extract question text.

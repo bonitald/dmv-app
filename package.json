@@ -54,7 +54,8 @@
     "qb:update-chunk-status": "tsx scripts/question-bank/update-chunk-status.ts",
     "qb:write-questions": "tsx scripts/question-bank/write-questions.ts",
     "qb:export-questions": "tsx scripts/question-bank/export-questions.ts",
-    "qb:apply-review": "tsx scripts/question-bank/apply-review.ts"
+    "qb:apply-review": "tsx scripts/question-bank/apply-review.ts",
+    "qb:publish-topics": "tsx scripts/question-bank/publish-topics.ts"
   },
   "private": true,
   "allowScripts": {
