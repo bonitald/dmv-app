@@ -1,6 +1,6 @@
 # Phase 1: Question Bank & Content Model — Summary
 
-## Status: Backend complete — 9 of 11 stories Complete, 2 Partially complete (2026-09-23)
+## Status: Complete (2026-09-23)
 
 Most of this phase's schema/content work was already delivered by the question-bank ingestion
 pipeline (`docs/superpowers/specs/2026-09-08-question-bank-ingestion-design.md`), which has run
@@ -8,8 +8,9 @@ against the CO DMV handbook and produced 1,415 questions across 499 concepts
 (`docs/dmv-reference/concept-list.md`). The rest of the phase built the server-side read/score paths (no direct bulk-read of the
 question bank), the topic catalog, the fixed baseline, and the on-device test cache module.
 
-**Still open:** ph-1-us-3 and ph-1-us-5 need the Phase 3 test-taking screen to use
-`src/study/testCache.ts`. See each story's status note.
+**Carried to Phase 3:** the remaining criteria of ph-1-us-3 and ph-1-us-5 describe how the
+test-taking screen uses `src/study/testCache.ts`. They moved to **ph-3-us-1**
+(`docs/phases/phase-3-practice-test-generator-and-test-taking-ui/`) so this phase could close.
 
 ## Stories
 
@@ -17,9 +18,9 @@ question bank), the topic catalog, the fixed baseline, and the on-device test ca
 |----|-------|-------|--------|--------|
 | ph-1-us-1 | Firestore schema for Question content | Backend | — | Complete |
 | ph-1-us-2 | Add/update questions without an app release | Backend | — | Complete |
-| ph-1-us-3 | Scoped offline caching for an in-progress test | Parent | — | Partially complete |
+| ph-1-us-3 | Scoped offline caching for an in-progress test | Parent | — | Complete (rest → ph-3-us-1) |
 | ph-1-us-4 | `assembleTest` callable Cloud Function | Backend | ph-1-us-3 | Complete |
-| ph-1-us-5 | On-device cache for the active test's question set | Frontend | ph-1-us-3 | Partially complete |
+| ph-1-us-5 | On-device cache for the active test's question set | Frontend | ph-1-us-3 | Complete (rest → ph-3-us-1) |
 | ph-1-us-6 | Paraphrased content with traceable source reference | Backend | — | Complete |
 | ph-1-us-7 | Topic-scoped mini-quiz assembly | Backend | — | Complete |
 | ph-1-us-8 | Fixed baseline diagnostic (sectioned, resumable, doubles as free test) | Backend | — | Complete |
@@ -66,7 +67,6 @@ question bank), the topic catalog, the fixed baseline, and the on-device test ca
 - Whether Concept Progress status is updated by `scoreTest` or stays a client action
   (ph-1-us-11).
 - Exact per-test question count (`prd.md` Section 9, still undefined) — ph-1-us-4.
-- Resume-vs-clear UX for a stale cached test after a force-quit — deferred to Phase 3, flagged in
-  ph-1-us-5.
+- Resume-vs-clear UX for a stale cached test after a force-quit — now owned by ph-3-us-1.
 - Randomization/repeat-avoidance strategy across a user's multiple tests — flagged in ph-1-us-4,
   simplest behavior acceptable to start.

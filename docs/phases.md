@@ -58,7 +58,7 @@ No content dependency; this is the scaffold everything else builds on.
 
 ---
 
-## Phase 1: Question Bank & Content Model — In Progress (backend complete; see phase-1-summary.md)
+## Phase 1: Question Bank & Content Model — Done
 
 > **Goal:** Build the content engine — a question bank that can hold both fact-recall and
 > scenario questions, be grown without app releases, and be served to students without letting
@@ -149,6 +149,9 @@ Depends on: Phase 1 (question bank).
 
 - [ ] As a teen user, I can start a practice test assembled from the question bank, mixing
   fact-recall and scenario items.
+- [ ] As a teen user, a test I've started keeps working offline and survives the app being
+  closed — carried over from Phase 1 as ph-3-us-1 (wires `src/study/testCache.ts` into the
+  test-taking screen).
 - [ ] As a teen user, I can generate and take multiple distinct practice tests, unlimited and
   free, without hitting any paywall or usage cap (MVP has no monetization — see Out of Scope).
 - [ ] As a teen user, I can choose (or the app defaults to) a timed or untimed test mode.
