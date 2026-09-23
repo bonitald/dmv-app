@@ -2535,12 +2535,12 @@ git commit -m "feat: add on-device test-set cache for ph-1-us-5"
 - Modify: each of the 7 story files (flip `**Status:**` to `Complete`, check off Acceptance
   Criteria and Tasks boxes that are now genuinely satisfied)
 
-- [ ] **Step 1: Update `phase-1-summary.md`**
+- [x] **Step 1: Update `phase-1-summary.md`**
 
 Flip the status table's remaining rows (ph-1-us-3, -5, -7, -8, -9, -10, -11) to `Complete`, and
 update the header line (`## Status: ...`) to reflect all 11 stories done.
 
-- [ ] **Step 2: Check off boxes in each story file**
+- [x] **Step 2: Check off boxes in each story file**
 
 For each of `ph-1-us-3-scoped-offline-test-cache.md`, `ph-1-us-5-local-test-cache.md`,
 `ph-1-us-7-topic-scoped-question-set.md`, `ph-1-us-8-baseline-diagnostic-assembly.md`,
@@ -2550,7 +2550,7 @@ check off (`- [x]`) every Acceptance Criteria and Tasks checkbox this plan actua
 Leave any AC unchecked if a task above genuinely didn't cover it (there shouldn't be any, per
 this plan's Self-Review below) rather than checking it off without verifying.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add docs/phases/phase-1-question-bank-and-content-model/
