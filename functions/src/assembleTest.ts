@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import type { Firestore } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { getDb } from './adminApp';
 import { shuffle } from './shuffle';
@@ -18,6 +19,7 @@ export interface AssembledQuestion {
   text: string; // The question prompt shown to the student
   choices: string[]; // Answer options, in stored order
   type: string; // Question style (e.g. fact recall vs. situational scenario)
+  chunkId: string; // Handbook topic/chunk this question was generated from
   conceptId: string; // Handbook concept this question tests; used to group/track weak areas
 }
 
@@ -46,9 +48,13 @@ interface AssembleTestOptions {
  *           auth — the caller's `request.auth` (undefined if not signed in)
  *           options.count — number of questions (default 25)
  *           options.random — random source (default Math.random)
- * Returns:  { testId, questions[] } — questions contain id/text/choices/type/conceptId only
+ * Returns:  { testId, questions[] } — questions contain id/text/choices/type/chunkId/conceptId
+ *           only
  * Reads:    `questions` collection, filtered to status == 'approved'
- * Writes:   none — the test is not persisted here, only handed back to the client
+ * Writes:   `users/{uid}/testAssignments/{testId}` — records exactly which question IDs were
+ *           assigned, so `scoreTest` (ph-1-us-11) can grade only what this call actually handed
+ *           out rather than trusting arbitrary question IDs submitted by the client (which would
+ *           let a caller submit IDs for questions they were never shown, revealing answers).
  * Errors:   HttpsError('unauthenticated') when `auth` is missing
  */
 export async function assembleTestForUser(
@@ -75,6 +81,10 @@ export async function assembleTestForUser(
   const shuffled = shuffle(snapshot.docs, random);
   const selected = shuffled.slice(0, count);
 
+  // Generated up front (rather than inline in the return) so the same ID is used both for the
+  // client-facing result and the testAssignments document written below.
+  const testId = randomUUID();
+
   // Convert each Firestore document into the client-safe shape. Copying fields one by one
   // (instead of spreading `doc.data()`) guarantees no extra stored fields leak to the app.
   const questions: AssembledQuestion[] = selected.map((doc) => {
@@ -84,13 +94,29 @@ export async function assembleTestForUser(
       text: data.text,
       choices: data.choices,
       type: data.type,
+      chunkId: data.chunkId,
       conceptId: data.conceptId,
     };
   });
 
+  // Persist which question IDs were actually assigned to this caller for this test. A later
+  // scoring function reads this record to grade only these questions, rather than trusting
+  // question IDs supplied by the client (which could otherwise be used to probe for answers to
+  // questions never shown to this user).
+  await db
+    .collection('users')
+    .doc(auth.uid)
+    .collection('testAssignments')
+    .doc(testId)
+    .set({
+      type: 'practice',
+      questionIds: questions.map((q) => q.id),
+      createdAt: FieldValue.serverTimestamp(),
+      scored: false,
+    });
+
   return {
-    // A new random ID per call so the client can refer to this specific test later.
-    testId: randomUUID(),
+    testId,
     questions,
   };
 }

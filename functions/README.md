@@ -28,7 +28,7 @@ authenticated caller. This is the **only** sanctioned way for a client to read q
 {
   "testId": "a locally-generated UUID, used as the frontend cache key (ph-1-us-5)",
   "questions": [
-    { "id": "...", "text": "...", "choices": ["..."], "type": "fact | scenario", "conceptId": "..." }
+    { "id": "...", "text": "...", "choices": ["..."], "type": "fact | scenario", "chunkId": "...", "conceptId": "..." }
   ]
 }
 ```
@@ -39,6 +39,11 @@ injectable random source for testing), and returns up to `DEFAULT_QUESTION_COUNT
 — exact per-test count is still an open product question, see `prd.md` Section 9). Randomization
 strategy is intentionally simple for MVP: fully random each call, repeats across a user's tests
 allowed. Revisit if practice starts feeling repetitive.
+
+**Persistence**: also writes `users/{uid}/testAssignments/{testId}` — `{ type: 'practice',
+questionIds: string[], createdAt: FieldValue, scored: false }` — recording exactly which question
+IDs were assigned. `scoreTest` (ph-1-us-11) reads this record to grade only questions actually
+handed to this caller, rather than trusting arbitrary question IDs submitted by the client.
 
 ## Local development
 

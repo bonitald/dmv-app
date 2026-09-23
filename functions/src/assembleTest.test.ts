@@ -60,6 +60,7 @@ describe('assembleTestForUser', () => {
       text: 'Question q1',
       choices: ['a', 'b', 'c'],
       type: 'fact',
+      chunkId: 'chunk-1',
       conceptId: 'concept-1',
     });
   });
@@ -111,5 +112,26 @@ describe('assembleTestForUser', () => {
     const ascendingIds = ascending.questions.map((q) => q.id);
     const descendingIds = descending.questions.map((q) => q.id);
     expect(ascendingIds).not.toEqual(descendingIds);
+  });
+
+  test('persists a practice testAssignments record for the caller', async () => {
+    await seedQuestion('q1');
+    await seedQuestion('q2');
+
+    const result = await assembleTestForUser(db, { uid: 'alice-uid' }, { count: 2 });
+
+    const assignmentSnap = await db
+      .collection('users')
+      .doc('alice-uid')
+      .collection('testAssignments')
+      .doc(result.testId)
+      .get();
+
+    expect(assignmentSnap.exists).toBe(true);
+    const assignment = assignmentSnap.data()!;
+    expect(assignment.type).toBe('practice');
+    expect(assignment.scored).toBe(false);
+    expect(assignment.questionIds.sort()).toEqual(result.questions.map((q) => q.id).sort());
+    expect(assignment.createdAt).toBeDefined();
   });
 });
