@@ -1328,7 +1328,7 @@ git commit -m "feat: add build-baseline and validate-baseline scripts"
   — read and advanced by Task 9 (`scoreTest`'s baseline path). Response `testId` format
   `baseline-{version}-{section}`, which Task 9 uses to detect a baseline submission.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `functions/src/startOrResumeBaseline.test.ts`:
 ```ts
@@ -1451,12 +1451,12 @@ describe('startOrResumeBaselineForUser', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npm run test:functions`
 Expected: FAIL with "Cannot find module './startOrResumeBaseline'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `functions/src/startOrResumeBaseline.ts`:
 ```ts
@@ -1567,12 +1567,12 @@ export const startOrResumeBaseline = onCall((request) =>
 );
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npm run test:functions`
 Expected: PASS.
 
-- [ ] **Step 5: Register the export and document it**
+- [x] **Step 5: Register the export and document it**
 
 In `functions/src/index.ts`, add:
 ```ts
@@ -1585,7 +1585,7 @@ questions for every user (3 sections × 15, handbook order), that progress lives
 `users/{uid}/baseline/progress` and only `scoreTest` advances `currentSection`, and that
 `already-exists` means the baseline (and free test) is already used.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add functions/src/startOrResumeBaseline.ts functions/src/startOrResumeBaseline.test.ts functions/src/index.ts functions/README.md
