@@ -124,7 +124,9 @@ without submitting returns the same section. Only `scoreTest` (ph-1-us-11) advan
 `currentSection` and sets `completedAt`. Clients can read the progress doc but never write it.
 
 **Errors**: `already-exists` means the baseline (and so the free test) has already been used;
-`failed-precondition` means the baseline version isn't published yet.
+`failed-precondition` means the baseline version isn't published yet, or the section
+references a question that has since been deleted (the message names it; publish a new baseline
+version to fix).
 
 ## `getFlashcards` (callable)
 
@@ -195,6 +197,11 @@ causing an error. Malformed answer entries are ignored.
 `perQuestion` lists every assigned question in the order it was handed out, with the correct
 answer, so the app can show what the student missed. Answers are revealed only after grading,
 only for questions this user was assigned, and each session can be graded only once.
+
+If an assigned question was deleted from the bank before grading, it's listed in `perQuestion`
+with `unavailable: true` (and `chunkId`/`correctAnswer`/`correct` null) and left out of
+`totalCount` and the score, so the student isn't marked down for it. Retire questions with a
+non-`approved` status instead of deleting them where possible.
 
 **Baseline answers are held back until the whole baseline is complete.** Every user takes the
 same 45 questions, so revealing section 1's answers early would let them be shared. For each

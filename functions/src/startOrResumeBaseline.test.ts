@@ -108,6 +108,16 @@ describe('startOrResumeBaselineForUser', () => {
     });
   });
 
+  test('returns failed-precondition, naming the question, when a baseline question was deleted', async () => {
+    await seedBaseline();
+    await db.collection('questions').doc('q1').delete();
+
+    await expect(startOrResumeBaselineForUser(db, { uid: 'alice-uid' })).rejects.toMatchObject({
+      code: 'failed-precondition',
+      message: expect.stringContaining('q1'),
+    });
+  });
+
   test('two different users receive identical section-1 questions', async () => {
     await seedBaseline();
 

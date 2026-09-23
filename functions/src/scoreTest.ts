@@ -32,7 +32,8 @@ export interface PerTopicResult {
  */
 export interface PerQuestionResult {
   questionId: string;
-  chunkId: string;
+  /** Null only when the question is unavailable (see below). */
+  chunkId: string | null;
   /** The choice the student submitted, or null if they skipped the question. */
   choice: string | null;
   /**
@@ -45,6 +46,11 @@ export interface PerQuestionResult {
    * still reveal right/wrong per question, since the baseline has one question per topic.
    */
   correct: boolean | null;
+  /**
+   * Present (true) when the question was deleted from the bank after it was assigned. It isn't
+   * graded and doesn't count toward totalCount or the score.
+   */
+  unavailable?: true;
 }
 
 /**
@@ -58,7 +64,10 @@ export interface ScoreTestResult {
   /** correctCount / totalCount, 0-1. */
   score: number;
   correctCount: number;
-  /** Number of questions assigned, not number answered — skipped questions count as wrong. */
+  /**
+   * Number of questions graded: every assigned question except any since deleted from the bank.
+   * Skipped questions still count (as wrong).
+   */
   totalCount: number;
   perTopic: PerTopicResult[];
   /**
@@ -107,7 +116,9 @@ function validateInput(input: ScoreTestInput): { testId: string; answers: Answer
  * Only `questionIds` (always taken from a server-side record) are graded. Answers for any other
  * question ID are ignored, so a client can't pad its score by submitting extra questions.
  *
- * Returns:  correctCount; perTopic breakdown; perQuestion results in `questionIds` order;
+ * Returns:  correctCount; gradedCount (excludes questions deleted since assignment, which are
+ *           listed in perQuestion as `unavailable`); perTopic breakdown; perQuestion results in
+ *           `questionIds` order;
  *           attemptChunkId — the single topic every question belongs to, or null when they
  *           span several topics
  * Reads:    `questions/{id}` for each ID
@@ -119,6 +130,7 @@ async function gradeQuestions(
   answers: AnswerInput[]
 ): Promise<{
   correctCount: number;
+  gradedCount: number;
   perTopic: PerTopicResult[];
   perQuestion: PerQuestionResult[];
   attemptChunkId: string | null;
@@ -130,16 +142,33 @@ async function gradeQuestions(
   const perTopicMap = new Map<string, PerTopicResult>();
   const perQuestion: PerQuestionResult[] = [];
   let correctCount = 0;
+  let gradedCount = 0;
   let singleChunkId: string | null = null;
 
   for (const doc of questionDocs) {
+    const submitted = answerByQuestionId.get(doc.id) ?? null;
+
+    // Deleted from the bank after it was assigned. Don't fail the whole submission, and don't
+    // mark the student down for something we removed: list it, but leave it ungraded.
+    if (!doc.exists) {
+      perQuestion.push({
+        questionId: doc.id,
+        chunkId: null,
+        choice: submitted,
+        correctAnswer: null,
+        correct: null,
+        unavailable: true,
+      });
+      continue;
+    }
+
+    gradedCount += 1;
     const data = doc.data()!;
     const chunkId: string = data.chunkId;
     // Track whether every question shares one topic; 'mixed' as soon as two differ.
     singleChunkId = singleChunkId === null ? chunkId : singleChunkId === chunkId ? chunkId : 'mixed';
 
     // A question with no submitted answer is wrong, not an error.
-    const submitted = answerByQuestionId.get(doc.id) ?? null;
     const correct = submitted !== null && submitted === data.correctAnswer;
     if (correct) correctCount += 1;
 
@@ -159,6 +188,7 @@ async function gradeQuestions(
 
   return {
     correctCount,
+    gradedCount,
     perTopic: [...perTopicMap.values()],
     perQuestion,
     attemptChunkId: singleChunkId === 'mixed' ? null : singleChunkId,
@@ -198,8 +228,8 @@ async function scoreAssignedTest(
 
     // Grade only the questions this user was actually assigned, never IDs the client chose.
     const questionIds: string[] = assignment.questionIds;
-    const { correctCount, perTopic, perQuestion, attemptChunkId } = await gradeQuestions(db, questionIds, answers);
-    const totalCount = questionIds.length;
+    const { correctCount, gradedCount, perTopic, perQuestion, attemptChunkId } = await gradeQuestions(db, questionIds, answers);
+    const totalCount = gradedCount;
     const score = totalCount === 0 ? 0 : correctCount / totalCount;
     // The type comes from the server-written assignment, so the client can't relabel a test.
     const type: AttemptType = assignment.type;
@@ -279,8 +309,8 @@ async function scoreBaselineSection(
 
     const sections: { section: number; questionIds: string[] }[] = baselineSnap.data()!.sections;
     const sectionDef = sections.find((s) => s.section === section)!;
-    const { correctCount, perTopic, perQuestion: graded } = await gradeQuestions(db, sectionDef.questionIds, answers);
-    const totalCount = sectionDef.questionIds.length;
+    const { correctCount, gradedCount, perTopic, perQuestion: graded } = await gradeQuestions(db, sectionDef.questionIds, answers);
+    const totalCount = gradedCount;
     const score = totalCount === 0 ? 0 : correctCount / totalCount;
     const isLastSection = section >= sections.length;
 

@@ -63,7 +63,8 @@ interface BaselineProgress {
  *           submitting returns the same section; only `scoreTest` moves progress forward.
  * Errors:   HttpsError('unauthenticated') — no signed-in caller
  *           HttpsError('already-exists') — this user already completed the baseline
- *           HttpsError('failed-precondition') — the user's baseline version isn't published
+ *           HttpsError('failed-precondition') — the user's baseline version isn't published, or
+ *           the section references a question that has since been deleted
  *           HttpsError('internal') — the progress doc points at a section the baseline lacks
  */
 export async function startOrResumeBaselineForUser(
@@ -116,6 +117,17 @@ export async function startOrResumeBaselineForUser(
   const questionDocs = await Promise.all(
     section.questionIds.map((id) => db.collection('questions').doc(id).get())
   );
+
+  // A question hard-deleted from the bank after the baseline was published. Serving a partial
+  // section would break "same questions for every user", so fail clearly instead; an operator
+  // fixes it by publishing a new baseline version (qb:validate-baseline reports these).
+  const missing = questionDocs.filter((doc) => !doc.exists).map((doc) => doc.id);
+  if (missing.length > 0) {
+    throw new HttpsError(
+      'failed-precondition',
+      `Baseline ${progress.version} section ${section.section} references deleted question(s): ${missing.join(', ')}.`
+    );
+  }
 
   // Map to the client-safe shape. `correctAnswer`, `sourceRef`, `selfCheck` and review fields are
   // intentionally left out so answers can't be read from the network response.

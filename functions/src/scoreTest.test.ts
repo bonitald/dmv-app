@@ -132,6 +132,34 @@ describe('scoreTestForUser', () => {
     ]);
   });
 
+  test('skips a question deleted after assignment instead of failing or counting it wrong', async () => {
+    await seedQuestion('q1', 'row', 'a');
+    await seedQuestion('q2', 'signs', 'b');
+    const assembled = await assembleTestForUser(db, { uid }, { count: 2 });
+    await db.collection('questions').doc('q2').delete();
+
+    const result = await scoreTestForUser(db, { uid }, {
+      testId: assembled.testId,
+      answers: [
+        { questionId: 'q1', choice: 'a' },
+        { questionId: 'q2', choice: 'b' },
+      ],
+    });
+
+    expect(result.correctCount).toBe(1);
+    expect(result.totalCount).toBe(1);
+    expect(result.score).toBe(1);
+    expect(result.perTopic).toEqual([{ chunkId: 'row', correct: 1, total: 1 }]);
+    expect(result.perQuestion.find((q) => q.questionId === 'q2')).toEqual({
+      questionId: 'q2',
+      chunkId: null,
+      choice: 'b',
+      correctAnswer: null,
+      correct: null,
+      unavailable: true,
+    });
+  });
+
   test('treats an unanswered question as incorrect, not an error', async () => {
     await seedQuestion('q1', 'row', 'a');
     const assembled = await assembleTestForUser(db, { uid }, { count: 1 });
