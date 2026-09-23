@@ -28,12 +28,13 @@ async function seedQuestion(chunkId: string, status: string) {
     });
 }
 
-describe('publishTopics', () => {
-  beforeEach(async () => {
-    const snap = await getDb().collection('questions').get();
-    await Promise.all(snap.docs.map((d) => d.ref.delete()));
-  });
+// Test files share one emulator and run in parallel, so each test scopes its data to a unique
+// chunkId instead of wiping collections other files are using.
+function uniqueChunkId(): string {
+  return `row-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
+describe('publishTopics', () => {
   const baseChunk = {
     title: 'Right of Way',
     description: 'desc',
@@ -45,15 +46,16 @@ describe('publishTopics', () => {
   };
 
   it('writes a topics doc per chunk with the approved question count', async () => {
-    const runId = await seedRun([{ ...baseChunk, chunkId: 'row' }]);
-    await seedQuestion('row', 'approved');
-    await seedQuestion('row', 'approved');
-    await seedQuestion('row', 'pending_review');
+    const chunkId = uniqueChunkId();
+    const runId = await seedRun([{ ...baseChunk, chunkId }]);
+    await seedQuestion(chunkId, 'approved');
+    await seedQuestion(chunkId, 'approved');
+    await seedQuestion(chunkId, 'pending_review');
 
     const result = await publishTopics(runId);
 
     expect(result.topicsWritten).toBe(1);
-    const topicSnap = await getDb().collection('topics').doc('row').get();
+    const topicSnap = await getDb().collection('topics').doc(chunkId).get();
     expect(topicSnap.data()).toEqual({
       title: 'Right of Way',
       description: 'desc',
@@ -63,14 +65,15 @@ describe('publishTopics', () => {
   });
 
   it('is idempotent when re-run', async () => {
-    const runId = await seedRun([{ ...baseChunk, chunkId: 'row' }]);
-    await seedQuestion('row', 'approved');
+    const chunkId = uniqueChunkId();
+    const runId = await seedRun([{ ...baseChunk, chunkId }]);
+    await seedQuestion(chunkId, 'approved');
 
     await publishTopics(runId);
-    await seedQuestion('row', 'approved');
+    await seedQuestion(chunkId, 'approved');
     await publishTopics(runId);
 
-    const topicSnap = await getDb().collection('topics').doc('row').get();
+    const topicSnap = await getDb().collection('topics').doc(chunkId).get();
     expect(topicSnap.data()?.approvedQuestionCount).toBe(2);
   });
 
