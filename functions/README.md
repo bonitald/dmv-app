@@ -126,6 +126,41 @@ without submitting returns the same section. Only `scoreTest` (ph-1-us-11) advan
 **Errors**: `already-exists` means the baseline (and so the free test) has already been used;
 `failed-precondition` means the baseline version isn't published yet.
 
+## `getFlashcards` (callable)
+
+Returns every approved question in one topic, **with answers**, for flashcard study (ph-1-us-10).
+
+**Auth**: requires a signed-in caller (anonymous auth is fine). Rejects with an `unauthenticated`
+`HttpsError` otherwise.
+
+**Input**:
+```json
+{ "chunkId": "string (required) — the handbook topic, e.g. 'right-of-way'" }
+```
+
+**Output**:
+```json
+{
+  "chunkId": "right-of-way",
+  "cards": [
+    { "id": "...", "text": "...", "choices": ["..."], "correctAnswer": "...", "type": "fact | scenario", "chunkId": "...", "conceptId": "..." }
+  ]
+}
+```
+Unlike `assembleTest` and `assembleMiniQuiz`, cards **include `correctAnswer`** — flashcards show
+the answer. `sourceRef` and review metadata are still omitted. Cards are shuffled on every call.
+
+**Rate limit**: 30 calls per 10 minutes per user (`RATE_LIMIT_MAX_CALLS` / `RATE_LIMIT_WINDOW_MS`),
+tracked server-side at `users/{uid}/rateLimits/flashcards`, which clients can't read or write. It
+slows bulk scraping of the answer key; it doesn't prevent it. **These values are a starting
+proposal, not a validated product decision** — tune them if real study sessions hit the limit.
+
+**Persistence**: none beyond the rate-limit counter. Studying is unscored: nothing is written to
+`testAssignments` or `testAttempts`.
+
+**Errors**: `invalid-argument` (missing/empty `chunkId`), `not-found` (topic has no approved
+questions), `resource-exhausted` (over the rate limit).
+
 ## Local development
 
 ```bash
