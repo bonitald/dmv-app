@@ -907,7 +907,7 @@ git commit -m "feat: add publish-topics script for the readable topic catalog"
 Already covered by Task 3's rules change and tests (the `topics/{chunkId}` match block and its
 rules tests). No additional work — this task is a checkpoint, not new code.
 
-- [ ] **Step 1: Confirm Task 3 is complete and its topics-specific tests pass**
+- [x] **Step 1: Confirm Task 3 is complete and its topics-specific tests pass**
 
 Run: `npm run test:rules`
 Expected: PASS, including `'a signed-in device can read topics'`, `'...cannot write topics'`,
