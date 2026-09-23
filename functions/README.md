@@ -188,12 +188,13 @@ causing an error. Malformed answer entries are ignored.
   "correctCount": 12,
   "totalCount": 15,
   "perTopic": [{ "chunkId": "right-of-way", "correct": 3, "total": 4 }],
+  "perQuestion": [{ "questionId": "...", "chunkId": "...", "choice": "... | null if skipped", "correctAnswer": "...", "correct": false }],
   "recommendation": "move-on | review-again | null"
 }
 ```
-**Known gap:** ph-1-us-11 also calls for per-question results including each correct answer
-(so a student can see what they missed). Not implemented yet — the response currently has only
-the score and per-topic totals.
+`perQuestion` lists every assigned question in the order it was handed out, with the correct
+answer, so the app can show what the student missed. Answers are revealed only after grading,
+only for questions this user was assigned, and each session can be graded only once.
 
 **How each type is graded** — always against a server-side record, never question IDs the client
 sends:
@@ -212,7 +213,7 @@ product decision.** `null` for practice tests and baseline sections.
 
 **Persistence**: writes `users/{uid}/testAttempts/{testId}` — `{ type, chunkId (topic for a
 mini-quiz, or for a practice test whose questions all share one; otherwise null), score,
-correctCount, totalCount, perTopic, recommendation, createdAt }`. Clients can read attempts but
+correctCount, totalCount, perTopic, perQuestion, recommendation, createdAt }`. Clients can read attempts but
 never write them.
 
 **Errors**: `invalid-argument` (missing `testId`, non-array `answers`, malformed baseline

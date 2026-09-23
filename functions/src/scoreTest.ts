@@ -26,9 +26,23 @@ export interface PerTopicResult {
 }
 
 /**
+ * How the student did on one question. Includes the correct answer so the app can show what
+ * they missed (ph-1-us-11). Answers are only revealed here, after the session is graded, and only
+ * for questions this user was assigned.
+ */
+export interface PerQuestionResult {
+  questionId: string;
+  chunkId: string;
+  /** The choice the student submitted, or null if they skipped the question. */
+  choice: string | null;
+  correctAnswer: string;
+  correct: boolean;
+}
+
+/**
  * What the client receives after submitting. The same fields (minus `testId`, plus `chunkId`
- * and `createdAt`) are saved to `users/{uid}/testAttempts/{testId}`. Known gap vs ph-1-us-11:
- * the story also asks for per-question results with each correct answer; not implemented yet.
+ * and `createdAt`) are saved to `users/{uid}/testAttempts/{testId}`, so a later review screen can
+ * show per-question results without re-grading.
  */
 export interface ScoreTestResult {
   testId: string;
@@ -39,6 +53,8 @@ export interface ScoreTestResult {
   /** Number of questions assigned, not number answered — skipped questions count as wrong. */
   totalCount: number;
   perTopic: PerTopicResult[];
+  /** One entry per assigned question, in the order the questions were handed out. */
+  perQuestion: PerQuestionResult[];
   /** Mini-quizzes only; null for practice tests and baseline sections. */
   recommendation: 'move-on' | 'review-again' | null;
 }
@@ -75,8 +91,9 @@ function validateInput(input: ScoreTestInput): { testId: string; answers: Answer
  * Only `questionIds` (always taken from a server-side record) are graded. Answers for any other
  * question ID are ignored, so a client can't pad its score by submitting extra questions.
  *
- * Returns:  correctCount; perTopic breakdown; attemptChunkId — the single topic every question
- *           belongs to, or null when they span several topics
+ * Returns:  correctCount; perTopic breakdown; perQuestion results in `questionIds` order;
+ *           attemptChunkId — the single topic every question belongs to, or null when they
+ *           span several topics
  * Reads:    `questions/{id}` for each ID
  * Writes:   none
  */
@@ -87,12 +104,15 @@ async function gradeQuestions(
 ): Promise<{
   correctCount: number;
   perTopic: PerTopicResult[];
+  perQuestion: PerQuestionResult[];
   attemptChunkId: string | null;
 }> {
   const answerByQuestionId = new Map(answers.map((a) => [a.questionId, a.choice]));
+  // Promise.all keeps results in questionIds order, which perQuestion relies on.
   const questionDocs = await Promise.all(questionIds.map((id) => db.collection('questions').doc(id).get()));
 
   const perTopicMap = new Map<string, PerTopicResult>();
+  const perQuestion: PerQuestionResult[] = [];
   let correctCount = 0;
   let singleChunkId: string | null = null;
 
@@ -107,6 +127,14 @@ async function gradeQuestions(
     const correct = submitted !== null && submitted === data.correctAnswer;
     if (correct) correctCount += 1;
 
+    perQuestion.push({
+      questionId: doc.id,
+      chunkId,
+      choice: submitted,
+      correctAnswer: data.correctAnswer,
+      correct,
+    });
+
     const topic = perTopicMap.get(chunkId) ?? { chunkId, correct: 0, total: 0 };
     topic.total += 1;
     if (correct) topic.correct += 1;
@@ -116,6 +144,7 @@ async function gradeQuestions(
   return {
     correctCount,
     perTopic: [...perTopicMap.values()],
+    perQuestion,
     attemptChunkId: singleChunkId === 'mixed' ? null : singleChunkId,
   };
 }
@@ -153,7 +182,7 @@ async function scoreAssignedTest(
 
     // Grade only the questions this user was actually assigned, never IDs the client chose.
     const questionIds: string[] = assignment.questionIds;
-    const { correctCount, perTopic, attemptChunkId } = await gradeQuestions(db, questionIds, answers);
+    const { correctCount, perTopic, perQuestion, attemptChunkId } = await gradeQuestions(db, questionIds, answers);
     const totalCount = questionIds.length;
     const score = totalCount === 0 ? 0 : correctCount / totalCount;
     // The type comes from the server-written assignment, so the client can't relabel a test.
@@ -170,12 +199,13 @@ async function scoreAssignedTest(
       correctCount,
       totalCount,
       perTopic,
+      perQuestion,
       recommendation,
       createdAt: FieldValue.serverTimestamp(),
     });
     tx.update(assignmentRef, { scored: true });
 
-    return { testId, type, score, correctCount, totalCount, perTopic, recommendation };
+    return { testId, type, score, correctCount, totalCount, perTopic, perQuestion, recommendation };
   });
 }
 
@@ -231,7 +261,7 @@ async function scoreBaselineSection(
 
     const sections: { section: number; questionIds: string[] }[] = baselineSnap.data()!.sections;
     const sectionDef = sections.find((s) => s.section === section)!;
-    const { correctCount, perTopic } = await gradeQuestions(db, sectionDef.questionIds, answers);
+    const { correctCount, perTopic, perQuestion } = await gradeQuestions(db, sectionDef.questionIds, answers);
     const totalCount = sectionDef.questionIds.length;
     const score = totalCount === 0 ? 0 : correctCount / totalCount;
 
@@ -243,6 +273,7 @@ async function scoreBaselineSection(
       correctCount,
       totalCount,
       perTopic,
+      perQuestion,
       recommendation: null,
       createdAt: FieldValue.serverTimestamp(),
     });
@@ -263,6 +294,7 @@ async function scoreBaselineSection(
       correctCount,
       totalCount,
       perTopic,
+      perQuestion,
       recommendation: null,
     };
   });

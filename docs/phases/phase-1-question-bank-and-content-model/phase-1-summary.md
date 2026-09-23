@@ -1,6 +1,6 @@
 # Phase 1: Question Bank & Content Model — Summary
 
-## Status: Backend complete — 8 of 11 stories Complete, 3 Partially complete (2026-09-23)
+## Status: Backend complete — 9 of 11 stories Complete, 2 Partially complete (2026-09-23)
 
 Most of this phase's schema/content work was already delivered by the question-bank ingestion
 pipeline (`docs/superpowers/specs/2026-09-08-question-bank-ingestion-design.md`), which has run
@@ -9,8 +9,7 @@ against the CO DMV handbook and produced 1,415 questions across 499 concepts
 question bank), the topic catalog, the fixed baseline, and the on-device test cache module.
 
 **Still open:** ph-1-us-3 and ph-1-us-5 need the Phase 3 test-taking screen to use
-`src/study/testCache.ts`; ph-1-us-11 needs `scoreTest` to return per-question results with
-correct answers. See each story's status note.
+`src/study/testCache.ts`. See each story's status note.
 
 ## Stories
 
@@ -26,7 +25,7 @@ correct answers. See each story's status note.
 | ph-1-us-8 | Fixed baseline diagnostic (sectioned, resumable, doubles as free test) | Backend | — | Complete |
 | ph-1-us-9 | Topic catalog for the learning path | Backend | — | Complete |
 | ph-1-us-10 | Flashcard delivery for a topic (with answers, unscored) | Backend | — | Complete |
-| ph-1-us-11 | Score a test, mini-quiz, or baseline section | Backend | — | Partially complete |
+| ph-1-us-11 | Score a test, mini-quiz, or baseline section | Backend | — | Complete |
 
 ## Key decisions made during planning
 

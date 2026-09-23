@@ -2,7 +2,7 @@
 
 **ID:** ph-1-us-11
 **Layer:** Backend
-**Status:** Partially complete
+**Status:** Complete
 
 ## Story
 As a teen user who finished a test, mini-quiz, or baseline section,
@@ -31,10 +31,9 @@ So that I see how I did and get a recommendation on what to do next.
   `freeTestUsedAt` on the user.
 
 ## Acceptance Criteria
-- [ ] Given a `testId` with an assignment at `users/{uid}/testAssignments/{testId}` for the
+- [x] Given a `testId` with an assignment at `users/{uid}/testAssignments/{testId}` for the
   caller and their answers, when the function runs, then it returns the score, per-question
   results including each correct answer, and per-topic (`chunkId`) results.
-  - _Note (2026-09-23):_ Not done: `scoreTest` returns score and per-topic results but no per-question results or correct answers. Needs a follow-up change to `scoreTest`.
 - [x] Given a `testId` with no assignment for this uid, then it rejects and reveals nothing.
 - [x] Given an assignment already marked `scored: true`, when scored again, then it rejects
   (`already-exists`) and leaves both records unchanged.
@@ -78,4 +77,4 @@ So that I see how I did and get a recommendation on what to do next.
   the recommendation, or stay a client action from the user's button choice (Phase 2)?
 
 ## Status note (2026-09-23)
-Grading, double-submit protection, the mini-quiz recommendation, attempt persistence and baseline completion are all done (`functions/src/scoreTest.ts`, 11 emulator tests). The one open criterion is per-question results with correct answers in the response.
+Grading, double-submit protection, the mini-quiz recommendation, attempt persistence and baseline completion are all done (`functions/src/scoreTest.ts`, 11 emulator tests). Per-question results with correct answers (`perQuestion`) were added the same day, and are also saved on the attempt for later review.

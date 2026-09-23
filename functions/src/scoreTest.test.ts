@@ -92,6 +92,46 @@ describe('scoreTestForUser', () => {
     expect(attemptSnap.data()?.type).toBe('practice');
   });
 
+  test('returns per-question results with each correct answer, in assignment order, and saves them', async () => {
+    await seedQuestion('q1', 'row', 'a');
+    await seedQuestion('q2', 'signs', 'b');
+    const assembled = await assembleTestForUser(db, { uid }, { count: 2 });
+
+    const result = await scoreTestForUser(db, { uid }, {
+      testId: assembled.testId,
+      answers: [
+        { questionId: 'q1', choice: 'a' },
+        { questionId: 'q2', choice: 'a' },
+      ],
+    });
+
+    const expected = {
+      q1: { questionId: 'q1', chunkId: 'row', choice: 'a', correctAnswer: 'a', correct: true },
+      q2: { questionId: 'q2', chunkId: 'signs', choice: 'a', correctAnswer: 'b', correct: false },
+    };
+    const assignedOrder = assembled.questions.map((q) => q.id as 'q1' | 'q2');
+    expect(result.perQuestion).toEqual(assignedOrder.map((id) => expected[id]));
+
+    const attemptSnap = await db
+      .collection('users')
+      .doc(uid)
+      .collection('testAttempts')
+      .doc(assembled.testId)
+      .get();
+    expect(attemptSnap.data()?.perQuestion).toEqual(result.perQuestion);
+  });
+
+  test('reports an unanswered question with a null choice', async () => {
+    await seedQuestion('q1', 'row', 'a');
+    const assembled = await assembleTestForUser(db, { uid }, { count: 1 });
+
+    const result = await scoreTestForUser(db, { uid }, { testId: assembled.testId, answers: [] });
+
+    expect(result.perQuestion).toEqual([
+      { questionId: 'q1', chunkId: 'row', choice: null, correctAnswer: 'a', correct: false },
+    ]);
+  });
+
   test('treats an unanswered question as incorrect, not an error', async () => {
     await seedQuestion('q1', 'row', 'a');
     const assembled = await assembleTestForUser(db, { uid }, { count: 1 });
@@ -162,6 +202,9 @@ describe('scoreTestForUser', () => {
     });
 
     expect(result.type).toBe('baseline');
+    expect(result.perQuestion).toEqual([
+      { questionId: 'q1', chunkId: 'row', choice: 'a', correctAnswer: 'a', correct: true },
+    ]);
 
     const progressSnap = await db.collection('users').doc(uid).collection('baseline').doc('progress').get();
     expect(progressSnap.data()?.currentSection).toBe(2);
