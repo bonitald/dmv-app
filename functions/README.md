@@ -45,6 +45,47 @@ questionIds: string[], createdAt: FieldValue, scored: false }` — recording exa
 IDs were assigned. `scoreTest` (ph-1-us-11) reads this record to grade only questions actually
 handed to this caller, rather than trusting arbitrary question IDs submitted by the client.
 
+## `assembleMiniQuiz` (callable)
+
+Server-side selects a bounded, topic-scoped, randomized set of `approved` questions for a specific
+handbook chunk and returns it to an authenticated caller. Similar to `assembleTest` but intended
+for review/drill sessions on a single topic rather than full practice tests.
+
+**Auth**: requires a signed-in caller (anonymous auth is fine). Rejects with an `unauthenticated`
+`HttpsError` and returns no content otherwise.
+
+**Input**:
+```json
+{
+  "chunkId": "string (required) — the handbook topic/chunk to quiz on (e.g. 'right-of-way')",
+  "count": "number (optional) — how many questions to return; defaults to 10, capped at 10",
+  "excludeIds": "string[] (optional) — question IDs from a previous quiz on this topic; used to avoid immediate repeats when the pool is large enough"
+}
+```
+
+**Output**:
+```json
+{
+  "testId": "a locally-generated UUID, used as the frontend cache key",
+  "questions": [
+    { "id": "...", "text": "...", "choices": ["..."], "type": "fact | scenario", "chunkId": "...", "conceptId": "..." }
+  ]
+}
+```
+Deliberately omits `correctAnswer`, `sourceRef`, and review metadata — the client never needs those.
+
+**Selection**: reads only `status == 'approved'` questions matching the requested `chunkId`,
+shuffles them (Fisher-Yates, injectable random source for testing), and returns up to
+`MAX_MINI_QUIZ_COUNT` (10). When `excludeIds` is provided and the pool has enough questions
+remaining after filtering them out, uses only the remaining pool; otherwise falls back to the
+full pool to ensure repeats are unavoidable only on small topics.
+
+**Persistence**: also writes `users/{uid}/testAssignments/{testId}` — `{ type: 'mini-quiz',
+chunkId: string, questionIds: string[], createdAt: FieldValue, scored: false }` — recording
+exactly which questions were assigned and their topic. `scoreTest` (ph-1-us-11) reads this record
+to grade only questions actually handed to this caller, rather than trusting arbitrary question
+IDs submitted by the client.
+
 ## Local development
 
 ```bash

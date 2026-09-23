@@ -9,4 +9,5 @@ module.exports = {
   transform: {
     '^.+\\.ts$': ['ts-jest', { tsconfig: path.join(__dirname, 'tsconfig.json') }],
   },
+  maxWorkers: 1,
 };
