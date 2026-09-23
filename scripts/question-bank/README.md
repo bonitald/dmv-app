@@ -105,3 +105,29 @@ Safe to re-run at any time after more questions are reviewed/approved — it's i
 recomputing `approvedQuestionCount` from the current `questions` collection rather than
 incrementing. It holds no question content by design: only title/description/order/count, so a
 client reading `topics/{chunkId}` can never extract question text.
+
+## `qb:build-baseline` / `qb:validate-baseline` (fixed baseline diagnostic, ph-1-us-8)
+
+```bash
+npm run qb:build-baseline -- v1 /path/to/baseline-selection.json
+npm run qb:validate-baseline -- v1
+```
+
+`baseline-selection.json` maps each topic to the one approved question a human reviewer
+hand-picked for its baseline slot — exactly 45 entries, one per topic:
+
+```json
+{
+  "right-of-way": "<approved questionId>",
+  "freeway-entering-and-driving": "<approved questionId>"
+}
+```
+
+`build-baseline` checks every question exists, is `approved`, and belongs to the topic it's
+listed under, then writes `baselineTests/<version>` as 3 sections of 15, ordered by
+`topics/{chunkId}.order`. **Run `qb:publish-topics` first** — a topic missing from `topics`
+fails the build. The app reads version `v1`, so use that name for the live baseline.
+
+`validate-baseline` re-checks a published baseline against the current bank and exits non-zero
+listing any question that is no longer `approved`. It never swaps questions itself — replace
+them in the selection file and re-run `build-baseline`. Re-run it after each review pass.

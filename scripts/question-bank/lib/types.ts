@@ -61,3 +61,13 @@ export interface QuestionRecord extends QuestionInput {
   reviewNotes: null;
   createdAt: FieldValue;
 }
+
+export interface BaselineSection {
+  section: number;
+  questionIds: string[];
+}
+
+export interface BaselineTestRecord {
+  sections: BaselineSection[];
+  createdAt: FieldValue;
+}

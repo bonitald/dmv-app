@@ -55,7 +55,9 @@
     "qb:write-questions": "tsx scripts/question-bank/write-questions.ts",
     "qb:export-questions": "tsx scripts/question-bank/export-questions.ts",
     "qb:apply-review": "tsx scripts/question-bank/apply-review.ts",
-    "qb:publish-topics": "tsx scripts/question-bank/publish-topics.ts"
+    "qb:publish-topics": "tsx scripts/question-bank/publish-topics.ts",
+    "qb:build-baseline": "tsx scripts/question-bank/build-baseline.ts",
+    "qb:validate-baseline": "tsx scripts/question-bank/validate-baseline.ts"
   },
   "private": true,
   "allowScripts": {
