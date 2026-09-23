@@ -20,3 +20,4 @@
 - Phase 1 plan Tasks 5-7 done: `qb:publish-topics` (topic catalog, ph-1-us-9), Task 6 rules checkpoint, and `qb:build-baseline`/`qb:validate-baseline` (ph-1-us-8 part 1); question-bank suite 39/39. Next: Task 8, `startOrResumeBaseline` callable.
 - Phase 1 plan Task 8 done: `startOrResumeBaseline` callable (ph-1-us-8 part 2) serves the fixed 45-question baseline 15 at a time from server-side progress; functions suite 21/21. Next: Task 9, `getFlashcards`.
 - Phase 1 plan Task 9 done: `getFlashcards` callable (ph-1-us-10) returns a topic's approved cards with answers, rate-limited to 30 calls/10 min per user; functions suite 28/28. Next: Task 10, `scoreTest`.
+- Phase 1 plan Task 10 done: `scoreTest` callable (ph-1-us-11) grades practice tests, mini-quizzes (80% move-on/review-again) and baseline sections; closed a gap in the plan where a client could score a baseline section from another version. Functions suite 39/39. Next: Task 11, frontend `testCache.ts`.
