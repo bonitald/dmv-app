@@ -196,6 +196,15 @@ causing an error. Malformed answer entries are ignored.
 answer, so the app can show what the student missed. Answers are revealed only after grading,
 only for questions this user was assigned, and each session can be graded only once.
 
+**Baseline answers are held back until the whole baseline is complete.** Every user takes the
+same 45 questions, so revealing section 1's answers early would let them be shared. For each
+section before the last, `perQuestion` has `correctAnswer: null` and `correct: null` — in the
+response and in the saved attempt (which the client can read). Per-topic totals and the score
+are still returned; because the baseline has one question per topic, those totals do show
+right/wrong per question, just not the correct answer. Scoring the last section adds `baselineReview`: every question from all sections, in
+baseline order, with the student's choice, the correct answer and whether it was right —
+rebuilt from the choices saved on each earlier section's attempt.
+
 **How each type is graded** — always against a server-side record, never question IDs the client
 sends:
 - **practice** / **mini-quiz**: `users/{uid}/testAssignments/{testId}`, written when
@@ -213,7 +222,8 @@ product decision.** `null` for practice tests and baseline sections.
 
 **Persistence**: writes `users/{uid}/testAttempts/{testId}` — `{ type, chunkId (topic for a
 mini-quiz, or for a practice test whose questions all share one; otherwise null), score,
-correctCount, totalCount, perTopic, perQuestion, recommendation, createdAt }`. Clients can read attempts but
+correctCount, totalCount, perTopic, perQuestion, recommendation, createdAt }`, plus
+`baselineReview` on the final baseline section's attempt. Clients can read attempts but
 never write them.
 
 **Errors**: `invalid-argument` (missing `testId`, non-array `answers`, malformed baseline

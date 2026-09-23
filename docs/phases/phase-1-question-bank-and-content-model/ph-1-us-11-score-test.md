@@ -77,4 +77,4 @@ So that I see how I did and get a recommendation on what to do next.
   the recommendation, or stay a client action from the user's button choice (Phase 2)?
 
 ## Status note (2026-09-23)
-Grading, double-submit protection, the mini-quiz recommendation, attempt persistence and baseline completion are all done (`functions/src/scoreTest.ts`, 11 emulator tests). Per-question results with correct answers (`perQuestion`) were added the same day, and are also saved on the attempt for later review.
+Grading, double-submit protection, the mini-quiz recommendation, attempt persistence and baseline completion are all done (`functions/src/scoreTest.ts`, 11 emulator tests). Per-question results with correct answers (`perQuestion`) were added the same day, and are also saved on the attempt for later review. Decision: baseline answers are withheld (null) until the final section is scored, which then returns `baselineReview` for all 45 questions — every user takes the same baseline, so early answers could be shared.

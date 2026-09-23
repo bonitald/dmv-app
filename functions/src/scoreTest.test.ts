@@ -202,9 +202,14 @@ describe('scoreTestForUser', () => {
     });
 
     expect(result.type).toBe('baseline');
-    expect(result.perQuestion).toEqual([
-      { questionId: 'q1', chunkId: 'row', choice: 'a', correctAnswer: 'a', correct: true },
-    ]);
+    // Answers are held back until the whole baseline is complete — in the response and in the
+    // client-readable attempt doc.
+    const withheld = [{ questionId: 'q1', chunkId: 'row', choice: 'a', correctAnswer: null, correct: null }];
+    expect(result.perQuestion).toEqual(withheld);
+    expect(result.baselineReview).toBeUndefined();
+    const attemptSnap = await db.collection('users').doc(uid).collection('testAttempts').doc(started.testId).get();
+    expect(attemptSnap.data()?.perQuestion).toEqual(withheld);
+    expect(JSON.stringify(attemptSnap.data())).not.toContain('correctAnswer":"a');
 
     const progressSnap = await db.collection('users').doc(uid).collection('baseline').doc('progress').get();
     expect(progressSnap.data()?.currentSection).toBe(2);
@@ -228,6 +233,42 @@ describe('scoreTestForUser', () => {
     const progressSnap = await db.collection('users').doc(uid).collection('baseline').doc('progress').get();
     expect(progressSnap.data()?.completedAt).not.toBeNull();
     expect(progressSnap.data()?.freeTestUsedAt).not.toBeNull();
+  });
+
+  test('finishing the baseline reveals every section\'s answers in baselineReview', async () => {
+    await seedQuestion('q1', 'row', 'a');
+    await seedQuestion('q2', 'signs', 'b');
+    await db
+      .collection('baselineTests')
+      .doc(CURRENT_BASELINE_VERSION)
+      .set({
+        sections: [
+          { section: 1, questionIds: ['q1'] },
+          { section: 2, questionIds: ['q2'] },
+        ],
+        createdAt: new Date(),
+      });
+
+    const section1 = await startOrResumeBaselineForUser(db, { uid });
+    await scoreTestForUser(db, { uid }, {
+      testId: section1.testId,
+      answers: [{ questionId: 'q1', choice: 'wrong' }],
+    });
+    const section2 = await startOrResumeBaselineForUser(db, { uid });
+    const final = await scoreTestForUser(db, { uid }, {
+      testId: section2.testId,
+      answers: [{ questionId: 'q2', choice: 'b' }],
+    });
+
+    const review = [
+      { questionId: 'q1', chunkId: 'row', choice: 'wrong', correctAnswer: 'a', correct: false },
+      { questionId: 'q2', chunkId: 'signs', choice: 'b', correctAnswer: 'b', correct: true },
+    ];
+    expect(final.perQuestion).toEqual([review[1]]);
+    expect(final.baselineReview).toEqual(review);
+
+    const attemptSnap = await db.collection('users').doc(uid).collection('testAttempts').doc(section2.testId).get();
+    expect(attemptSnap.data()?.baselineReview).toEqual(review);
   });
 
   test('rejects a baseline testId for a section that is not the caller\'s current section', async () => {

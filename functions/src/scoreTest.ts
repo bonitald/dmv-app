@@ -27,16 +27,24 @@ export interface PerTopicResult {
 
 /**
  * How the student did on one question. Includes the correct answer so the app can show what
- * they missed (ph-1-us-11). Answers are only revealed here, after the session is graded, and only
- * for questions this user was assigned.
+ * they missed (ph-1-us-11). Answers are only revealed after grading, and only for questions this
+ * user was assigned.
  */
 export interface PerQuestionResult {
   questionId: string;
   chunkId: string;
   /** The choice the student submitted, or null if they skipped the question. */
   choice: string | null;
-  correctAnswer: string;
-  correct: boolean;
+  /**
+   * Null while withheld: baseline answers stay hidden until the whole baseline is complete,
+   * because every user takes the same 45 questions and early answers could be shared.
+   */
+  correctAnswer: string | null;
+  /**
+   * Null while withheld, alongside correctAnswer. Note: a baseline section's perTopic totals
+   * still reveal right/wrong per question, since the baseline has one question per topic.
+   */
+  correct: boolean | null;
 }
 
 /**
@@ -53,8 +61,16 @@ export interface ScoreTestResult {
   /** Number of questions assigned, not number answered — skipped questions count as wrong. */
   totalCount: number;
   perTopic: PerTopicResult[];
-  /** One entry per assigned question, in the order the questions were handed out. */
+  /**
+   * One entry per assigned question, in the order the questions were handed out. For baseline
+   * sections before the last, `correctAnswer` and `correct` are null (see PerQuestionResult).
+   */
   perQuestion: PerQuestionResult[];
+  /**
+   * Final baseline section only: every question from every section, in baseline order, with
+   * answers revealed. Absent otherwise.
+   */
+  baselineReview?: PerQuestionResult[];
   /** Mini-quizzes only; null for practice tests and baseline sections. */
   recommendation: 'move-on' | 'review-again' | null;
 }
@@ -213,6 +229,8 @@ async function scoreAssignedTest(
  * Grades one baseline section and advances the user's baseline progress.
  *
  * Reads:    `users/{uid}/baseline/progress`, `baselineTests/{version}`, `questions/{id}`
+ * Returns:  per-question results with answers withheld (null) until the last section; the
+ *           last section also returns `baselineReview` with every section's answers
  * Writes:   `users/{uid}/testAttempts/{testId}`; `users/{uid}/baseline/progress` — moves
  *           `currentSection` forward, or on the last section sets `completedAt` and
  *           `freeTestUsedAt` (the baseline is the user's one free full test)
@@ -261,9 +279,41 @@ async function scoreBaselineSection(
 
     const sections: { section: number; questionIds: string[] }[] = baselineSnap.data()!.sections;
     const sectionDef = sections.find((s) => s.section === section)!;
-    const { correctCount, perTopic, perQuestion } = await gradeQuestions(db, sectionDef.questionIds, answers);
+    const { correctCount, perTopic, perQuestion: graded } = await gradeQuestions(db, sectionDef.questionIds, answers);
     const totalCount = sectionDef.questionIds.length;
     const score = totalCount === 0 ? 0 : correctCount / totalCount;
+    const isLastSection = section >= sections.length;
+
+    // Every user takes the same baseline, so answers stay hidden until the user has finished it:
+    // otherwise section 1's answers could be passed to someone who hasn't taken it yet. The
+    // attempt doc is client-readable, so it must not hold them either.
+    const perQuestion = isLastSection
+      ? graded
+      : graded.map((q) => ({ ...q, correctAnswer: null, correct: null }));
+
+    // On the last section, reveal everything: re-grade all sections using the choices saved on
+    // each earlier section's attempt (which hold choices but no answers) plus this submission.
+    let baselineReview: PerQuestionResult[] | undefined;
+    if (isLastSection) {
+      const ordered = [...sections].sort((a, b) => a.section - b.section);
+      const earlier = ordered.filter((s) => s.section < section);
+      // All transaction reads must happen before its first write, so read earlier attempts here.
+      const earlierSnaps = await Promise.all(
+        earlier.map((s) =>
+          tx.get(db.collection('users').doc(uid).collection('testAttempts').doc(`baseline-${version}-${s.section}`))
+        )
+      );
+      const allAnswers: AnswerInput[] = [...answers];
+      for (const snap of earlierSnaps) {
+        const saved = (snap.data()?.perQuestion ?? []) as PerQuestionResult[];
+        for (const q of saved) {
+          if (q.choice !== null) allAnswers.push({ questionId: q.questionId, choice: q.choice });
+        }
+      }
+      baselineReview = (
+        await gradeQuestions(db, ordered.flatMap((s) => s.questionIds), allAnswers)
+      ).perQuestion;
+    }
 
     tx.set(attemptRef, {
       type: 'baseline' as AttemptType,
@@ -274,13 +324,13 @@ async function scoreBaselineSection(
       totalCount,
       perTopic,
       perQuestion,
+      ...(baselineReview ? { baselineReview } : {}),
       recommendation: null,
       createdAt: FieldValue.serverTimestamp(),
     });
 
     // After the last section, leave currentSection where it is and mark the baseline complete;
     // startOrResumeBaseline then refuses to serve it again.
-    const isLastSection = section >= sections.length;
     tx.update(progressRef, {
       currentSection: isLastSection ? section : section + 1,
       completedAt: isLastSection ? FieldValue.serverTimestamp() : null,
@@ -295,6 +345,7 @@ async function scoreBaselineSection(
       totalCount,
       perTopic,
       perQuestion,
+      ...(baselineReview ? { baselineReview } : {}),
       recommendation: null,
     };
   });
@@ -312,7 +363,8 @@ async function scoreBaselineSection(
  * Inputs:   db; auth — request.auth; rawInput.testId — as returned by assembleTest,
  *           assembleMiniQuiz, or startOrResumeBaseline; rawInput.answers —
  *           [{ questionId, choice }]. Unanswered or unknown questions count as wrong.
- * Returns:  ScoreTestResult — score, per-topic breakdown, and for mini-quizzes a
+ * Returns:  ScoreTestResult — score, per-topic and per-question results (with correct answers,
+ *           except baseline sections before the last), and for mini-quizzes a
  *           move-on/review-again recommendation (see MINI_QUIZ_PASS_THRESHOLD)
  * Reads:    the session's server-side record (testAssignments, or baseline progress +
  *           baselineTests) and `questions/{id}` for each graded question
