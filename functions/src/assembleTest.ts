@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import type { Firestore } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { getDb } from './adminApp';
+import { shuffle } from './shuffle';
 
 // ph-1-us-4: exact per-test question count is undefined (prd.md Section 9) — kept as a single
 // easy-to-change constant rather than hardcoded in multiple places.
@@ -92,24 +93,6 @@ export async function assembleTestForUser(
     testId: randomUUID(),
     questions,
   };
-}
-
-/**
- * Returns a new array with the items in random order (Fisher–Yates shuffle).
- *
- * Fisher–Yates gives every ordering equal probability, unlike naive sort-by-random tricks.
- * The input array is copied first, so the caller's array is never mutated. `random` is
- * injected so tests can supply a predictable sequence.
- */
-function shuffle<T>(items: T[], random: () => number): T[] {
-  const result = [...items];
-  // Walk from the end toward the start; at each position swap in a randomly chosen item
-  // from the not-yet-fixed portion (indexes 0..i). Once we pass an index it is final.
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
 }
 
 /**
