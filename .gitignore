@@ -1,4 +1,5 @@
 node_modules/
+.claude/worktrees/
 .env
 .env.development
 .env.staging
@@ -44,3 +45,6 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Cloud Functions build output
+functions/lib/

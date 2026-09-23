@@ -3,7 +3,7 @@
 **ID:** ph-1-us-3
 **Layer:** Parent
 **Children:** ph-1-us-4 (Backend), ph-1-us-5 (Frontend)
-**Status:** Not Started
+**Status:** Complete (remaining criteria moved to ph-3-us-1)
 
 ## Story
 As a teen user,
@@ -24,19 +24,36 @@ So that I'm not interrupted or lose progress partway through a test.
 - General flashcard-mode offline caching (Phase 2) is explicitly out of scope here.
 
 ## Acceptance Criteria
-- [ ] Given a teen user starts a practice test while online, when the test's question set is
+- [x] Given a teen user starts a practice test while online, when the test's question set is
   assembled, then only those specific questions are cached locally — not the full bank.
-- [ ] Given a cached in-progress test, when the device goes offline mid-test, then the user can
-  continue answering questions from the cached set without interruption.
-- [ ] Given a test is completed or abandoned, when the session ends, then its cached question set
-  is cleared from local storage (no indefinite local accumulation of question content).
-- [ ] Given no direct Firestore read/query path to the `questions` collection exists for clients
+- [x] Given no direct Firestore read/query path to the `questions` collection exists for clients
   (ph-1-us-1), when a client is inspected/reverse-engineered, then the only way to obtain
   question content is by legitimately starting a test through the `assembleTest` function
   (ph-1-us-4), which returns a bounded set, not the whole bank.
+  - _Note (2026-09-23):_ Holds with the other bounded callables added since (`assembleMiniQuiz`, `startOrResumeBaseline`, and the rate-limited `getFlashcards`) — still no direct client read of `questions`.
+
+## Scope update (2026-09-20)
+The same "cache only what one session needs" mechanism now serves three kinds of sessions, not
+just practice tests:
+- **Practice test** — as originally written.
+- **Concept mini-quiz** (ph-1-us-7) — small, short-lived; same cache and clear-on-finish rules.
+- **Baseline section** (ph-1-us-8) — cache only the *current section's* questions. Unlike a
+  practice test, an unfinished baseline is **not abandoned** when the user pauses: the baseline
+  is a fixed set, and the user's progress is stored server-side, so it can resume, possibly on
+  another phone. Local cache can be cleared safely when the section ends or the app is reset,
+  since the server is the source of truth.
+- Flashcards (ph-1-us-10) are not part of this story's cache; whether to cache them offline is a
+  Phase 2 decision.
+
+Additional acceptance criteria:
+- [x] Given a user pauses a baseline between sections, when they return (any device), then the
+  local cache is rebuilt from the server's stored assignment rather than assumed to exist.
+- [x] Given a paused baseline, when the local cache is cleared, then the baseline itself is not
+  treated as abandoned or lost.
 
 ## Dependencies
 - **Blocked by**: ph-1-us-1 (schema + deny-all read rule), ph-1-us-4, ph-1-us-5.
+- Related: ph-1-us-7 (topic mini-quiz), ph-1-us-8 (baseline).
 - Loosely related to Phase 3 (`Test Attempt` recording) — this story builds the underlying
   "assemble and cache a scoped question set" mechanism; Phase 3 is what actually drives *when*
   a test starts and records its outcome. Phase 1 builds the primitive; Phase 3 wires it into a
@@ -44,3 +61,13 @@ So that I'm not interrupted or lose progress partway through a test.
 
 ## Notes
 No separate Tasks/Test Notes here — see child stories ph-1-us-4 and ph-1-us-5.
+
+## Moved to Phase 3 (2026-09-23)
+The backend pieces and the cache module are done. These criteria describe how the test-taking
+screen uses the cache, so they moved to **ph-3-us-1**
+(`docs/phases/phase-3-practice-test-generator-and-test-taking-ui/ph-3-us-1-offline-test-cache-in-test-flow.md`):
+
+- Given a cached in-progress test, when the device goes offline mid-test, then the user can
+  continue answering questions from the cached set without interruption.
+- Given a test is completed or abandoned, when the session ends, then its cached question set
+  is cleared from local storage (no indefinite local accumulation of question content).

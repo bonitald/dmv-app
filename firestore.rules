@@ -2,14 +2,38 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ph-0-us-6: baseline per-user scoping. Every later phase's per-user data
-    // (test attempts, driving sessions, test outcomes) lives under this same
-    // users/{uid} path rather than introducing a separate identity scheme, so this
-    // single rule is the enforcement point for all of it.
-    match /users/{uid}/{document=**} {
+    // ph-0-us-6: baseline per-user scoping for the user's own top-level profile doc.
+    match /users/{uid} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
-    // Everything else stays deny-all (ph-0-us-3's locked-by-default baseline).
+    // ph-1-us-8/ph-1-us-11: server-owned records under users/{uid} — written only by Cloud
+    // Functions via the Admin SDK (which bypasses these rules entirely), read-only to the
+    // owning client. The old `users/{uid}/{document=**}` wildcard let a signed-in user write
+    // anything under their own uid; since Firestore rules are OR'd, a more specific deny rule
+    // could not have tightened that, so it had to be replaced with these explicit paths instead.
+    match /users/{uid}/testAssignments/{testId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+    match /users/{uid}/testAttempts/{testId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+    match /users/{uid}/baseline/{docId} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // ph-1-us-9: topic catalog — holds no question content, so it's safe to expose to any
+    // signed-in client. Populated only by the publish-topics script (Admin SDK).
+    match /topics/{chunkId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Everything else stays deny-all (ph-0-us-3's locked-by-default baseline). Later phases
+    // that need a client-writable sub-collection under users/{uid} (driving sessions, test
+    // outcomes, settings) add an explicit `match` block here rather than reopening the wildcard.
   }
 }

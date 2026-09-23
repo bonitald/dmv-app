@@ -3,7 +3,7 @@
 **ID:** ph-1-us-5
 **Layer:** Frontend
 **Parent:** ph-1-us-3
-**Status:** Not Started
+**Status:** Complete (remaining criteria moved to ph-3-us-1)
 
 ## Story
 As a teen user,
@@ -22,17 +22,6 @@ So that I can keep answering questions even if I go offline mid-test.
   no need for relational querying of cached content on-device.
 
 ## Acceptance Criteria
-- [ ] Given a user starts a practice test, when `assembleTest` returns a question set, then it's
-  written to AsyncStorage under a key derived from its `testId` before the test-taking UI renders
-  its first question.
-- [ ] Given a cached test set exists locally, when the device loses network connectivity, then
-  navigating between questions in that test reads from the local cache, not a network call.
-- [ ] Given a test is completed (all questions answered/submitted) or explicitly abandoned by the
-  user, when that happens, then its cached entry is removed from AsyncStorage.
-- [ ] Given the app is killed and reopened while a test's cache entry still exists (e.g. user
-  force-quit mid-test), when the app restarts, then the app can detect and either resume from or
-  clear the stale cached test (exact resume-vs-clear UX is a Phase 3 test-taking-flow decision,
-  not this story's — this story only guarantees the data survives the process kill).
 
 ## UI/UX Notes
 - No new screens — this is a data-layer concern underneath Phase 3's test-taking UI, which does
@@ -57,12 +46,29 @@ So that I can keep answering questions even if I go offline mid-test.
   error to the caller, not fail silently and leave the test unusable offline.
 
 ## Tasks
-- [ ] Add `@react-native-async-storage/async-storage` dependency.
-- [ ] Implement `src/study/testCache.ts`: `saveTestCache(testId, questions)`,
+- [x] Add `@react-native-async-storage/async-storage` dependency.
+- [x] Implement `src/study/testCache.ts`: `saveTestCache(testId, questions)`,
   `getTestCache(testId)`, `clearTestCache(testId)`.
-- [ ] Write unit tests covering the Test Notes scenarios above (mock AsyncStorage per Jest/Expo
+- [x] Write unit tests covering the Test Notes scenarios above (mock AsyncStorage per Jest/Expo
   conventions already used elsewhere in this repo).
 
 ## Questions
-- Resume-vs-clear UX for a stale cached test after a force-quit is deferred to Phase 3 — flagged
-  here so it isn't lost.
+- Resume-vs-clear UX for a stale cached test after a force-quit — now owned by ph-3-us-1.
+
+## Moved to Phase 3 (2026-09-23)
+`src/study/testCache.ts` (save/get/clear, 5 unit tests via `npm run test:app`) is done. These
+criteria need the test-taking screen to call it, so they moved to **ph-3-us-1**
+(`docs/phases/phase-3-practice-test-generator-and-test-taking-ui/ph-3-us-1-offline-test-cache-in-test-flow.md`),
+along with the finding that Phase 3 must also store the active `testId`:
+
+- Given a user starts a practice test, when `assembleTest` returns a question set, then it's
+  written to AsyncStorage under a key derived from its `testId` before the test-taking UI renders
+  its first question.
+- Given a cached test set exists locally, when the device loses network connectivity, then
+  navigating between questions in that test reads from the local cache, not a network call.
+- Given a test is completed (all questions answered/submitted) or explicitly abandoned by the
+  user, when that happens, then its cached entry is removed from AsyncStorage.
+- Given the app is killed and reopened while a test's cache entry still exists (e.g. user
+  force-quit mid-test), when the app restarts, then the app can detect and either resume from or
+  clear the stale cached test (exact resume-vs-clear UX is a Phase 3 test-taking-flow decision,
+  not this story's — this story only guarantees the data survives the process kill).

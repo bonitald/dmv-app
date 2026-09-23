@@ -3,5 +3,5 @@
   "compilerOptions": {
     "strict": true
   },
-  "exclude": ["node_modules", "firestore-tests"]
+  "exclude": ["node_modules", "firestore-tests", "**/*.test.ts"]
 }

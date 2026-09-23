@@ -3,7 +3,7 @@
 **ID:** ph-1-us-4
 **Layer:** Backend
 **Parent:** ph-1-us-3
-**Status:** Not Started
+**Status:** Complete
 
 ## Story
 As a developer,
@@ -24,20 +24,21 @@ So that the client never needs (or is able to) query the full `questions` collec
   be selectable, matching the existing app-wide rule from the ingestion spec.
 
 ## Acceptance Criteria
-- [ ] Given an authenticated (anonymous-auth) caller invokes `assembleTest`, when the function
+- [x] Given an authenticated (anonymous-auth) caller invokes `assembleTest`, when the function
   runs, then it returns a fixed-size set (count TBD — not yet decided per `prd.md` Section 9's
   open question on practice-test size) of `approved` questions mixing `fact` and `scenario`
   types, with each question's `id`, `text`, `choices`, `type`, and `conceptId` — but not
   `sourceRef`, `selfCheck`, or review metadata (no need to ship that to the client).
-- [ ] Given the function is called without a valid `request.auth`, when it executes, then it
+- [x] Given the function is called without a valid `request.auth`, when it executes, then it
   rejects with an `unauthenticated` error and returns no question content.
-- [ ] Given the function selects questions, when it queries Firestore internally, then it uses
+- [x] Given the function selects questions, when it queries Firestore internally, then it uses
   the Admin SDK (bypassing the deny-all client rule, per ph-1-us-1) — this is legitimate because
   the function itself enforces the "approved only, bounded count" constraint before returning
   data, unlike an open client query which enforces nothing.
-- [ ] Given repeated calls from the same user, when questions are selected, then the selection
+- [x] Given repeated calls from the same user, when questions are selected, then the selection
   is randomized (not the same fixed set every time) — exact randomization strategy (weighted by
   concept, fully random, avoid repeats from a user's recent tests) is left open, see Questions.
+  Implemented as a Fisher-Yates shuffle over all approved questions before slicing to `count`.
 
 ## Data and API
 - **Cloud Function**: `assembleTest` (callable, `functions.https.onCall`).
@@ -65,17 +66,36 @@ So that the client never needs (or is able to) query the full `questions` collec
   `internal` callable error, not a partial/malformed question list.
 
 ## Tasks
-- [ ] Set up Cloud Functions in this project (none exist yet — add `functions/` per Firebase's
+- [x] Set up Cloud Functions in this project (none exist yet — add `functions/` per Firebase's
   standard layout, wire into `firebase.json`).
-- [ ] Implement `assembleTest` per the Data and API section above.
-- [ ] Write emulator-based tests (Firebase Functions + Firestore emulators) covering the
-  Acceptance Criteria.
-- [ ] Document the function's contract in a README (mirroring `scripts/question-bank/README.md`'s
+- [x] Implement `assembleTest` per the Data and API section above.
+- [x] Write emulator-based tests (Firebase Functions + Firestore emulators) covering the
+  Acceptance Criteria. (Tests the testable core, `assembleTestForUser`, directly against the
+  Firestore emulator via `firebase-admin` — doesn't need the Functions emulator or
+  `httpsCallable`, since the `onCall` wrapper is a thin pass-through.)
+- [x] Document the function's contract in a README (mirroring `scripts/question-bank/README.md`'s
   style) so the frontend child (ph-1-us-5) and later Phase 3 work can integrate against it.
 
+## Follow-ups (2026-09-20)
+This story stays Complete as the general practice-test function. The journey changes add work in
+new stories rather than reopening it: mini-quiz sets (ph-1-us-7), the fixed baseline (ph-1-us-8),
+the topic list (ph-1-us-9), flashcards with answers (ph-1-us-10), and scoring (ph-1-us-11).
+Two small changes to this function are needed, tracked under those stories:
+- Add `chunkId` to the returned question shape.
+- **Persist the assigned question IDs under `testId`** (it currently generates the ID and stores
+  nothing), so `scoreTest` can grade only sets the server assigned. Collection: **`users/{uid}/
+  testAssignments/{testId}`** — `{ type: 'practice' | 'mini-quiz', chunkId?, questionIds: string[],
+  createdAt, scored: false }`. Read-only to clients; read (and later marked `scored: true`) by
+  `scoreTest` (ph-1-us-11). This gives the function its first write, and updates the "Writes:
+  none" line in its doc comment.
+The function intentionally returns no `correctAnswer`; grading happens in `scoreTest`, which
+writes the scored outcome to a separate `users/{uid}/testAttempts/{testId}` (see ph-1-us-11) —
+the assignment (what was asked) and the attempt (what the user got) are kept as two records, not
+one, since they're written at different times by different functions.
+
 ## Questions
-- Exact question count per assembled test is undefined (`prd.md` Section 9) — implement with a
-  constant that's easy to change (e.g. 25) rather than hardcoding it inline in multiple places.
-- Randomization/repeat-avoidance strategy across a user's multiple tests is unresolved — simplest
-  MVP behavior (fully random each call, repeats allowed) is acceptable to start; revisit if it
-  makes practice feel repetitive.
+- Exact question count per assembled test is undefined (`prd.md` Section 9) — implemented as
+  `DEFAULT_QUESTION_COUNT = 25` in `functions/src/assembleTest.ts`, easy to change in one place.
+- Randomization/repeat-avoidance strategy across a user's multiple tests is unresolved — shipped
+  the simplest MVP behavior (fully random each call, repeats allowed); revisit if it makes
+  practice feel repetitive.

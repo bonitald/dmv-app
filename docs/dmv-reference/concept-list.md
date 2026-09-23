@@ -4,255 +4,491 @@
 - aggressive-driving-criminal-acts (2 questions, status: approved)
 - aggressive-driving-definition (3 questions, status: approved)
 - aggressive-driving-qualifying-acts (3 questions, status: approved)
-- protect-yourself-from-aggressive-drivers (2 questions, status: pending_review)
-- report-aggressive-drivers-star-csp (3 questions, status: pending_review)
-- self-assessment-aggressive-driver-risk (3 questions, status: pending_review)
-- tips-avoid-becoming-aggressive-driver (3 questions, status: pending_review)
+- protect-yourself-from-aggressive-drivers (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice paraphrased too closely to the
+    handbook's exact wording; content was already correct, only phrasing changed.
+- report-aggressive-drivers-star-csp (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice was a verbatim handbook sentence;
+    content unchanged.
+- self-assessment-aggressive-driver-risk (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one quoted the handbook near-verbatim in the
+    question stem, one had a near-verbatim answer choice; content unchanged.
+- tips-avoid-becoming-aggressive-driver (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — "what does the handbook recommend/advise"
+    meta-references removed and near-verbatim answer clauses paraphrased; content unchanged.
 
 ## basic-driving-controls
 - backing-up-accelerate-steer-technique (3 questions, status: approved)
 - backing-up-brake-shift-reverse (3 questions, status: approved)
-- backing-up-check-behind-first (3 questions, status: pending_review)
-- backing-up-hand-body-position (3 questions, status: pending_review)
-- backing-up-mirrors-limitation (3 questions, status: pending_review)
-- hand-position-grip-technique (3 questions, status: pending_review)
-- hand-position-steering-wheel (3 questions, status: pending_review)
-- moving-vehicle-procedure (3 questions, status: pending_review)
-- starting-engine-brake-foot (3 questions, status: pending_review)
-- steering-direction-rule (3 questions, status: pending_review)
-- stopping-vehicle-procedure (3 questions, status: pending_review)
+- backing-up-check-behind-first (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice was near-verbatim handbook text;
+    content unchanged.
+- backing-up-hand-body-position (3 questions, status: approved)
+  - NOTE: 2 of 3 questions reworded during review — answer choices were near word-for-word
+    copies of the handbook's backing-up instructions; content unchanged.
+- backing-up-mirrors-limitation (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one had a "according to the handbook" framing
+    plus a verbatim clause, one had a near-verbatim answer choice; content unchanged.
+- hand-position-grip-technique (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice was an exact verbatim handbook
+    sentence; content unchanged.
+- hand-position-steering-wheel (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — both referenced "the handbook" directly in the
+    question stem rather than asking a normal driving-knowledge question; answer choices
+    unchanged (not verbatim).
+- moving-vehicle-procedure (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one was an exact verbatim handbook sentence,
+    one was near-identical; content unchanged.
+- starting-engine-brake-foot (3 questions, status: approved)
+- steering-direction-rule (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the handbook's distinctive
+    "in the direction you want the vehicle to move" clause verbatim or near-verbatim; content
+    unchanged.
+- stopping-vehicle-procedure (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer choice reused an 8-word verbatim clause
+    from the handbook; content unchanged.
 
 ## bicyclist-laws-and-etiquette
-- avoid-horn-near-bicyclists (3 questions, status: pending_review)
-- bicyclist-hand-signals (4 questions, status: pending_review)
-- bicyclist-side-by-side (3 questions, status: pending_review)
-- bicyclist-stop-as-yield-law (3 questions, status: pending_review)
-- bike-lane-intersection-row (3 questions, status: pending_review)
-- bike-lane-motorist-restrictions (3 questions, status: pending_review)
-- dutch-reach (3 questions, status: pending_review)
-- three-foot-passing-rule (4 questions, status: pending_review)
+- avoid-horn-near-bicyclists (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook advises/says" framing removed
+    and near-verbatim answer clauses paraphrased; content unchanged.
+- bicyclist-hand-signals (4 questions, status: approved)
+  - NOTE: 1 question reworded during review — framing/verbatim-clause fix; content unchanged.
+- bicyclist-side-by-side (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim answer clauses paraphrased;
+    content unchanged.
+- bicyclist-stop-as-yield-law (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem and answer both copied the handbook almost
+    word-for-word; content unchanged.
+- bike-lane-intersection-row (3 questions, status: approved)
+- bike-lane-motorist-restrictions (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "what does the handbook say" framing removed
+    and near-verbatim answer clauses paraphrased; content unchanged.
+- dutch-reach (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "the handbook recommend" framing removed from
+    question stem; content unchanged.
+- three-foot-passing-rule (4 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim answer clause paraphrased; content
+    unchanged.
 
 ## careless-reckless-and-distracted-driving
-- distracted-driving-definition (3 questions, status: pending_review)
-- distracted-vs-reckless-legal-distinction (2 questions, status: pending_review)
-- distraction-prevention-tips (3 questions, status: pending_review)
-- impairment-plus-distraction-risk (2 questions, status: pending_review)
-- mobile-device-manual-use-law (3 questions, status: pending_review)
-- reckless-driving-definition (3 questions, status: pending_review)
-- reckless-driving-points-penalty (3 questions, status: pending_review)
-- texting-careless-penalty (3 questions, status: pending_review)
+- distracted-driving-definition (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook says/according to" framing
+    removed and near-verbatim definition clauses paraphrased; content unchanged.
+- distracted-vs-reckless-legal-distinction (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — "based on the handbook" framing removed from stem;
+    content unchanged.
+- distraction-prevention-tips (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook-citation framing removed and
+    near-verbatim tip wording paraphrased; content unchanged.
+- impairment-plus-distraction-risk (2 questions, status: approved)
+  - NOTE: both questions reworded during review — "according to the handbook" framing removed
+    and near-verbatim "ability to manage multiple tasks" clause paraphrased; content unchanged.
+- mobile-device-manual-use-law (3 questions, status: flagged)
+  - ISSUE: question FGSnPBSGsgY4SRosJZ2F asks specifically when MANUAL use of a mobile device
+    is allowed, but its correct answer says "only with a hands-free device, or in an emergency
+    situation" — using a hands-free device is by definition NOT manual use, so it can't satisfy
+    a "manual use" exception. Handbook p.27: device use in general is barred unless hands-free or
+    an emergency, but manual use specifically (texting, tapping the screen) is only excused in an
+    emergency. Needs a content-team decision: either narrow correctAnswer to "Only in an
+    emergency situation," or broaden the question to ask about mobile device use generally
+    rather than manual use specifically. The other 2 questions in this concept were reworded for
+    verbatim phrasing (same hands-free/manual-use nuance was tightened in one of them without
+    changing its correct bottom-line answer) and approved.
+- reckless-driving-definition (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "the Colorado Driver Handbook" citation removed
+    from stem and a 10+ word near-verbatim definition paraphrased; content unchanged.
+- reckless-driving-points-penalty (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim legal phrase paraphrased; content
+    unchanged.
+- texting-careless-penalty (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — answer choices reused the handbook's exact
+    "fined or charged with a misdemeanor" phrase; content unchanged.
 
 ## changing-lanes-and-passing
-- bicyclist-3-foot-buffer (3 questions, status: pending_review)
-- blind-spot-definition (3 questions, status: pending_review)
-- illegal-passing-behaviors (3 questions, status: pending_review)
-- lane-change-checks (3 questions, status: pending_review)
-- lane-change-signal-timing (3 questions, status: pending_review)
-- no-pass-200ft-oncoming (2 questions, status: pending_review)
-- no-pass-near-intersection-railroad (2 questions, status: pending_review)
-- no-pass-obstructed-view (3 questions, status: pending_review)
-- no-pass-solid-yellow (2 questions, status: pending_review)
-- one-vehicle-at-a-time (2 questions, status: pending_review)
-- passing-left-right-rule (3 questions, status: pending_review)
-- passing-procedure (3 questions, status: pending_review)
+- bicyclist-3-foot-buffer (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — a 13-word verbatim handbook sentence paraphrased;
+    content unchanged.
+- blind-spot-definition (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim blind-spot descriptions
+    paraphrased; content unchanged.
+- illegal-passing-behaviors (3 questions, status: approved)
+  - NOTE: 3 questions reworded during review — verbatim handbook clauses (school bus stop arm,
+    exceeding speed limit, marked no-passing zone) paraphrased; content unchanged.
+- lane-change-checks (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the handbook's blind-spot-check
+    or mirror-check clause verbatim or near-verbatim; content unchanged.
+- lane-change-signal-timing (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — both repeated the handbook's "3 seconds or 200
+    feet" clause verbatim; content unchanged.
+- no-pass-200ft-oncoming (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem mirrored handbook sentence structure around
+    the 200-foot rule; content unchanged.
+- no-pass-near-intersection-railroad (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem lifted "feet of an intersection or railroad
+    crossing" verbatim; content unchanged.
+- no-pass-obstructed-view (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer was an exact unmodified quote of the
+    handbook's curve/hill bullet; content unchanged.
+- no-pass-solid-yellow (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem closely tracked handbook wording; content
+    unchanged.
+- one-vehicle-at-a-time (2 questions, status: approved)
+  - NOTE: both questions reworded during review — both reused the handbook's "one vehicle at a
+    time" idiom verbatim; content unchanged.
+- passing-left-right-rule (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim passing-on-right and
+    off-pavement-passing clauses paraphrased; content unchanged.
+- passing-procedure (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer was the handbook sentence with only
+    synonym swaps; content unchanged.
 
 ## construction-zone-driving
-- doubled-fines-work-zone (3 questions, status: pending_review)
-- obey-flagger-and-work-zone-signs (3 questions, status: pending_review)
-- work-zone-rear-end-collision-avoidance (3 questions, status: pending_review)
-- work-zone-speed-limits (3 questions, status: pending_review)
+- doubled-fines-work-zone (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — answer was the handbook's own sentence with only
+    clause order flipped; content unchanged.
+- obey-flagger-and-work-zone-signs (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim answer clause paraphrased; content
+    unchanged.
+- work-zone-rear-end-collision-avoidance (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the handbook's "rear-end
+    collisions...inattentive driver" clause verbatim or near-verbatim; content unchanged.
+- work-zone-speed-limits (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim answer clauses paraphrased;
+    content unchanged.
 
 ## crash-reporting-and-move-over-law
-- crash-accident-alert-status (3 questions, status: pending_review)
-- crash-duties-incapacitated-driver (3 questions, status: pending_review)
-- crash-duties-insurance-proof (3 questions, status: pending_review)
-- crash-duties-stop-render-aid (3 questions, status: pending_review)
-- crash-parked-car (3 questions, status: pending_review)
-- move-it-law-conditions (3 questions, status: pending_review)
-- move-it-law-no-penalty (3 questions, status: pending_review)
-- move-over-law-requirement (3 questions, status: pending_review)
-- move-over-law-who-protected (3 questions, status: pending_review)
+- crash-accident-alert-status (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim definition/procedure clauses
+    paraphrased; content unchanged.
+- crash-duties-incapacitated-driver (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim clauses paraphrased; content
+    unchanged.
+- crash-duties-insurance-proof (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim "at the scene or at the police
+    station" clause paraphrased; content unchanged.
+- crash-duties-stop-render-aid (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — two distractor choices lifted handbook language
+    verbatim; content unchanged.
+- crash-parked-car (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused "call law enforcement and leave
+    a note" verbatim or near-verbatim; content unchanged.
+- move-it-law-conditions (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem and answer both copied a 16+ word handbook
+    run almost verbatim; content unchanged.
+- move-it-law-no-penalty (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the "will not penalize you for
+    moving your car" clause verbatim or near-verbatim; content unchanged.
+- move-over-law-requirement (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the "20 mph below the posted
+    speed limit" clause verbatim, one also had a near-verbatim stem; content unchanged.
+- move-over-law-who-protected (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim reproduction of the
+    protected-persons list paraphrased; content unchanged.
 
 ## defensive-driving-and-scanning
-- cell-phone-handheld-law (3 questions, status: pending_review)
-- check-mirrors-frequency (3 questions, status: pending_review)
-- look-ahead-distance (3 questions, status: pending_review)
-- look-to-the-sides (3 questions, status: pending_review)
-- proper-hand-position (3 questions, status: pending_review)
-- scanning-overview (3 questions, status: pending_review)
-- seatbelt-buckle-up (3 questions, status: pending_review)
-- texting-while-driving-law (3 questions, status: pending_review)
-- turning-technique (3 questions, status: pending_review)
+- cell-phone-handheld-law (3 questions, status: approved)
+- check-mirrors-frequency (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook recommend" framing removed
+    and a near-verbatim lane-change/hill mirror-check clause paraphrased; content unchanged.
+- look-ahead-distance (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — handbook framing removed and near-verbatim
+    "10 seconds ahead" clause paraphrased; content unchanged.
+- look-to-the-sides (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim answer clauses paraphrased,
+    one also had "what does the handbook say" framing removed; content unchanged.
+- proper-hand-position (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — handbook framing removed and a near-verbatim
+    "palm of your hand" clause paraphrased; content unchanged.
+- scanning-overview (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "look left, right, then left again" clauses paraphrased; content unchanged.
+- seatbelt-buckle-up (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "all people in the vehicle" clauses paraphrased; content unchanged.
+- texting-while-driving-law (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim exception clause paraphrased;
+    content unchanged.
+- turning-technique (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "slide through your fingers" clause paraphrased; content unchanged.
 
 ## driver-fitness-vision-hearing-fatigue
-- earphones-exceptions (3 questions, status: pending_review)
-- earphones-prohibited (3 questions, status: pending_review)
-- fatigue-pull-over-when-drowsy (3 questions, status: pending_review)
-- fatigue-two-hour-segments (3 questions, status: pending_review)
-- hearing-decline-audiologist (3 questions, status: pending_review)
-- vision-corrective-lens-restriction (3 questions, status: pending_review)
-- vision-eye-exam-frequency (3 questions, status: pending_review)
+- earphones-exceptions (3 questions, status: approved)
+- earphones-prohibited (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim stem/answer clauses paraphrased;
+    content unchanged.
+- fatigue-pull-over-when-drowsy (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "pull off the road and rest" clause paraphrased; content unchanged.
+- fatigue-two-hour-segments (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook recommends/suggests" framing
+    removed; content unchanged.
+- hearing-decline-audiologist (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "hearing tested by an audiologist" clause paraphrased; content unchanged.
+- vision-corrective-lens-restriction (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim "glasses or contact lenses" clause
+    paraphrased; content unchanged.
+- vision-eye-exam-frequency (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — "the handbook says/stress" framing removed;
+    content unchanged.
 
 ## drugged-and-impaired-driving
-- consecutive-revocations (2 questions, status: pending_review)
-- drug-impairment-illegal-same-penalties (3 questions, status: pending_review)
-- express-consent-law (3 questions, status: pending_review)
-- ignition-interlock-function (3 questions, status: pending_review)
-- illegal-drugs-effects (3 questions, status: pending_review)
-- no-plea-bargain (2 questions, status: pending_review)
-- polydrug-impairment-definition (3 questions, status: pending_review)
-- prescription-otc-drug-impairment (3 questions, status: pending_review)
-- refusal-penalty (3 questions, status: pending_review)
-- thc-5ng-permissible-inference (3 questions, status: pending_review)
-- thc-level-no-impairment-correlation (3 questions, status: pending_review)
+- consecutive-revocations (2 questions, status: approved)
+- drug-impairment-illegal-same-penalties (3 questions, status: approved)
+- express-consent-law (3 questions, status: approved)
+- ignition-interlock-function (3 questions, status: approved)
+- illegal-drugs-effects (3 questions, status: approved)
+- no-plea-bargain (2 questions, status: approved)
+- polydrug-impairment-definition (3 questions, status: approved)
+- prescription-otc-drug-impairment (3 questions, status: approved)
+- refusal-penalty (3 questions, status: approved)
+- thc-5ng-permissible-inference (3 questions, status: approved)
+- thc-level-no-impairment-correlation (3 questions, status: approved)
 
 ## dui-dwai-definitions-and-bac
-- bac-elimination-rate (3 questions, status: pending_review)
-- bac-factors (3 questions, status: pending_review)
-- bac-threshold-cdl (3 questions, status: pending_review)
-- bac-threshold-general (3 questions, status: pending_review)
-- bac-threshold-under-21 (3 questions, status: pending_review)
-- dui-conviction-basis (3 questions, status: pending_review)
-- dwai-vs-dui-definition (3 questions, status: pending_review)
-- standard-drink-equivalence (3 questions, status: pending_review)
+- bac-elimination-rate (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "according to the handbook" framing removed;
+    content unchanged.
+- bac-factors (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — 2 had handbook framing removed, 1 had a
+    verbatim distractor phrase paraphrased; content unchanged.
+- bac-threshold-cdl (3 questions, status: approved)
+- bac-threshold-general (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "0.08% or higher" tightened to "Over 0.08%" to
+    match the handbook's strict-inequality wording exactly (minor correctness fix, same
+    threshold).
+- bac-threshold-under-21 (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — both incorrectly labeled the under-21 0.02%
+    figure a "per se" threshold; the handbook reserves that term for the 0.08% general
+    threshold only, so the mislabel was removed (minor correctness fix, same numeric value).
+- dui-conviction-basis (3 questions, status: approved)
+- dwai-vs-dui-definition (3 questions, status: approved)
+  - NOTE: 3 questions reworded during review — one had a dropped word in the "DWAI" acronym
+    expansion (corrected to match the handbook's exact statutory term), two had near-verbatim
+    "impaired to the slightest degree" clauses paraphrased.
+- standard-drink-equivalence (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each reused the handbook's standard-drink
+    definition near-verbatim; content unchanged.
 
 ## dui-penalties-and-underage-dui
-- dui-1st-offense-penalties (3 questions, status: pending_review)
-- dwai-1st-offense-penalties (3 questions, status: pending_review)
-- second-dui-dwai-penalties (3 questions, status: pending_review)
-- third-plus-dui-dwai-penalties (3 questions, status: pending_review)
-- underage-alcohol-possession-revocation (3 questions, status: pending_review)
-- underage-dui-dwai-revocation (3 questions, status: pending_review)
+- dui-1st-offense-penalties (3 questions, status: approved)
+- dwai-1st-offense-penalties (3 questions, status: flagged)
+  - ISSUE: question yTC1ilhY4heSowNNRUDW is a scenario about a 17-year-old convicted of a first
+    DWAI, using jail-range figures (2-180 days) from handbook p.7's "Table 1: Possible Penalties
+    for Impaired Driving for 21 and Older." The handbook doesn't state that adult penalty ranges
+    apply unchanged to minors — its only stated under-21-specific consequences are license
+    revocation triggers (failing a court-ordered evaluation on a 1st conviction; automatic
+    revocation on a 2nd or 3rd). Needs a content-team decision: change the driver's age to 21+
+    so Table 1 applies cleanly, or rewrite to test the actual under-21 revocation rule instead.
+    The other 2 questions in this concept were reviewed and approved.
+- second-dui-dwai-penalties (3 questions, status: approved)
+- third-plus-dui-dwai-penalties (3 questions, status: approved)
+- underage-alcohol-possession-revocation (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim "buying or possessing alcohol"
+    clause paraphrased; content unchanged.
+- underage-dui-dwai-revocation (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim "court-ordered evaluation or
+    program" clause paraphrased; content unchanged.
 
 ## emergency-collision-avoidance
-- animal-crossing-slow-down (3 questions, status: pending_review)
-- animal-sudden-evasive-action-risk (3 questions, status: pending_review)
-- run-off-road-vs-head-on (3 questions, status: pending_review)
-- speeding-up-to-avoid-collision (3 questions, status: pending_review)
-- stopping-with-abs (3 questions, status: pending_review)
-- stopping-without-abs (3 questions, status: pending_review)
-- three-options-avoid-collision (3 questions, status: pending_review)
-- turning-quicker-than-stopping (4 questions, status: pending_review)
-- turning-with-abs (3 questions, status: pending_review)
-- turning-without-abs (3 questions, status: pending_review)
+- animal-crossing-slow-down (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — handbook framing removed and near-verbatim
+    "slow down and look for animals" clause paraphrased; content unchanged.
+- animal-sudden-evasive-action-risk (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "retaining control of the vehicle" clause paraphrased; content unchanged.
+- run-off-road-vs-head-on (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and a near-verbatim
+    answer clause paraphrased; content unchanged.
+- speeding-up-to-avoid-collision (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    "once the danger has passed" / escape-scenario clauses paraphrased; content unchanged.
+- stopping-with-abs (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim ABS braking-pressure clause and a
+    "brake pedal pushing back" phrase paraphrased; content unchanged.
+- stopping-without-abs (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim non-ABS braking clauses
+    paraphrased; content unchanged.
+- three-options-avoid-collision (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "according to the Colorado Driver Handbook"
+    framing removed; content unchanged.
+- turning-quicker-than-stopping (4 questions, status: approved)
+  - NOTE: all 4 questions reworded during review — near-verbatim clauses paraphrased, 3 also
+    had sourceRef corrected from p.29 to p.28; content unchanged.
+- turning-with-abs (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim "turn your vehicle while
+    braking without skidding" clause paraphrased and sourceRef corrected from p.29 to p.28;
+    content unchanged.
+- turning-without-abs (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim clauses describing the non-ABS
+    turning procedure and turning hazards paraphrased; content unchanged.
 
 ## freeway-entering-and-driving
-- accel-ramp-purpose (3 questions, status: pending_review)
-- deceleration-lane-exit (3 questions, status: pending_review)
-- entering-ramp-procedure (3 questions, status: pending_review)
-- exit-tips (3 questions, status: pending_review)
-- metered-ramps (3 questions, status: pending_review)
-- move-over-merging-traffic (3 questions, status: pending_review)
-- no-median-island (3 questions, status: pending_review)
-- no-stop-accel-lane-yield (3 questions, status: pending_review)
-- passing-lane-leftmost (3 questions, status: pending_review)
-- rightmost-lane-slower (3 questions, status: pending_review)
-- solid-white-line-merge (3 questions, status: pending_review)
+NOTE (chunk-wide): every question in this chunk originally had 3 answer choices, while every
+other chunk has 4. A fourth (clearly incorrect) distractor was added to each of the 33 questions
+so the whole bank now uses 4 choices. The original three choices and the correct answer's
+position were left unchanged.
+- accel-ramp-purpose (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim "match freeway speed" clauses
+    paraphrased; content unchanged.
+- deceleration-lane-exit (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim slow-down/signal-distance
+    clauses paraphrased; content unchanged.
+- entering-ramp-procedure (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim signal/look/accelerate/merge
+    sequence paraphrased; content unchanged.
+- exit-tips (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim exit-tip bullets paraphrased;
+    content unchanged.
+- metered-ramps (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim ramp-signal clauses
+    paraphrased; content unchanged.
+- move-over-merging-traffic (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim "make room for vehicles
+    entering" clause paraphrased; content unchanged.
+- no-median-island (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — verbatim "across, over or within any median
+    or island" clause paraphrased; content unchanged.
+- no-stop-accel-lane-yield (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim clause paraphrased; content
+    unchanged.
+- passing-lane-leftmost (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — handbook framing removed and near-verbatim
+    passing-lane list paraphrased; content unchanged.
+- rightmost-lane-slower (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — handbook phrasing/framing removed; content
+    unchanged.
+- solid-white-line-merge (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim "until the solid white line
+    has ended" clause paraphrased; content unchanged.
 
 ## health-emotions-distractions-and-vehicle-checks
-- brake-system-check (3 questions, status: pending_review)
-- cellphone-passenger-distraction (3 questions, status: pending_review)
-- distraction-definition (3 questions, status: pending_review)
-- emotions-driving (3 questions, status: pending_review)
-- engine-poor-tune-consequences (3 questions, status: pending_review)
-- exhaust-system-danger (3 questions, status: pending_review)
-- headrest-adjustment (3 questions, status: pending_review)
-- health-conditions-doctor (3 questions, status: pending_review)
-- horn-check (3 questions, status: pending_review)
-- lights-check (3 questions, status: pending_review)
-- loose-objects-safety (3 questions, status: pending_review)
-- minor-health-issues (3 questions, status: pending_review)
-- mirror-adjustment-driver-side (3 questions, status: pending_review)
-- mirror-adjustment-passenger-side (3 questions, status: pending_review)
-- pre-trip-adjustments (3 questions, status: pending_review)
-- steering-system-check (3 questions, status: pending_review)
-- suspension-system-check (3 questions, status: pending_review)
-- tire-wear-effects (3 questions, status: pending_review)
-- vehicle-poor-condition-consequences (3 questions, status: pending_review)
-- windshield-wipers-check (3 questions, status: pending_review)
+NOTE (chunk-wide): 58 of 60 questions reworded during review — nearly all had "according to the
+handbook"-style stem framing and/or near-verbatim answer text; facts were correct throughout.
+Only windshield-wipers-check and steering-system-check each had one question left as-is.
+- brake-system-check (3 questions, status: approved)
+- cellphone-passenger-distraction (3 questions, status: approved)
+- distraction-definition (3 questions, status: approved)
+- emotions-driving (3 questions, status: approved)
+- engine-poor-tune-consequences (3 questions, status: approved)
+- exhaust-system-danger (3 questions, status: approved)
+- headrest-adjustment (3 questions, status: approved)
+- health-conditions-doctor (3 questions, status: approved)
+- horn-check (3 questions, status: approved)
+- lights-check (3 questions, status: approved)
+- loose-objects-safety (3 questions, status: approved)
+- minor-health-issues (3 questions, status: approved)
+- mirror-adjustment-driver-side (3 questions, status: approved)
+  - NOTE: one question also had a distractor that referenced "the handbook" replaced.
+- mirror-adjustment-passenger-side (3 questions, status: approved)
+- pre-trip-adjustments (3 questions, status: approved)
+- steering-system-check (3 questions, status: approved)
+- suspension-system-check (3 questions, status: approved)
+- tire-wear-effects (3 questions, status: approved)
+- vehicle-poor-condition-consequences (3 questions, status: approved)
+- windshield-wipers-check (3 questions, status: approved)
 
 ## hills-curves-and-night-driving
-- curves-accelerate-after-middle (2 questions, status: pending_review)
-- curves-slow-before-entering (3 questions, status: pending_review)
-- hills-curves-hidden-obstructions (3 questions, status: pending_review)
-- hills-slow-to-crest (2 questions, status: pending_review)
-- night-bike-motorcycle-single-light (2 questions, status: pending_review)
-- night-dim-500ft-oncoming (3 questions, status: pending_review)
-- night-headlights-required (3 questions, status: pending_review)
-- night-high-beam-rural-use (2 questions, status: pending_review)
-- night-increase-following-distance (2 questions, status: pending_review)
-- night-low-beam-200ft-following (2 questions, status: pending_review)
-- night-no-driving-with-parking-lights-only (2 questions, status: pending_review)
-- night-oncoming-glare-technique (2 questions, status: pending_review)
-- night-parked-vehicle-lights (3 questions, status: pending_review)
-- night-slow-in-poorly-lit-areas (2 questions, status: pending_review)
-- night-watch-for-unlit-vehicles (2 questions, status: pending_review)
+NOTE (chunk-wide): 21 of 35 questions reworded during review — near-verbatim answer clauses (or,
+for one question, a near-verbatim stem) paraphrased; facts and numeric distances were correct
+throughout. 14 questions approved as-is.
+- curves-accelerate-after-middle (2 questions, status: approved)
+- curves-slow-before-entering (3 questions, status: approved)
+- hills-curves-hidden-obstructions (3 questions, status: approved)
+- hills-slow-to-crest (2 questions, status: approved)
+- night-bike-motorcycle-single-light (2 questions, status: approved)
+- night-dim-500ft-oncoming (3 questions, status: approved)
+- night-headlights-required (3 questions, status: approved)
+- night-high-beam-rural-use (2 questions, status: approved)
+- night-increase-following-distance (2 questions, status: approved)
+- night-low-beam-200ft-following (2 questions, status: approved)
+- night-no-driving-with-parking-lights-only (2 questions, status: approved)
+- night-oncoming-glare-technique (2 questions, status: approved)
+- night-parked-vehicle-lights (3 questions, status: approved)
+- night-slow-in-poorly-lit-areas (2 questions, status: approved)
+- night-watch-for-unlit-vehicles (2 questions, status: approved)
 
 ## how-you-can-lose-your-license
-- license-loss-child-support (3 questions, status: pending_review)
-- license-loss-dui-conviction (3 questions, status: pending_review)
-- license-loss-fail-reexam (3 questions, status: pending_review)
-- license-loss-fail-report-crash-dmv (3 questions, status: pending_review)
-- license-loss-fail-report-crash-scene (3 questions, status: pending_review)
-- license-loss-false-application-info (3 questions, status: pending_review)
-- license-loss-lend-license (3 questions, status: pending_review)
-- license-loss-no-insurance-proof (3 questions, status: pending_review)
-- license-loss-point-accumulation (3 questions, status: pending_review)
-- license-loss-refuse-chemical-test (3 questions, status: pending_review)
-- license-loss-underage-alcohol (3 questions, status: pending_review)
-- license-loss-unpaid-judgment (3 questions, status: pending_review)
-- license-loss-vehicular-homicide (3 questions, status: pending_review)
+NOTE (chunk-wide): 26 of 39 questions reworded during review — stems/answers reused the
+handbook's "suspended, revoked or canceled" and bulleted-list wording near-verbatim, or used
+"listed as" framing; facts were correct throughout. 13 questions approved as-is.
+- license-loss-child-support (3 questions, status: approved)
+- license-loss-dui-conviction (3 questions, status: approved)
+- license-loss-fail-reexam (3 questions, status: approved)
+- license-loss-fail-report-crash-dmv (3 questions, status: approved)
+- license-loss-fail-report-crash-scene (3 questions, status: approved)
+- license-loss-false-application-info (3 questions, status: approved)
+- license-loss-lend-license (3 questions, status: approved)
+- license-loss-no-insurance-proof (3 questions, status: approved)
+- license-loss-point-accumulation (3 questions, status: approved)
+- license-loss-refuse-chemical-test (3 questions, status: approved)
+- license-loss-underage-alcohol (3 questions, status: approved)
+- license-loss-unpaid-judgment (3 questions, status: approved)
+- license-loss-vehicular-homicide (3 questions, status: approved)
 
 ## lane-controls-and-special-lanes
-- bike-lane-right-of-way (3 questions, status: pending_review)
-- bike-lane-through-intersection (2 questions, status: pending_review)
-- center-turn-lane-other-lanes (2 questions, status: pending_review)
-- center-turn-lane-stopping (2 questions, status: pending_review)
-- center-turn-lane-usage (2 questions, status: pending_review)
-- hov-lane-identification (2 questions, status: pending_review)
-- restricted-lane-markings (2 questions, status: pending_review)
-- transit-lane-purpose (2 questions, status: pending_review)
-- unmarked-lane-positioning (3 questions, status: pending_review)
+NOTE (chunk-wide): 16 of 20 questions reworded during review — answers reused the handbook's
+special-lane sentences near-verbatim (one also had "according to the handbook" stem framing);
+facts were correct throughout. 4 questions approved as-is.
+- bike-lane-right-of-way (3 questions, status: approved)
+- bike-lane-through-intersection (2 questions, status: approved)
+- center-turn-lane-other-lanes (2 questions, status: approved)
+- center-turn-lane-stopping (2 questions, status: approved)
+- center-turn-lane-usage (2 questions, status: approved)
+- hov-lane-identification (2 questions, status: approved)
+- restricted-lane-markings (2 questions, status: approved)
+- transit-lane-purpose (2 questions, status: approved)
+- unmarked-lane-positioning (3 questions, status: approved)
 
 ## left-turns-and-turnabouts
-- forward-two-point-turnabout-procedure (3 questions, status: pending_review)
-- left-turn-blocking-intersection (2 questions, status: pending_review)
-- left-turn-crash-risk (3 questions, status: pending_review)
-- left-turn-wait-for-gap (3 questions, status: pending_review)
-- left-turn-wheels-straight (3 questions, status: pending_review)
-- reverse-two-point-turnabout-procedure (3 questions, status: pending_review)
-- three-point-turnabout-procedure (3 questions, status: pending_review)
-- three-point-turnabout-when-used (3 questions, status: pending_review)
-- two-point-turnabout-definition (2 questions, status: pending_review)
-- u-turn-alternative (2 questions, status: pending_review)
-- u-turn-definition (2 questions, status: pending_review)
-- u-turn-legality (3 questions, status: pending_review)
+NOTE (chunk-wide): 24 of 32 questions reworded during review — turnabout procedures and
+left-turn rules were reused near-verbatim from handbook p.16; facts and step order were correct
+throughout. 8 questions approved as-is.
+- forward-two-point-turnabout-procedure (3 questions, status: approved)
+- left-turn-blocking-intersection (2 questions, status: approved)
+- left-turn-crash-risk (3 questions, status: approved)
+- left-turn-wait-for-gap (3 questions, status: approved)
+- left-turn-wheels-straight (3 questions, status: approved)
+- reverse-two-point-turnabout-procedure (3 questions, status: approved)
+- three-point-turnabout-procedure (3 questions, status: approved)
+- three-point-turnabout-when-used (3 questions, status: approved)
+  - NOTE: one scenario stem also had the handbook's "two-point turnabout not possible" condition
+    added, since without it a two-point turnabout distractor was arguably also valid.
+- two-point-turnabout-definition (2 questions, status: approved)
+- u-turn-alternative (2 questions, status: approved)
+- u-turn-definition (2 questions, status: approved)
+- u-turn-legality (3 questions, status: approved)
 
 ## licensing-process-and-drive-test
-- licensing-drive-test-acceleration (2 questions, status: pending_review)
-- licensing-drive-test-categories (3 questions, status: pending_review)
-- licensing-drive-test-general-behavior (2 questions, status: pending_review)
-- licensing-drive-test-lane-management (3 questions, status: pending_review)
-- licensing-drive-test-maneuvers (2 questions, status: pending_review)
-- licensing-drive-test-occupants (2 questions, status: pending_review)
-- licensing-drive-test-provider (2 questions, status: pending_review)
-- licensing-drive-test-retake-wait (2 questions, status: pending_review)
-- licensing-drive-test-searching (2 questions, status: pending_review)
-- licensing-drive-test-speed-control (2 questions, status: pending_review)
-- licensing-drive-test-stopping-criteria (3 questions, status: pending_review)
-- licensing-drive-test-turn-signal-distance (4 questions, status: pending_review)
-- licensing-drive-test-vehicle-check (2 questions, status: pending_review)
-- licensing-drive-test-vehicle-prep (2 questions, status: pending_review)
-- licensing-min-age-16 (3 questions, status: pending_review)
-- licensing-minor-affidavit (3 questions, status: pending_review)
-- licensing-minor-behind-wheel-training (3 questions, status: pending_review)
-- licensing-minor-permit-duration-hours (3 questions, status: pending_review)
-- licensing-name-address-change-30-days (2 questions, status: pending_review)
-- licensing-permit-after-written-test (3 questions, status: pending_review)
-- licensing-permit-supervisor-21 (2 questions, status: pending_review)
-- licensing-residency-30-days (3 questions, status: pending_review)
-- licensing-written-test-closing-time (2 questions, status: pending_review)
-- licensing-written-test-content (2 questions, status: pending_review)
+NOTE (chunk-wide): 32 of 59 questions reworded during review — near-verbatim handbook lists and
+sentences, or "according to the handbook" stem framing. All numbers (ages, hours, days, miles,
+distances) were verified against the handbook and were correct. 27 questions approved as-is.
+- licensing-drive-test-acceleration (2 questions, status: approved)
+- licensing-drive-test-categories (3 questions, status: approved)
+- licensing-drive-test-general-behavior (2 questions, status: approved)
+- licensing-drive-test-lane-management (3 questions, status: approved)
+- licensing-drive-test-maneuvers (2 questions, status: approved)
+- licensing-drive-test-occupants (2 questions, status: approved)
+- licensing-drive-test-provider (2 questions, status: approved)
+- licensing-drive-test-retake-wait (2 questions, status: approved)
+- licensing-drive-test-searching (2 questions, status: approved)
+- licensing-drive-test-speed-control (2 questions, status: approved)
+- licensing-drive-test-stopping-criteria (3 questions, status: approved)
+- licensing-drive-test-turn-signal-distance (4 questions, status: approved)
+- licensing-drive-test-vehicle-check (2 questions, status: approved)
+- licensing-drive-test-vehicle-prep (2 questions, status: approved)
+- licensing-min-age-16 (3 questions, status: approved)
+- licensing-minor-affidavit (3 questions, status: approved)
+- licensing-minor-behind-wheel-training (3 questions, status: approved)
+- licensing-minor-permit-duration-hours (3 questions, status: approved)
+- licensing-name-address-change-30-days (2 questions, status: approved)
+- licensing-permit-after-written-test (3 questions, status: approved)
+- licensing-permit-supervisor-21 (2 questions, status: approved)
+- licensing-residency-30-days (3 questions, status: approved)
+- licensing-written-test-closing-time (2 questions, status: approved)
+- licensing-written-test-content (2 questions, status: approved)
 
 ## minor-permit-requirements
 - affidavit-foster-care-exemption (3 questions, status: pending_review)
@@ -404,16 +640,23 @@
 - roundabout-yield-no-large-vehicle (3 questions, status: pending_review)
 
 ## school-bus-stop-law
-- school-bus-20-foot-rule (3 questions, status: pending_review)
-- school-bus-caution-children (3 questions, status: pending_review)
-- school-bus-divided-median-exception (3 questions, status: pending_review)
-- school-bus-five-lane-center-turn-exception (3 questions, status: pending_review)
-- school-bus-four-lane-no-median-both-stop (3 questions, status: pending_review)
-- school-bus-illegal-not-stop (3 questions, status: pending_review)
-- school-bus-red-stop-arm (3 questions, status: pending_review)
-- school-bus-remain-stopped (3 questions, status: pending_review)
-- school-bus-two-lane-both-stop (3 questions, status: pending_review)
-- school-bus-yellow-warning-lights (3 questions, status: pending_review)
+- school-bus-20-foot-rule (3 questions, status: approved)
+- school-bus-caution-children (3 questions, status: flagged)
+  - ISSUE: question CPcnNCFCxfBOYWBODFF5 is a near-verbatim lift of the handbook's p.23 CAUTION
+    sentence ("Motorists should use extreme care when near a stopped school bus because children
+    are likely to dart from the bus's front or rear") with only minor word swaps — not a genuine
+    paraphrase, a legal/reuse concern per prd.md Section 8. Content is factually correct and the
+    concept is already adequately covered by question PZVepcsdjM5G4VZNOA9o (approved). Needs
+    rewriting with a genuinely different sentence structure before it can be approved. The other
+    2 questions in this concept were reviewed and approved.
+- school-bus-divided-median-exception (3 questions, status: approved)
+- school-bus-five-lane-center-turn-exception (3 questions, status: approved)
+- school-bus-four-lane-no-median-both-stop (3 questions, status: approved)
+- school-bus-illegal-not-stop (3 questions, status: approved)
+- school-bus-red-stop-arm (3 questions, status: approved)
+- school-bus-remain-stopped (3 questions, status: approved)
+- school-bus-two-lane-both-stop (3 questions, status: approved)
+- school-bus-yellow-warning-lights (3 questions, status: approved)
 
 ## seasonal-mountain-and-rural-driving
 - bicyclist-fatalities-rural-alert (3 questions, status: pending_review)
