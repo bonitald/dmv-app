@@ -161,6 +161,62 @@ proposal, not a validated product decision** — tune them if real study session
 **Errors**: `invalid-argument` (missing/empty `chunkId`), `not-found` (topic has no approved
 questions), `resource-exhausted` (over the rate limit).
 
+## `scoreTest` (callable)
+
+Grades a submitted practice test, mini-quiz, or baseline section (ph-1-us-11). This is the only
+place correct answers are compared with a student's choices — answers never leave the server.
+
+**Auth**: requires a signed-in caller (anonymous auth is fine). Rejects with an `unauthenticated`
+`HttpsError` otherwise.
+
+**Input**:
+```json
+{
+  "testId": "string — as returned by assembleTest, assembleMiniQuiz, or startOrResumeBaseline",
+  "answers": [{ "questionId": "string", "choice": "string — the choice text picked" }]
+}
+```
+Unanswered questions, and answers for questions that weren't assigned, count as wrong rather than
+causing an error. Malformed answer entries are ignored.
+
+**Output**:
+```json
+{
+  "testId": "...",
+  "type": "practice | mini-quiz | baseline",
+  "score": 0.8,
+  "correctCount": 12,
+  "totalCount": 15,
+  "perTopic": [{ "chunkId": "right-of-way", "correct": 3, "total": 4 }],
+  "recommendation": "move-on | review-again | null"
+}
+```
+Correct answers are not returned.
+
+**How each type is graded** — always against a server-side record, never question IDs the client
+sends:
+- **practice** / **mini-quiz**: `users/{uid}/testAssignments/{testId}`, written when
+  `assembleTest` / `assembleMiniQuiz` handed the questions out. Marked `scored: true` afterward.
+- **baseline**: detected by the `testId` format `baseline-{version}-{section}` (set by
+  `startOrResumeBaseline`; practice and mini-quiz testIds are UUIDs and never start with
+  `baseline-`). Grades that section of `baselineTests/{version}`, then advances
+  `users/{uid}/baseline/progress`. After the last section it sets `completedAt` and
+  `freeTestUsedAt`. Only the user's current section, in the version they're pinned to, can be
+  submitted.
+
+**Recommendation**: mini-quizzes only. `move-on` at or above `MINI_QUIZ_PASS_THRESHOLD` (0.8),
+otherwise `review-again`. **The 80% threshold is prd.md's proposed default, not a validated
+product decision.** `null` for practice tests and baseline sections.
+
+**Persistence**: writes `users/{uid}/testAttempts/{testId}` — `{ type, chunkId (topic for a
+mini-quiz, or for a practice test whose questions all share one; otherwise null), score,
+correctCount, totalCount, perTopic, recommendation, createdAt }`. Clients can read attempts but
+never write them.
+
+**Errors**: `invalid-argument` (missing `testId`, non-array `answers`, malformed baseline
+`testId`), `not-found` (no matching assignment or baseline for this user), `already-exists`
+(already scored, or not the user's current baseline section).
+
 ## Local development
 
 ```bash
