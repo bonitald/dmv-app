@@ -17,3 +17,4 @@
 
 ### 2026-09-23
 - Recovered and merged prior session's worktree work into `ph2-stories`: Tasks 1-4 of the Phase 1 remaining-stories plan (shared `shuffle` helper extracted from `assembleTest`, `assembleTest` now returns `chunkId` and persists `testAssignments`, `firestore.rules` narrowed to explicit server-owned paths under `users/{uid}`, and the new `assembleMiniQuiz` callable for topic-scoped mini-quizzes) were already committed on the `worktree-phase-1-remaining-stories` worktree branch; fast-forwarded `ph2-stories` onto it and committed the previously-untracked plan doc. Left off before Task 5 (topic catalog population script, ph-1-us-9) of `docs/superpowers/plans/2026-09-22-phase-1-remaining-stories.md`.
+- Phase 1 plan Tasks 5-7 done: `qb:publish-topics` (topic catalog, ph-1-us-9), Task 6 rules checkpoint, and `qb:build-baseline`/`qb:validate-baseline` (ph-1-us-8 part 1); question-bank suite 39/39. Next: Task 8, `startOrResumeBaseline` callable.
