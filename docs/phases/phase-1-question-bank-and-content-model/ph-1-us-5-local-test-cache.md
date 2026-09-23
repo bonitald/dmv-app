@@ -3,7 +3,7 @@
 **ID:** ph-1-us-5
 **Layer:** Frontend
 **Parent:** ph-1-us-3
-**Status:** Not Started
+**Status:** Partially complete
 
 ## Story
 As a teen user,
@@ -57,12 +57,15 @@ So that I can keep answering questions even if I go offline mid-test.
   error to the caller, not fail silently and leave the test unusable offline.
 
 ## Tasks
-- [ ] Add `@react-native-async-storage/async-storage` dependency.
-- [ ] Implement `src/study/testCache.ts`: `saveTestCache(testId, questions)`,
+- [x] Add `@react-native-async-storage/async-storage` dependency.
+- [x] Implement `src/study/testCache.ts`: `saveTestCache(testId, questions)`,
   `getTestCache(testId)`, `clearTestCache(testId)`.
-- [ ] Write unit tests covering the Test Notes scenarios above (mock AsyncStorage per Jest/Expo
+- [x] Write unit tests covering the Test Notes scenarios above (mock AsyncStorage per Jest/Expo
   conventions already used elsewhere in this repo).
 
 ## Questions
 - Resume-vs-clear UX for a stale cached test after a force-quit is deferred to Phase 3 — flagged
   here so it isn't lost.
+
+## Status note (2026-09-23)
+`src/study/testCache.ts` (save/get/clear, 5 unit tests via `npm run test:app`) is done. All four criteria need the Phase 3 test-taking screen to call it. For the force-quit case, note that the module has no "list cached tests" call: Phase 3 must also persist the active `testId` so a restarted app knows which entry to resume or clear.

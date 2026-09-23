@@ -27,8 +27,8 @@ export interface PerTopicResult {
 
 /**
  * What the client receives after submitting. The same fields (minus `testId`, plus `chunkId`
- * and `createdAt`) are saved to `users/{uid}/testAttempts/{testId}`. Correct answers are
- * deliberately not returned — review of individual misses is a later phase.
+ * and `createdAt`) are saved to `users/{uid}/testAttempts/{testId}`. Known gap vs ph-1-us-11:
+ * the story also asks for per-question results with each correct answer; not implemented yet.
  */
 export interface ScoreTestResult {
   testId: string;

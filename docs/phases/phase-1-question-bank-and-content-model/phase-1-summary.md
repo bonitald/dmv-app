@@ -1,12 +1,16 @@
 # Phase 1: Question Bank & Content Model — Summary
 
-## Status: Not Started (2 of 4 checklist items already satisfied by prior work)
+## Status: Backend complete — 8 of 11 stories Complete, 3 Partially complete (2026-09-23)
 
 Most of this phase's schema/content work was already delivered by the question-bank ingestion
 pipeline (`docs/superpowers/specs/2026-09-08-question-bank-ingestion-design.md`), which has run
 against the CO DMV handbook and produced 1,415 questions across 499 concepts
-(`docs/dmv-reference/concept-list.md`). What remains is closing the client read path safely
-(no direct bulk-read of the question bank) and building the scoped, per-test offline cache.
+(`docs/dmv-reference/concept-list.md`). The rest of the phase built the server-side read/score paths (no direct bulk-read of the
+question bank), the topic catalog, the fixed baseline, and the on-device test cache module.
+
+**Still open:** ph-1-us-3 and ph-1-us-5 need the Phase 3 test-taking screen to use
+`src/study/testCache.ts`; ph-1-us-11 needs `scoreTest` to return per-question results with
+correct answers. See each story's status note.
 
 ## Stories
 
@@ -14,15 +18,15 @@ against the CO DMV handbook and produced 1,415 questions across 499 concepts
 |----|-------|-------|--------|--------|
 | ph-1-us-1 | Firestore schema for Question content | Backend | — | Complete |
 | ph-1-us-2 | Add/update questions without an app release | Backend | — | Complete |
-| ph-1-us-3 | Scoped offline caching for an in-progress test | Parent | — | Not Started |
+| ph-1-us-3 | Scoped offline caching for an in-progress test | Parent | — | Partially complete |
 | ph-1-us-4 | `assembleTest` callable Cloud Function | Backend | ph-1-us-3 | Complete |
-| ph-1-us-5 | On-device cache for the active test's question set | Frontend | ph-1-us-3 | Not Started |
+| ph-1-us-5 | On-device cache for the active test's question set | Frontend | ph-1-us-3 | Partially complete |
 | ph-1-us-6 | Paraphrased content with traceable source reference | Backend | — | Complete |
-| ph-1-us-7 | Topic-scoped mini-quiz assembly | Backend | — | Not Started |
-| ph-1-us-8 | Fixed baseline diagnostic (sectioned, resumable, doubles as free test) | Backend | — | Not Started |
-| ph-1-us-9 | Topic catalog for the learning path | Backend | — | Not Started |
-| ph-1-us-10 | Flashcard delivery for a topic (with answers, unscored) | Backend | — | Not Started |
-| ph-1-us-11 | Score a test, mini-quiz, or baseline section | Backend | — | Not Started |
+| ph-1-us-7 | Topic-scoped mini-quiz assembly | Backend | — | Complete |
+| ph-1-us-8 | Fixed baseline diagnostic (sectioned, resumable, doubles as free test) | Backend | — | Complete |
+| ph-1-us-9 | Topic catalog for the learning path | Backend | — | Complete |
+| ph-1-us-10 | Flashcard delivery for a topic (with answers, unscored) | Backend | — | Complete |
+| ph-1-us-11 | Score a test, mini-quiz, or baseline section | Backend | — | Partially complete |
 
 ## Key decisions made during planning
 
@@ -54,12 +58,12 @@ against the CO DMV handbook and produced 1,415 questions across 499 concepts
 
 ## Open items carried into implementation
 
-- **`firestore.rules`**: the `users/{uid}/**` wildcard lets clients write everything under their
-  uid, and rules are OR'd, so it must be narrowed to explicit client-writable paths, with
-  attempts, baseline progress, and `freeTestUsedAt` read-only (ph-1-us-8).
+- ~~**`firestore.rules`** wildcard under `users/{uid}/**`~~ — resolved: narrowed to explicit
+  paths; attempts, assignments and baseline progress are client-read-only (2026-09-23).
 - Reinstalling creates a new anonymous uid, so the baseline/free test can be retaken; linking a
   real account (Phase 9) is what closes it later.
-- Mini-quiz recommendation threshold value (proposed 80%) and the per-user flashcard rate limit.
+- Mini-quiz recommendation threshold and flashcard rate limit are implemented as tunable
+  constants (80%; 30 calls / 10 min) but still unvalidated product values.
 - Whether Concept Progress status is updated by `scoreTest` or stays a client action
   (ph-1-us-11).
 - Exact per-test question count (`prd.md` Section 9, still undefined) — ph-1-us-4.

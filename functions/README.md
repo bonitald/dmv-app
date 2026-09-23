@@ -191,7 +191,9 @@ causing an error. Malformed answer entries are ignored.
   "recommendation": "move-on | review-again | null"
 }
 ```
-Correct answers are not returned.
+**Known gap:** ph-1-us-11 also calls for per-question results including each correct answer
+(so a student can see what they missed). Not implemented yet — the response currently has only
+the score and per-topic totals.
 
 **How each type is graded** — always against a server-side record, never question IDs the client
 sends:

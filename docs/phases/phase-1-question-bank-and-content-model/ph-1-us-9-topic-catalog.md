@@ -2,7 +2,7 @@
 
 **ID:** ph-1-us-9
 **Layer:** Backend
-**Status:** Not Started
+**Status:** Complete
 
 ## Story
 As a teen user,
@@ -20,14 +20,14 @@ So that I can follow the learning path or jump to any topic.
 - Order comes from `pageStart` (handbook PDF order), per the "organize by the PDF layout" decision.
 
 ## Acceptance Criteria
-- [ ] Given the ingestion chunk plan, when the catalog is populated, then a `topics/{chunkId}`
+- [x] Given the ingestion chunk plan, when the catalog is populated, then a `topics/{chunkId}`
   doc exists for each chunk with `title`, `description`, `order` (from `pageStart`), and
   `approvedQuestionCount`.
-- [ ] Given a signed-in client, when it reads `topics`, then it succeeds; given any client, when
+- [x] Given a signed-in client, when it reads `topics`, then it succeeds; given any client, when
   it tries to write `topics`, then it is denied.
-- [ ] Given `topics` docs, when inspected, then none contains question text, choices, answers, or
+- [x] Given `topics` docs, when inspected, then none contains question text, choices, answers, or
   `sourceRef`.
-- [ ] Given questions are approved or rejected later, when the catalog is refreshed by re-running
+- [x] Given questions are approved or rejected later, when the catalog is refreshed by re-running
   the script, then `approvedQuestionCount` reflects the change (no manual editing).
 
 ## Data and API
@@ -47,9 +47,9 @@ So that I can follow the learning path or jump to any topic.
 - **Failure modes**: client write denied; unauthenticated read denied.
 
 ## Tasks
-- [ ] Add the `publish-topics` script.
-- [ ] Add the rule and its tests.
-- [ ] Document the collection in the question-bank README.
+- [x] Add the `publish-topics` script.
+- [x] Add the rule and its tests.
+- [x] Document the collection in the question-bank README.
 
 ## Questions
 - Should very small or empty topics be hidden from the learning path until they have enough

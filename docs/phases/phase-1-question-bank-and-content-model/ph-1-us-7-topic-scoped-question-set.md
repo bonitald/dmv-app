@@ -2,7 +2,7 @@
 
 **ID:** ph-1-us-7
 **Layer:** Backend
-**Status:** Not Started
+**Status:** Complete
 
 ## Story
 As a teen user reviewing one handbook topic,
@@ -24,18 +24,19 @@ So that I can check what I just reviewed before deciding to move on or repeat it
   reveal correct answers for any question — an extraction path.
 
 ## Acceptance Criteria
-- [ ] Given an authenticated caller passes a valid `chunkId` (and optional `count`), when the
+- [x] Given an authenticated caller passes a valid `chunkId` (and optional `count`), when the
   function runs, then it returns only `approved` questions from that topic, randomized, capped at
   a server-enforced maximum (proposed: 10), plus a `testId`.
-- [ ] Given the response, when inspected, then questions include `id`, `text`, `choices`, `type`,
+- [x] Given the response, when inspected, then questions include `id`, `text`, `choices`, `type`,
   `chunkId`, `conceptId` and omit `correctAnswer`, `sourceRef`, `selfCheck`, review metadata.
-- [ ] Given the function returns a set, when it does, then the assigned question IDs are saved to
+- [x] Given the function returns a set, when it does, then the assigned question IDs are saved to
   `users/{uid}/testAssignments/{testId}` (read-only to clients) — see Data and API.
-- [ ] Given a topic with fewer approved questions than requested, then it returns what exists; a
+- [x] Given a topic with fewer approved questions than requested, then it returns what exists; a
   topic with none returns a clear `not-found`-style error.
-- [ ] Given an unknown or malformed `chunkId`, then `invalid-argument`; given no auth, then
+- [x] Given an unknown or malformed `chunkId`, then `invalid-argument`; given no auth, then
   `unauthenticated`.
-- [ ] Given repeated "Review Again" calls, when selecting, then the set avoids repeating the
+  - _Note (2026-09-23):_ Actual behavior: a malformed `chunkId` returns `invalid-argument`; a well-formed but unknown one returns `not-found`, since the function can't tell an unknown topic from an empty one.
+- [x] Given repeated "Review Again" calls, when selecting, then the set avoids repeating the
   previous one where the pool allows.
 
 ## Data and API
@@ -58,9 +59,9 @@ So that I can check what I just reviewed before deciding to move on or repeat it
 - **Failure modes**: bad `chunkId`; unauthenticated.
 
 ## Tasks
-- [ ] Add `chunkId` to the returned question shape.
-- [ ] Implement topic-scoped selection, input validation, and assignment persistence.
-- [ ] Emulator tests; update `functions/README.md`.
+- [x] Add `chunkId` to the returned question shape.
+- [x] Implement topic-scoped selection, input validation, and assignment persistence.
+- [x] Emulator tests; update `functions/README.md`.
 
 ## Questions
 - Repeat avoidance for "Review Again": client passes previous question IDs, or server remembers

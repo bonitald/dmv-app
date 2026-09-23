@@ -2,7 +2,7 @@
 
 **ID:** ph-1-us-10
 **Layer:** Backend
-**Status:** Not Started
+**Status:** Complete
 
 ## Story
 As a teen user studying one handbook topic,
@@ -20,15 +20,16 @@ So that I can learn the material before quizzing myself.
   per call, per-user rate limit) but can't stop it. Accepted for the MVP learning path.
 
 ## Acceptance Criteria
-- [ ] Given an authenticated caller passes a valid `chunkId`, when the function runs, then it
+- [x] Given an authenticated caller passes a valid `chunkId`, when the function runs, then it
   returns that topic's `approved` questions in random order, each with `id`, `text`, `choices`,
   `correctAnswer`, `type`, `chunkId`, `conceptId`.
-- [ ] Given the response, when inspected, then `sourceRef`, `selfCheck`, and review metadata are
+- [x] Given the response, when inspected, then `sourceRef`, `selfCheck`, and review metadata are
   omitted.
-- [ ] Given a call, when it runs, then nothing is scored or recorded as a test attempt.
-- [ ] Given an unknown `chunkId` → `invalid-argument`; no auth → `unauthenticated`; topic with no
+- [x] Given a call, when it runs, then nothing is scored or recorded as a test attempt.
+- [x] Given an unknown `chunkId` → `invalid-argument`; no auth → `unauthenticated`; topic with no
   approved questions → clear `not-found`-style error.
-- [ ] Given a user calls the function repeatedly in a short window, when a proposed per-user
+  - _Note (2026-09-23):_ Actual behavior: a malformed `chunkId` returns `invalid-argument`; a well-formed but unknown one returns `not-found` (indistinguishable from an empty topic). Rate limit: 30 calls / 10 min per user — a starting value.
+- [x] Given a user calls the function repeatedly in a short window, when a proposed per-user
   limit is exceeded, then it rejects (`resource-exhausted`).
 
 ## Data and API
@@ -47,8 +48,8 @@ So that I can learn the material before quizzing myself.
 - **Failure modes**: bad `chunkId`; unauthenticated.
 
 ## Tasks
-- [ ] Implement `getFlashcards` with validation and rate limit.
-- [ ] Emulator tests; document the contract in `functions/README.md`.
+- [x] Implement `getFlashcards` with validation and rate limit.
+- [x] Emulator tests; document the contract in `functions/README.md`.
 
 ## Questions
 - Per-user rate limit value, and whether a topic's cards should return whole or paged.

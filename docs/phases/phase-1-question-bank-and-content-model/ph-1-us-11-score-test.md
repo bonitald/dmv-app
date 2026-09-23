@@ -2,7 +2,7 @@
 
 **ID:** ph-1-us-11
 **Layer:** Backend
-**Status:** Not Started
+**Status:** Partially complete
 
 ## Story
 As a teen user who finished a test, mini-quiz, or baseline section,
@@ -34,18 +34,19 @@ So that I see how I did and get a recommendation on what to do next.
 - [ ] Given a `testId` with an assignment at `users/{uid}/testAssignments/{testId}` for the
   caller and their answers, when the function runs, then it returns the score, per-question
   results including each correct answer, and per-topic (`chunkId`) results.
-- [ ] Given a `testId` with no assignment for this uid, then it rejects and reveals nothing.
-- [ ] Given an assignment already marked `scored: true`, when scored again, then it rejects
+  - _Note (2026-09-23):_ Not done: `scoreTest` returns score and per-topic results but no per-question results or correct answers. Needs a follow-up change to `scoreTest`.
+- [x] Given a `testId` with no assignment for this uid, then it rejects and reveals nothing.
+- [x] Given an assignment already marked `scored: true`, when scored again, then it rejects
   (`already-exists`) and leaves both records unchanged.
-- [ ] Given a mini-quiz, when scored, then the response includes a recommendation ("move on" or
+- [x] Given a mini-quiz, when scored, then the response includes a recommendation ("move on" or
   "review again") from a server-side threshold constant (proposed default 80%, see `prd.md`
   Section 9).
-- [ ] Given a completed attempt, when saved, then `users/{uid}/testAttempts/{testId}` records
+- [x] Given a completed attempt, when saved, then `users/{uid}/testAttempts/{testId}` records
   type (`practice`, `mini-quiz`, `baseline`), score, per-topic results, and timestamp, and the
   matching `testAssignments/{testId}` is marked `scored: true`.
-- [ ] Given the final baseline section is scored, when saved, then the user is marked
+- [x] Given the final baseline section is scored, when saved, then the user is marked
   baseline-complete with `freeTestUsedAt` (ph-1-us-8).
-- [ ] Given an unauthenticated caller, then `unauthenticated`.
+- [x] Given an unauthenticated caller, then `unauthenticated`.
 
 ## Data and API
 - **Cloud Function**: callable `scoreTest({ testId, answers: [{ questionId, choice }] })`.
@@ -68,10 +69,13 @@ So that I see how I did and get a recommendation on what to do next.
   or `testAttempts` directly.
 
 ## Tasks
-- [ ] Persist assignments in `assembleTest` (ph-1-us-4 follow-up).
-- [ ] Implement `scoreTest` and the recommendation threshold constant.
-- [ ] Emulator tests; document the contract in `functions/README.md`.
+- [x] Persist assignments in `assembleTest` (ph-1-us-4 follow-up).
+- [x] Implement `scoreTest` and the recommendation threshold constant.
+- [x] Emulator tests; document the contract in `functions/README.md`.
 
 ## Questions
 - Should Concept Progress status ("reviewed", "needs revisit") be updated by this function from
   the recommendation, or stay a client action from the user's button choice (Phase 2)?
+
+## Status note (2026-09-23)
+Grading, double-submit protection, the mini-quiz recommendation, attempt persistence and baseline completion are all done (`functions/src/scoreTest.ts`, 11 emulator tests). The one open criterion is per-question results with correct answers in the response.

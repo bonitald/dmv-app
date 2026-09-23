@@ -58,7 +58,7 @@ No content dependency; this is the scaffold everything else builds on.
 
 ---
 
-## Phase 1: Question Bank & Content Model — Not Started
+## Phase 1: Question Bank & Content Model — In Progress (backend complete; see phase-1-summary.md)
 
 > **Goal:** Build the content engine — a question bank that can hold both fact-recall and
 > scenario questions, be grown without app releases, and be served to students without letting

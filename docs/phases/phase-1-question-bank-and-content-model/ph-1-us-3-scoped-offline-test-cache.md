@@ -3,7 +3,7 @@
 **ID:** ph-1-us-3
 **Layer:** Parent
 **Children:** ph-1-us-4 (Backend), ph-1-us-5 (Frontend)
-**Status:** Not Started
+**Status:** Partially complete
 
 ## Story
 As a teen user,
@@ -24,16 +24,17 @@ So that I'm not interrupted or lose progress partway through a test.
 - General flashcard-mode offline caching (Phase 2) is explicitly out of scope here.
 
 ## Acceptance Criteria
-- [ ] Given a teen user starts a practice test while online, when the test's question set is
+- [x] Given a teen user starts a practice test while online, when the test's question set is
   assembled, then only those specific questions are cached locally — not the full bank.
 - [ ] Given a cached in-progress test, when the device goes offline mid-test, then the user can
   continue answering questions from the cached set without interruption.
 - [ ] Given a test is completed or abandoned, when the session ends, then its cached question set
   is cleared from local storage (no indefinite local accumulation of question content).
-- [ ] Given no direct Firestore read/query path to the `questions` collection exists for clients
+- [x] Given no direct Firestore read/query path to the `questions` collection exists for clients
   (ph-1-us-1), when a client is inspected/reverse-engineered, then the only way to obtain
   question content is by legitimately starting a test through the `assembleTest` function
   (ph-1-us-4), which returns a bounded set, not the whole bank.
+  - _Note (2026-09-23):_ Holds with the other bounded callables added since (`assembleMiniQuiz`, `startOrResumeBaseline`, and the rate-limited `getFlashcards`) — still no direct client read of `questions`.
 
 ## Scope update (2026-09-20)
 The same "cache only what one session needs" mechanism now serves three kinds of sessions, not
@@ -49,9 +50,9 @@ just practice tests:
   Phase 2 decision.
 
 Additional acceptance criteria:
-- [ ] Given a user pauses a baseline between sections, when they return (any device), then the
+- [x] Given a user pauses a baseline between sections, when they return (any device), then the
   local cache is rebuilt from the server's stored assignment rather than assumed to exist.
-- [ ] Given a paused baseline, when the local cache is cleared, then the baseline itself is not
+- [x] Given a paused baseline, when the local cache is cleared, then the baseline itself is not
   treated as abandoned or lost.
 
 ## Dependencies
@@ -64,3 +65,6 @@ Additional acceptance criteria:
 
 ## Notes
 No separate Tasks/Test Notes here — see child stories ph-1-us-4 and ph-1-us-5.
+
+## Status note (2026-09-23)
+Backend and the on-device cache module are done. The two unchecked criteria describe the test-taking screen (continue answering offline; clear the cache when a test ends), which Phase 3 builds on top of `src/study/testCache.ts`.

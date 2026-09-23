@@ -2,7 +2,7 @@
 
 **ID:** ph-1-us-8
 **Layer:** Backend
-**Status:** Not Started
+**Status:** Complete
 
 ## Story
 As a first-time teen user,
@@ -32,21 +32,21 @@ So that I learn where my gaps are without a long, tiring sitting.
   with server-owned data (baseline progress, attempts, the free-test flag) as read-only.
 
 ## Acceptance Criteria
-- [ ] Given a fixed baseline definition (45 approved question IDs, one per topic, 3 sections of
+- [x] Given a fixed baseline definition (45 approved question IDs, one per topic, 3 sections of
   15 in handbook order), when any user starts the baseline, then they receive section 1's
   questions — text, choices, `type`, `chunkId`, `conceptId` — and no answers.
-- [ ] Given a baseline in progress, when the user returns (same or another device, same uid),
+- [x] Given a baseline in progress, when the user returns (same or another device, same uid),
   then the function returns their current section's same questions.
-- [ ] Given a section is finished, when the client requests the next one, then only that section
+- [x] Given a section is finished, when the client requests the next one, then only that section
   is returned; the whole baseline is never sent at once.
-- [ ] Given the user finishes all 3 sections, when the final section is scored (ph-1-us-11), then
+- [x] Given the user finishes all 3 sections, when the final section is scored (ph-1-us-11), then
   the user's server-owned record is marked baseline-complete with a `freeTestUsedAt` timestamp.
-- [ ] Given a user who has completed the baseline, when they start it again, then the function
+- [x] Given a user who has completed the baseline, when they start it again, then the function
   rejects (`already-exists`) and the baseline result is not overwritten.
-- [ ] Given a baseline question that later becomes non-approved, when the baseline definition is
+- [x] Given a baseline question that later becomes non-approved, when the baseline definition is
   next validated, then it is flagged for replacement (a stale question must not silently
   remain).
-- [ ] Given the stored progress or flag, when a client tries to write it directly, then security
+- [x] Given the stored progress or flag, when a client tries to write it directly, then security
   rules deny the write.
 
 ## Data and API
@@ -83,9 +83,10 @@ So that I learn where my gaps are without a long, tiring sitting.
 ## Tasks
 - [ ] Script to build and validate the fixed baseline definition (one approved question per
   topic, fact/scenario mix noted).
-- [ ] Implement `startOrResumeBaseline`.
-- [ ] Narrow `firestore.rules` and add rules tests.
-- [ ] Emulator tests; document the contract in `functions/README.md`.
+  - _Note (2026-09-23):_ Build + validate scripts are done (`qb:build-baseline`, `qb:validate-baseline`). Not done: reporting the fact/scenario mix of the selection.
+- [x] Implement `startOrResumeBaseline`.
+- [x] Narrow `firestore.rules` and add rules tests.
+- [x] Emulator tests; document the contract in `functions/README.md`.
 
 ## Questions
 - Pick the baseline questions by hand (balanced fact/scenario, reviewed), or automatically?
