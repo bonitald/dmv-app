@@ -2406,13 +2406,13 @@ otherwise backend-heavy plan.
   `getTestCache(testId): Promise<unknown[] | null>`, `clearTestCache(testId): Promise<void>` —
   Phase 3's test-taking UI imports these; not consumed by anything else in this plan.
 
-- [ ] **Step 1: Add the dependency**
+- [x] **Step 1: Add the dependency**
 
 ```bash
 npx expo install @react-native-async-storage/async-storage
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Create `src/study/testCache.test.ts`:
 ```ts
@@ -2471,7 +2471,7 @@ describe('testCache', () => {
 });
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `npx jest src/study/testCache.test.ts` (adjust to this repo's app-level Jest invocation if
 one is already configured for `src/`; if no app-level Jest config exists yet, add one now
@@ -2479,7 +2479,7 @@ mirroring `jest.rules.config.js`'s `roots`/`testMatch` pattern, pointed at `src/
 `jest-expo` or `react-native` preset so `AsyncStorage`'s native module mock resolves).
 Expected: FAIL with "Cannot find module './testCache'".
 
-- [ ] **Step 4: Implement**
+- [x] **Step 4: Implement**
 
 Create `src/study/testCache.ts`:
 ```ts
@@ -2514,12 +2514,12 @@ export async function clearTestCache(testId: string): Promise<void> {
 }
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 Run: `npx jest src/study/testCache.test.ts`
 Expected: PASS.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add package.json package-lock.json src/study/testCache.ts src/study/testCache.test.ts
