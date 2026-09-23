@@ -86,6 +86,46 @@ exactly which questions were assigned and their topic. `scoreTest` (ph-1-us-11) 
 to grade only questions actually handed to this caller, rather than trusting arbitrary question
 IDs submitted by the client.
 
+## `startOrResumeBaseline` (callable)
+
+Serves the fixed baseline diagnostic (ph-1-us-8) one section at a time: starts a new user on
+section 1, or returns the section they're currently on. The baseline doubles as the user's one
+free full test.
+
+**Auth**: requires a signed-in caller (anonymous auth is fine). Rejects with an `unauthenticated`
+`HttpsError` otherwise.
+
+**Input**: none. Which section to serve comes only from the server-side progress doc, so a client
+can't skip ahead or replay an earlier section.
+
+**Output**:
+```json
+{
+  "testId": "baseline-{version}-{section}, e.g. baseline-v1-1 — scoreTest parses this format",
+  "version": "v1",
+  "section": 1,
+  "totalSections": 3,
+  "questions": [
+    { "id": "...", "text": "...", "choices": ["..."], "type": "fact | scenario", "chunkId": "...", "conceptId": "..." }
+  ]
+}
+```
+Deliberately omits `correctAnswer`, `sourceRef`, and review metadata.
+
+**Selection**: every user gets the same 45 questions — 3 sections of 15 in handbook order — read
+by ID from `baselineTests/{version}` (published by `npm run qb:build-baseline`). No shuffling.
+`CURRENT_BASELINE_VERSION` (`v1`) is the version new users start on; users keep the version stored
+in their progress doc, so publishing and switching to a new version never disrupts someone
+mid-baseline.
+
+**Persistence**: on a user's first call, creates `users/{uid}/baseline/progress` —
+`{ version, currentSection: 1, completedAt: null, freeTestUsedAt: null, createdAt }`. Calling again
+without submitting returns the same section. Only `scoreTest` (ph-1-us-11) advances
+`currentSection` and sets `completedAt`. Clients can read the progress doc but never write it.
+
+**Errors**: `already-exists` means the baseline (and so the free test) has already been used;
+`failed-precondition` means the baseline version isn't published yet.
+
 ## Local development
 
 ```bash
