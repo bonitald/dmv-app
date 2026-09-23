@@ -731,7 +731,7 @@ git commit -m "feat: add assembleMiniQuiz callable for topic-scoped mini-quizzes
   writes `topics/{chunkId}` docs consumed by Task 4/6's callers and Task 6 (`buildBaseline`
   reads `topics/{chunkId}.order` to sequence sections).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `scripts/question-bank/lib/publishTopics.test.ts`:
 ```ts
@@ -812,12 +812,12 @@ describe('publishTopics', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npm run test:question-bank`
 Expected: FAIL with "Cannot find module './publishTopics'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `scripts/question-bank/lib/publishTopics.ts`:
 ```ts
@@ -854,12 +854,12 @@ export async function publishTopics(runId: string): Promise<PublishTopicsResult>
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npm run test:question-bank`
 Expected: PASS.
 
-- [ ] **Step 5: Add the CLI entrypoint and npm script**
+- [x] **Step 5: Add the CLI entrypoint and npm script**
 
 Create `scripts/question-bank/publish-topics.ts`:
 ```ts
@@ -887,13 +887,13 @@ In `package.json`'s `scripts`, add (alongside the other `qb:*` entries):
 "qb:publish-topics": "tsx scripts/question-bank/publish-topics.ts",
 ```
 
-- [ ] **Step 6: Document in `scripts/question-bank/README.md`**
+- [x] **Step 6: Document in `scripts/question-bank/README.md`**
 
 Add a `## qb:publish-topics (after review, repeatable)` section documenting usage
 (`npm run qb:publish-topics -- <runId>`), that it's safe to re-run (idempotent — recomputes
 `approvedQuestionCount` each time), and that it holds no question content by design (ph-1-us-9).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add scripts/question-bank/lib/publishTopics.ts scripts/question-bank/lib/publishTopics.test.ts scripts/question-bank/publish-topics.ts package.json scripts/question-bank/README.md
