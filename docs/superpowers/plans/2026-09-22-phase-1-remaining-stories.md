@@ -937,7 +937,7 @@ traceable to a task in this plan.)
   }], createdAt }` — read by Task 8 (`startOrResumeBaseline`) and Task 9 (`scoreTest`'s
   baseline path).
 
-- [ ] **Step 1: Add the baseline record types**
+- [x] **Step 1: Add the baseline record types**
 
 In `scripts/question-bank/lib/types.ts`, add:
 ```ts
@@ -952,7 +952,7 @@ export interface BaselineTestRecord {
 }
 ```
 
-- [ ] **Step 2: Write the failing test for `buildBaseline`**
+- [x] **Step 2: Write the failing test for `buildBaseline`**
 
 Create `scripts/question-bank/lib/buildBaseline.test.ts`:
 ```ts
@@ -1045,12 +1045,12 @@ describe('buildBaseline', () => {
 });
 ```
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `npm run test:question-bank`
 Expected: FAIL with "Cannot find module './buildBaseline'".
 
-- [ ] **Step 4: Implement `buildBaseline`**
+- [x] **Step 4: Implement `buildBaseline`**
 
 Create `scripts/question-bank/lib/buildBaseline.ts`:
 ```ts
@@ -1130,12 +1130,12 @@ export async function buildBaseline(
 }
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 Run: `npm run test:question-bank`
 Expected: PASS.
 
-- [ ] **Step 6: Add the CLI entrypoint**
+- [x] **Step 6: Add the CLI entrypoint**
 
 Create `scripts/question-bank/build-baseline.ts`:
 ```ts
@@ -1160,7 +1160,7 @@ main().catch((error: Error) => {
 });
 ```
 
-- [ ] **Step 7: Write the failing test for `validateBaseline`**
+- [x] **Step 7: Write the failing test for `validateBaseline`**
 
 Create `scripts/question-bank/lib/validateBaseline.test.ts`:
 ```ts
@@ -1216,7 +1216,7 @@ describe('validateBaseline', () => {
 });
 ```
 
-- [ ] **Step 8: Run tests to verify they fail, then implement**
+- [x] **Step 8: Run tests to verify they fail, then implement**
 
 Run: `npm run test:question-bank` — expect FAIL ("Cannot find module './validateBaseline'").
 
@@ -1261,7 +1261,7 @@ export async function validateBaseline(version: string): Promise<ValidateBaselin
 
 Run: `npm run test:question-bank` — expect PASS.
 
-- [ ] **Step 9: Add the CLI entrypoint, npm scripts, and README docs**
+- [x] **Step 9: Add the CLI entrypoint, npm scripts, and README docs**
 
 Create `scripts/question-bank/validate-baseline.ts`:
 ```ts
@@ -1304,7 +1304,7 @@ that `publish-topics` must run first (order comes from `topics/{chunkId}.order`)
 `validate-baseline` should be re-run periodically/after review passes to catch a baseline
 question that was later rejected.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add scripts/question-bank/lib/types.ts scripts/question-bank/lib/buildBaseline.ts scripts/question-bank/lib/buildBaseline.test.ts scripts/question-bank/build-baseline.ts scripts/question-bank/lib/validateBaseline.ts scripts/question-bank/lib/validateBaseline.test.ts scripts/question-bank/validate-baseline.ts package.json scripts/question-bank/README.md
