@@ -83,9 +83,15 @@ the topic list (ph-1-us-9), flashcards with answers (ph-1-us-10), and scoring (p
 Two small changes to this function are needed, tracked under those stories:
 - Add `chunkId` to the returned question shape.
 - **Persist the assigned question IDs under `testId`** (it currently generates the ID and stores
-  nothing), so `scoreTest` can grade only sets the server assigned. This gives the function its
-  first write, and updates the "Writes: none" line in its doc comment.
-The function intentionally returns no `correctAnswer`; grading happens in `scoreTest`.
+  nothing), so `scoreTest` can grade only sets the server assigned. Collection: **`users/{uid}/
+  testAssignments/{testId}`** — `{ type: 'practice' | 'mini-quiz', chunkId?, questionIds: string[],
+  createdAt, scored: false }`. Read-only to clients; read (and later marked `scored: true`) by
+  `scoreTest` (ph-1-us-11). This gives the function its first write, and updates the "Writes:
+  none" line in its doc comment.
+The function intentionally returns no `correctAnswer`; grading happens in `scoreTest`, which
+writes the scored outcome to a separate `users/{uid}/testAttempts/{testId}` (see ph-1-us-11) —
+the assignment (what was asked) and the attempt (what the user got) are kept as two records, not
+one, since they're written at different times by different functions.
 
 ## Questions
 - Exact question count per assembled test is undefined (`prd.md` Section 9) — implemented as

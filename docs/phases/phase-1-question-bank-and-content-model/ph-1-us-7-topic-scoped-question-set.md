@@ -29,8 +29,8 @@ So that I can check what I just reviewed before deciding to move on or repeat it
   a server-enforced maximum (proposed: 10), plus a `testId`.
 - [ ] Given the response, when inspected, then questions include `id`, `text`, `choices`, `type`,
   `chunkId`, `conceptId` and omit `correctAnswer`, `sourceRef`, `selfCheck`, review metadata.
-- [ ] Given the function returns a set, when it does, then the assigned question IDs are saved
-  server-side under `testId` for that uid (read-only to clients).
+- [ ] Given the function returns a set, when it does, then the assigned question IDs are saved to
+  `users/{uid}/testAssignments/{testId}` (read-only to clients) — see Data and API.
 - [ ] Given a topic with fewer approved questions than requested, then it returns what exists; a
   topic with none returns a clear `not-found`-style error.
 - [ ] Given an unknown or malformed `chunkId`, then `invalid-argument`; given no auth, then
@@ -41,7 +41,10 @@ So that I can check what I just reviewed before deciding to move on or repeat it
 ## Data and API
 - **Cloud Function**: callable, `{ chunkId: string, count?: number }` →
   `{ testId, questions[] }`. May be a mode of `assembleTest` or a sibling function.
-- **Firestore**: reads `questions` (Admin SDK); writes the server-owned assignment record.
+- **Firestore**: reads `questions` (Admin SDK); writes `users/{uid}/testAssignments/{testId}` —
+  `{ type: 'mini-quiz', chunkId, questionIds: string[], createdAt, scored: false }`. Same
+  collection `assembleTest` writes practice sets to (ph-1-us-4 follow-up); `type` distinguishes
+  them so `scoreTest` (ph-1-us-11) can label the resulting attempt correctly.
 - **Security rules**: `questions` stays deny-all; the assignment is server-owned (see the rules
   note in ph-1-us-8).
 
