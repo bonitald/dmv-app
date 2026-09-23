@@ -7,9 +7,11 @@ describe('assembleMiniQuizForUser', () => {
   beforeEach(async () => {
     const snap = await db.collection('questions').get();
     await Promise.all(snap.docs.map((d) => d.ref.delete()));
-    const usersSnap = await db.collection('users').get();
-    for (const userDoc of usersSnap.docs) {
-      const assignments = await userDoc.ref.collection('testAssignments').get();
+    // listDocuments(), not get(): the users/{uid} parent docs are never created, only their
+    // subcollections, and get() skips parents that don't exist.
+    const userRefs = await db.collection('users').listDocuments();
+    for (const userRef of userRefs) {
+      const assignments = await userRef.collection('testAssignments').get();
       await Promise.all(assignments.docs.map((d) => d.ref.delete()));
     }
   });
