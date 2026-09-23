@@ -1607,7 +1607,7 @@ git commit -m "feat: add startOrResumeBaseline callable for the sectioned baseli
 - Produces: `getFlashcardsForUser(db, auth, chunkId, options?): Promise<{ chunkId: string; cards:
   Flashcard[] }>` — standalone, nothing downstream consumes its output.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `functions/src/getFlashcards.test.ts`:
 ```ts
@@ -1728,12 +1728,12 @@ describe('getFlashcardsForUser', () => {
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `npm run test:functions`
 Expected: FAIL with "Cannot find module './getFlashcards'".
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `functions/src/getFlashcards.ts`:
 ```ts
@@ -1854,12 +1854,12 @@ export const getFlashcards = onCall((request) =>
 );
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `npm run test:functions`
 Expected: PASS.
 
-- [ ] **Step 5: Register the export and document it**
+- [x] **Step 5: Register the export and document it**
 
 In `functions/src/index.ts`, add:
 ```ts
@@ -1871,7 +1871,7 @@ In `functions/README.md`, add a `## getFlashcards (callable)` section: input
 10 minutes per user, flagged as a starting value not a validated product decision), and that
 nothing is scored or recorded.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add functions/src/getFlashcards.ts functions/src/getFlashcards.test.ts functions/src/index.ts functions/README.md
