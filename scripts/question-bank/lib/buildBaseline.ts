@@ -6,10 +6,23 @@ const SECTION_SIZE = 15;
 const SECTION_COUNT = 3;
 const EXPECTED_TOPIC_COUNT = SECTION_SIZE * SECTION_COUNT;
 
+/** Count of questions per `type` (e.g. `fact`, `scenario`). */
+export type TypeCounts = Record<string, number>;
+
 export interface BuildBaselineResult {
   version: string;
   sectionsWritten: number;
   questionsWritten: number;
+  /** Fact/scenario mix across the whole baseline, so a reviewer can check the balance. */
+  typeCounts: TypeCounts;
+  /** Same mix per section, in section order. */
+  sectionTypeCounts: TypeCounts[];
+}
+
+function countTypes(types: string[]): TypeCounts {
+  const counts: TypeCounts = {};
+  for (const type of types) counts[type] = (counts[type] ?? 0) + 1;
+  return counts;
 }
 
 /** chunkId -> the one approved questionId hand-picked for that topic's baseline slot. */
@@ -29,7 +42,7 @@ export async function buildBaseline(
     );
   }
 
-  const ordered: { questionId: string; order: number }[] = [];
+  const ordered: { questionId: string; order: number; type: string }[] = [];
   for (const chunkId of chunkIds) {
     const questionId = selection[chunkId];
 
@@ -52,17 +65,17 @@ export async function buildBaseline(
       throw new Error(`Topic "${chunkId}" does not exist in the topics collection — run publish-topics first.`);
     }
 
-    ordered.push({ questionId, order: topicSnap.data()!.order });
+    ordered.push({ questionId, order: topicSnap.data()!.order, type: question.type });
   }
 
   ordered.sort((a, b) => a.order - b.order);
 
   const sections = [];
+  const sectionTypeCounts: TypeCounts[] = [];
   for (let i = 0; i < SECTION_COUNT; i++) {
-    sections.push({
-      section: i + 1,
-      questionIds: ordered.slice(i * SECTION_SIZE, (i + 1) * SECTION_SIZE).map((q) => q.questionId),
-    });
+    const slice = ordered.slice(i * SECTION_SIZE, (i + 1) * SECTION_SIZE);
+    sections.push({ section: i + 1, questionIds: slice.map((q) => q.questionId) });
+    sectionTypeCounts.push(countTypes(slice.map((q) => q.type)));
   }
 
   await db.collection('baselineTests').doc(version).set({
@@ -70,5 +83,11 @@ export async function buildBaseline(
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  return { version, sectionsWritten: sections.length, questionsWritten: ordered.length };
+  return {
+    version,
+    sectionsWritten: sections.length,
+    questionsWritten: ordered.length,
+    typeCounts: countTypes(ordered.map((q) => q.type)),
+    sectionTypeCounts,
+  };
 }

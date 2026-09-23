@@ -81,9 +81,8 @@ So that I learn where my gaps are without a long, tiring sitting.
 - **Failure modes**: unauthenticated; rules test that clients cannot write progress or the flag.
 
 ## Tasks
-- [ ] Script to build and validate the fixed baseline definition (one approved question per
+- [x] Script to build and validate the fixed baseline definition (one approved question per
   topic, fact/scenario mix noted).
-  - _Note (2026-09-23):_ Build + validate scripts are done (`qb:build-baseline`, `qb:validate-baseline`). Not done: reporting the fact/scenario mix of the selection.
 - [x] Implement `startOrResumeBaseline`.
 - [x] Narrow `firestore.rules` and add rules tests.
 - [x] Emulator tests; document the contract in `functions/README.md`.

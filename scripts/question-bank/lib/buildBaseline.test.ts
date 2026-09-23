@@ -20,7 +20,7 @@ async function seedTopic(chunkId: string, order: number) {
   });
 }
 
-async function seedQuestion(id: string, chunkId: string, status = 'approved') {
+async function seedQuestion(id: string, chunkId: string, status = 'approved', type = 'fact') {
   await getDb()
     .collection('questions')
     .doc(id)
@@ -28,7 +28,7 @@ async function seedQuestion(id: string, chunkId: string, status = 'approved') {
       conceptId: 'c1',
       chunkId,
       sourceRef: 'p.1',
-      type: 'fact',
+      type,
       text: 'x',
       choices: ['a', 'b'],
       correctAnswer: 'a',
@@ -83,5 +83,25 @@ describe('buildBaseline', () => {
     expect(data.sections[0].questionIds).toHaveLength(15);
     expect(data.sections[0].questionIds[0]).toBe('q-0');
     expect(data.sections[2].questionIds[14]).toBe('q-44');
+  });
+
+  it('reports the fact/scenario mix overall and per section', async () => {
+    const selection = buildSelection(45);
+    for (const [chunkId, questionId] of Object.entries(selection)) {
+      const order = Number(chunkId.split('-')[1]);
+      await seedTopic(chunkId, order);
+      // Every third topic gets a scenario question: 5 per section of 15.
+      await seedQuestion(questionId, chunkId, 'approved', order % 3 === 0 ? 'scenario' : 'fact');
+    }
+    const filePath = writeTempSelection(selection);
+
+    const result = await buildBaseline('v1', filePath);
+
+    expect(result.typeCounts).toEqual({ fact: 30, scenario: 15 });
+    expect(result.sectionTypeCounts).toEqual([
+      { fact: 10, scenario: 5 },
+      { fact: 10, scenario: 5 },
+      { fact: 10, scenario: 5 },
+    ]);
   });
 });
