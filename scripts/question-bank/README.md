@@ -127,7 +127,8 @@ hand-picked for its baseline slot — exactly 45 entries, one per topic:
 listed under, then writes `baselineTests/<version>` as 3 sections of 15, ordered by
 `topics/{chunkId}.order`. **Run `qb:publish-topics` first** — a topic missing from `topics`
 fails the build. The app reads version `v1`, so use that name for the live baseline. It prints the
-fact/scenario mix overall and per section, so you can check the balance before publishing.
+fact/scenario mix overall and per section; if the balance is off, adjust the selection and
+re-run (it overwrites `baselineTests/<version>`).
 
 `validate-baseline` re-checks a published baseline against the current bank and exits non-zero
 listing any question that is no longer `approved`. It never swaps questions itself — replace
