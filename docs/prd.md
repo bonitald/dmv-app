@@ -98,7 +98,15 @@ _Last updated: 2026-09-20_
 - Persistent driving-timer indicator: spike complete, see [`phase-0-findings.md`](./phase-0-findings.md). Both platforms are buildable via Expo prebuild + config plugins (no bare RN eject needed). Remaining risk is narrower than originally scoped: iOS Live Activities have a known OS-level timer-freeze bug on some iOS 18 builds, so the recommendation is to build Android's foreground-service version as the reliable baseline and treat iOS Live Activity as best-effort, with an in-app-only timer as an acceptable fallback rather than a blocker.
 - Does Colorado's official supervised-driving-hour requirement mandate specific fields beyond total duration (e.g. day vs. night hours, supervisor name/signature, odometer)? Unconfirmed — affects what the exportable log needs to capture to actually be useful at the DMV.
 - Beta rollout mechanism not yet defined: TestFlight/Play Internal Testing vs. another distribution method, size of the beta group, and how long the beta period runs before deciding pass-rate results are meaningful.
+- **Action (noted 2026-09-23): privacy review for minors before the beta.** Review current
+  Colorado and federal privacy rules for 15-16 year old users, now that optional account linking
+  can hold an email address (Section 8). This must be done before Phase 8 (beta rollout) starts;
+  it's listed as a gate in `docs/phases.md` Phase 8 and flagged on ph-9-us-10. Owner and date
+  not yet set.
 - Exact question bank size/number of distinct practice tests not yet defined.
+- ~~Questions per practice test~~ — resolved 2026-09-23: practice tests mirror the real Colorado
+  written knowledge test: **25 multiple-choice questions, 60-minute time limit, 20 correct (80%)
+  to pass**, so at most 5 misses.
 - Pricing and bundle/unlimited structure for the later monetization phase not yet defined (deferred).
 - Team size/roles not specified.
 - Whether/how much CO's actual written permit test uses scenario-style items (vs. pure fact recall) is assumed, not confirmed — worth checking against official sample questions or the handbook's practice-test section so the scenario/fact-recall mix in the question bank actually mirrors the real test.

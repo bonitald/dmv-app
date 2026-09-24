@@ -58,7 +58,9 @@ Added when carrying over:
 ## Dependencies
 - **Built in Phase 1**: `src/study/testCache.ts` (ph-1-us-5); `assembleTest`,
   `assembleMiniQuiz`, `startOrResumeBaseline`, `scoreTest` (ph-1-us-4, -7, -8, -11).
-- **Needs**: the Phase 3 test-taking screen (to be broken out as later ph-3 stories).
+- **Blocked by**: ph-3-us-4 (test-taking screen / shared runner this hooks into).
+- **Serves**: practice tests (ph-3-us-4), baseline sections (ph-3-us-13), concept mini-quizzes
+  (ph-2-us-8). Also stores `startedAt` for timed tests (ph-3-us-9).
 
 ## Test Notes
 - **Happy path**: start test → questions cached → answer all → submit → cache entry and active
