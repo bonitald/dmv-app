@@ -149,7 +149,7 @@ function QuestionStrip({
             onPress={() => onJump(i)}
             accessibilityRole="button"
             accessibilityLabel={`Question ${i + 1}${answered ? ', answered' : ''}`}
-            hitSlop={4}
+            hitSlop={6}
             style={[
               styles.chip,
               answered && styles.chipAnswered,

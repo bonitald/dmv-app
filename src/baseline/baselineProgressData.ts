@@ -6,6 +6,8 @@ export const BASELINE_TOTAL_SECTIONS = 3;
 
 export type BaselineProgress =
   | { status: 'loading' }
+  /** The progress doc couldn't be read; the server (startOrResumeBaseline) decides instead. */
+  | { status: 'error' }
   | { status: 'not-started' }
   | { status: 'in-progress'; currentSection: number; totalSections: number }
   | { status: 'complete' };

@@ -135,3 +135,11 @@ test('a notice is shown when given', async () => {
   await setup({ notice: 'This section can’t be saved on your phone.' });
   expect(screen.getByText('This section can’t be saved on your phone.')).toBeTruthy();
 });
+
+test('question strip chips meet the 48pt touch-target minimum', async () => {
+  await setup();
+  const chip = screen.getByLabelText('Question 1');
+  const size = chip.props.style.width ?? chip.props.style.find?.((x: any) => x?.width)?.width;
+  const slop = chip.props.hitSlop;
+  expect(size + 2 * (typeof slop === 'number' ? slop : slop.left)).toBeGreaterThanOrEqual(48);
+});

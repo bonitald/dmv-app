@@ -126,6 +126,7 @@ export function BaselineScreen() {
     } else if (progress.status === 'not-started') {
       setPhase({ kind: 'intro' });
     } else {
+      // In progress, or progress couldn't be read: the server knows which section is next.
       void load();
     }
   }, [progress, load]);

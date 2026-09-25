@@ -197,6 +197,13 @@ test('section 3 submit goes to the complete screen with the total from baselineR
   expect(screen.getByText('You got 30 of 45 right.')).toBeTruthy();
 });
 
+test('if progress cannot be read, the server decides: the section loads instead of a blank screen', async () => {
+  mockProgress = { status: 'error' };
+  mockStart.mockResolvedValueOnce(sectionOf(2));
+  await renderFlow();
+  expect(await screen.findByText('Section 2 of 3')).toBeTruthy();
+});
+
 test('complete progress opens straight to the complete screen', async () => {
   mockProgress = { status: 'complete' };
   await renderFlow();
