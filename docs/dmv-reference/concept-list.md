@@ -562,18 +562,33 @@ approved as-is.
 - pulling-away-from-parallel-park (3 questions, status: pending_review)
 
 ## pavement-markings
-- broken-white-lane-change (2 questions, status: pending_review)
-- broken-yellow-passing (2 questions, status: pending_review)
-- conflict-zone-marking (2 questions, status: pending_review)
-- crosswalk-right-of-way (3 questions, status: pending_review)
-- double-solid-yellow-no-passing (2 questions, status: pending_review)
-- green-paint-bike-lane (2 questions, status: pending_review)
-- sharrows-meaning (2 questions, status: pending_review)
-- solid-broken-yellow-combo (3 questions, status: pending_review)
-- solid-white-stay-in-lane (2 questions, status: pending_review)
-- solid-yellow-no-passing (3 questions, status: pending_review)
-- white-line-same-direction (2 questions, status: pending_review)
-- yellow-line-opposite-direction (2 questions, status: pending_review)
+NOTE (chunk-wide): 10 of 27 questions reworded during review — correct answers reused
+distinctive handbook clauses verbatim or with only synonym swaps (mostly the "Yellow lines",
+"White lines", solid/broken-yellow-combo, and crosswalk bullets on p.12); content unchanged.
+17 questions approved as-is. All sourceRefs (p.12) verified correct — the facts for this whole
+chunk appear under the "PAVEMENT MARKINGS" heading on PDF page 12.
+- broken-white-lane-change (2 questions, status: approved)
+- broken-yellow-passing (2 questions, status: approved)
+- conflict-zone-marking (2 questions, status: approved)
+- crosswalk-right-of-way (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim handbook phrasing; content unchanged.
+- double-solid-yellow-no-passing (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim handbook phrasing; content unchanged.
+- green-paint-bike-lane (2 questions, status: approved)
+- sharrows-meaning (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim handbook phrasing; content unchanged.
+- solid-broken-yellow-combo (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim handbook phrasing; content
+    unchanged.
+- solid-white-stay-in-lane (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim handbook phrasing; content unchanged.
+- solid-yellow-no-passing (3 questions, status: approved)
+- white-line-same-direction (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied the entire handbook bullet
+    verbatim; content unchanged.
+- yellow-line-opposite-direction (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied the entire handbook bullet
+    verbatim; content unchanged.
 
 ## pedestrian-safety
 - cautious-driving-pedestrian-zones (3 questions, status: pending_review)
@@ -634,14 +649,34 @@ approved as-is.
 - uncontrolled-intersection-left-yields-right (3 questions, status: pending_review)
 
 ## right-of-way-pedestrians-and-bicycles
-- bicycles-are-vehicles (2 questions, status: pending_review)
-- bicyclists-sidewalk-crosswalk-pedestrian-rights (2 questions, status: pending_review)
-- green-light-no-right-of-way (3 questions, status: pending_review)
-- pedestrians-always-yield (3 questions, status: pending_review)
-- pedestrians-crosswalks-intersections (3 questions, status: pending_review)
-- pedestrians-deaf-blind-caution (3 questions, status: pending_review)
-- yield-already-in-intersection (3 questions, status: pending_review)
-- yield-to-bicyclists-bike-lane (3 questions, status: pending_review)
+NOTE (chunk-wide): 9 of 22 questions reworded during review — correct answers reused the
+handbook's pedestrian/bicycle right-of-way sentences (p.14) near-verbatim or with only a
+word swapped (e.g. "many of the same rights and responsibilities as", "you must always yield
+the right-of-way to pedestrians", "come to a complete stop and let the ... pass safely",
+"Pedestrians have the right-of-way at all intersections and crosswalks", "when merging with or
+crossing a bike lane to turn"); facts were correct throughout. 13 questions approved as-is. No
+questions flagged.
+- bicycles-are-vehicles (2 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answer reused "many of the same rights
+    and responsibilities as" near-verbatim; content unchanged.
+- bicyclists-sidewalk-crosswalk-pedestrian-rights (2 questions, status: approved)
+- green-light-no-right-of-way (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer opened with "The law states who
+    must yield the right-of-way, but" copied verbatim; content unchanged.
+- pedestrians-always-yield (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied "you must always yield the
+    right-of-way to pedestrians" near-verbatim; content unchanged.
+- pedestrians-crosswalks-intersections (3 questions, status: approved)
+  - NOTE: 3 questions reworded during review — correct answers copied "Pedestrians have the
+    right-of-way at all intersections and crosswalks" and "come to a complete stop and let the
+    person pass safely" near-verbatim; content unchanged.
+- pedestrians-deaf-blind-caution (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer reused "some pedestrians may be
+    deaf, hard of hearing, deaf-blind or blind" near-verbatim; content unchanged.
+- yield-already-in-intersection (3 questions, status: approved)
+- yield-to-bicyclists-bike-lane (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied "when merging with or
+    crossing a bike lane to turn" near-verbatim with only "a"/"the" swapped; content unchanged.
 
 ## roundabouts-and-reversible-lanes
 - ddi-definition (3 questions, status: pending_review)
@@ -817,26 +852,62 @@ questions approved as-is. No questions flagged.
     sentence near-verbatim, in one case almost the entire sentence; content unchanged.
 
 ## traffic-signs-bicycle-and-disabled-parking
-- bicycle-full-lane-sign (3 questions, status: pending_review)
-- bike-ped-crossing-sign (3 questions, status: pending_review)
-- disabled-parking-crosshatch (3 questions, status: pending_review)
-- disabled-parking-penalty-misuse-placard (3 questions, status: pending_review)
-- disabled-parking-penalty-no-placard (3 questions, status: pending_review)
-- disabled-parking-placard-owner-present (3 questions, status: pending_review)
-- disabled-parking-sign-basic (3 questions, status: pending_review)
-- pass-3ft-min-sign (3 questions, status: pending_review)
-- route-sign-shape (3 questions, status: pending_review)
-- slow-moving-vehicle-triangle (3 questions, status: pending_review)
+NOTE (chunk-wide): all 30 questions verified against handbook p.12 (route signs, bicycle/pedestrian
+signs, pass-3ft-min sign, bicycle-may-use-full-lane sign, slow-moving-vehicle marker, disabled
+parking signs and penalties); facts were correct throughout and every sourceRef was accurate, so
+no sourceRef corrections were needed. 7 questions reworded for near-verbatim handbook language, 1
+corrected for a grammar error, 22 approved as-is.
+- bicycle-full-lane-sign (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied a 10-word near-verbatim run
+    from the handbook; content unchanged.
+- bike-ped-crossing-sign (3 questions, status: approved)
+- disabled-parking-crosshatch (3 questions, status: approved)
+- disabled-parking-penalty-misuse-placard (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied an 8-word verbatim run from
+    the handbook ("jail time, loss of driving privileges and towing"); content unchanged.
+- disabled-parking-penalty-no-placard (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers/stems copied long verbatim or
+    reordered-synonym runs from the handbook penalty sentence; content unchanged.
+- disabled-parking-placard-owner-present (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was almost the entire handbook
+    sentence verbatim; content unchanged.
+- disabled-parking-sign-basic (3 questions, status: approved)
+  - NOTE: 1 question corrected during review — fixed a subject-verb agreement error in the
+    correct answer ("the vehicle... display" -> "must display"), p.12.
+- pass-3ft-min-sign (3 questions, status: approved)
+- route-sign-shape (3 questions, status: approved)
+- slow-moving-vehicle-triangle (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied a 9-word verbatim run from
+    the handbook; content unchanged.
 
 ## traffic-signs-railroad-workzone-guide
-- guide-sign-color-purpose (3 questions, status: pending_review)
-- railroad-clear-tracks-room (3 questions, status: pending_review)
-- railroad-ens-dot-number (3 questions, status: pending_review)
-- railroad-ens-sign-purpose (3 questions, status: pending_review)
-- railroad-never-beat-train (3 questions, status: pending_review)
-- railroad-no-gear-shift (3 questions, status: pending_review)
-- service-recreation-sign-colors (3 questions, status: pending_review)
-- work-zone-sign-appearance-purpose (3 questions, status: pending_review)
+All 24 questions verified against handbook p.11 (printed page 8, "Traffic Signs" section); one
+question's sourceRef was already correct and needed no change. 17 questions approved as-is; 7
+questions had their correct answer (and one stem) auto-reworded because they reused a handbook
+clause verbatim or near-verbatim, or used "according to the handbook" framing — content and
+meaning unchanged in every case, correct answer kept in the same array position.
+- guide-sign-color-purpose (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied "directional and mileage
+    information to specific destinations" near-verbatim; content unchanged.
+- railroad-clear-tracks-room (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied "enough room for your
+    vehicle to clear the tracks on the other side" near-verbatim; content unchanged.
+- railroad-ens-dot-number (3 questions, status: approved)
+- railroad-ens-sign-purpose (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer closely mirrored the handbook
+    sentence on the ENS sign's purpose with only synonym swaps; content unchanged.
+- railroad-never-beat-train (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one copied "Never try to beat a train across the
+    tracks" verbatim as its correct answer; the other used "According to the Colorado Driver
+    Handbook" framing and also copied "beat a train across the tracks" verbatim. Both reworded;
+    content unchanged.
+- railroad-no-gear-shift (3 questions, status: approved)
+- service-recreation-sign-colors (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer closely mirrored both handbook
+    sentences on blue/brown sign meaning with only minor word swaps; content unchanged.
+- work-zone-sign-appearance-purpose (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer stitched together two handbook
+    sentences near-verbatim; content unchanged.
 
 ## traffic-signs-regulatory-and-warning
 NOTE (chunk-wide): All 27 questions had an incorrect sourceRef during review — the export used the
