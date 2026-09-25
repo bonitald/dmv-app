@@ -626,27 +626,60 @@ chunk appear under the "PAVEMENT MARKINGS" heading on PDF page 12.
 - rr-train-speed-judgment (3 questions, status: pending_review)
 
 ## right-of-way-emergency-and-work-vehicles
-- construction-zone-caution (2 questions, status: pending_review)
-- construction-zone-speed-fines (3 questions, status: pending_review)
-- emergency-vehicle-move-over-speed (3 questions, status: pending_review)
-- emergency-vehicle-stopped-move-over-lane (3 questions, status: pending_review)
-- emergency-vehicle-yield-general (3 questions, status: pending_review)
-- maintenance-vehicle-yield (3 questions, status: pending_review)
-- school-bus-stop-distance (3 questions, status: pending_review)
-- school-bus-stop-scope-and-exception (3 questions, status: pending_review)
-- snow-plow-caution (3 questions, status: pending_review)
-- transit-bus-yield (3 questions, status: pending_review)
+NOTE (chunk-wide): 17 of 29 questions reworded during review — correct answers tracked
+handbook p.14/p.15 sentences nearly word for word or with only synonyms swapped/reordered;
+content unchanged in every case. 11 questions approved as-is. 1 question corrected (sourceRef
+fix).
+- construction-zone-caution (2 questions, status: approved)
+- construction-zone-speed-fines (3 questions, status: approved)
+- emergency-vehicle-move-over-speed (3 questions, status: approved)
+- emergency-vehicle-stopped-move-over-lane (3 questions, status: approved)
+  - NOTE: question w4PSUfz39tkDuPmRC6sP corrected during review — sourceRef changed from p.14
+    to p.30. Colorado's Move Over Law on p.30 requires moving over one lane for any stationary
+    vehicle with hazards flashing (if safe) and explicitly protects tow truck drivers, so the
+    scenario is supported; content otherwise unchanged.
+- emergency-vehicle-yield-general (3 questions, status: approved)
+- maintenance-vehicle-yield (3 questions, status: approved)
+- school-bus-stop-distance (3 questions, status: approved)
+- school-bus-stop-scope-and-exception (3 questions, status: approved)
+- snow-plow-caution (3 questions, status: approved)
+- transit-bus-yield (3 questions, status: approved)
 
 ## right-of-way-intersections-and-merging
-- changing-lanes-passing-yield (3 questions, status: pending_review)
-- four-way-stop-first-arrival (3 questions, status: pending_review)
-- four-way-stop-responsible-for-avoiding-crash (2 questions, status: pending_review)
-- four-way-stop-same-time-left-yields-right (3 questions, status: pending_review)
-- merging-yield (3 questions, status: pending_review)
-- narrow-mountain-road-downhill-yields (4 questions, status: pending_review)
-- reversing-yield (2 questions, status: pending_review)
-- turning-left-yield-oncoming (4 questions, status: pending_review)
-- uncontrolled-intersection-left-yields-right (3 questions, status: pending_review)
+NOTE (chunk-wide): all facts verified against handbook p.14 (RIGHT-OF-WAY section); sourceRefs
+were already correct for every question, no p.N corrections needed. 12 of 27 questions were
+auto-reworded during review because their correct-answer choice (or, in one case, the question
+stem) reused a handbook clause verbatim or near-verbatim; content and meaning were unchanged in
+every case. 15 questions approved as-is.
+- changing-lanes-passing-yield (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct choice was near-verbatim to the handbook's
+    "vehicles already occupying the lane you wish to enter or use for passing"; content unchanged.
+- four-way-stop-first-arrival (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct choice copied "the vehicle that reached
+    the intersection first" verbatim; content unchanged.
+- four-way-stop-responsible-for-avoiding-crash (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct choice was near-verbatim to "you are
+    always responsible for avoiding a crash"; content unchanged.
+- four-way-stop-same-time-left-yields-right (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct choice reused "the vehicle on the left
+    must yield ... to the vehicle on the right" verbatim; content unchanged.
+- merging-yield (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one stem used "According to the handbook..."
+    framing (removed per rule 6); one correct choice was near-verbatim to "all vehicles on the
+    roadway you are merging with". Content unchanged in both.
+- narrow-mountain-road-downhill-yields (4 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct choices were near-verbatim to the
+    handbook's downhill-yield sentence (reordered/synonym-swapped); content unchanged.
+- reversing-yield (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct choice copied "all vehicles close enough
+    to be a hazard" verbatim; content unchanged.
+- turning-left-yield-oncoming (4 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one correct choice was near-verbatim to "...or
+    arrived first at a four-way stop"; another copied a 10-word run of "look for and yield to
+    pedestrians in the crosswalk and..." verbatim. Content unchanged in both.
+- uncontrolled-intersection-left-yields-right (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct choice reused "the vehicle on the left
+    must yield ... to the vehicle on the right" verbatim; content unchanged.
 
 ## right-of-way-pedestrians-and-bicycles
 NOTE (chunk-wide): 9 of 22 questions reworded during review — correct answers reused the
@@ -679,15 +712,42 @@ questions flagged.
     crossing a bike lane to turn" near-verbatim with only "a"/"the" swapped; content unchanged.
 
 ## roundabouts-and-reversible-lanes
-- ddi-definition (3 questions, status: pending_review)
-- reversible-lane-definition (3 questions, status: pending_review)
-- roundabout-definition (3 questions, status: pending_review)
-- roundabout-dont-stop-unnecessarily (3 questions, status: pending_review)
-- roundabout-pedestrian-crosswalk-yield (3 questions, status: pending_review)
-- roundabout-signal-use (3 questions, status: pending_review)
-- roundabout-two-large-vehicles (3 questions, status: pending_review)
-- roundabout-yield-large-vehicle (3 questions, status: pending_review)
-- roundabout-yield-no-large-vehicle (3 questions, status: pending_review)
+NOTE (chunk-wide): 13 of 27 questions reworded during review — correct answers (and, for 3
+questions, the stems) reused distinctive handbook clauses near-verbatim or as simple
+reorderings/synonym swaps of the same sentence; content and meaning were unchanged in every
+case. Facts were verified against handbook p.13 throughout; no fabrications or sourceRef errors
+found. 14 questions approved as-is.
+- ddi-definition (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers reused the handbook's DDI
+    definition/left-turn-conflict clauses near-verbatim; content unchanged.
+- reversible-lane-definition (2 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers reused the handbook's
+    reversible-lane definition and marking clauses near-verbatim; content unchanged.
+- roundabout-definition (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied a 10-word run from the
+    handbook's roundabout definition; content unchanged.
+- roundabout-dont-stop-unnecessarily (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers copied "existing traffic prevents
+    you from merging" verbatim from the handbook; content unchanged.
+- roundabout-pedestrian-crosswalk-yield (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was an exact verbatim lift of
+    "traffic already inside the roundabout"; content unchanged.
+- roundabout-signal-use (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer reordered the handbook's
+    turn-signal sentence with only minor synonym swaps; content unchanged.
+- roundabout-two-large-vehicles (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one stem/answer pair copied the handbook's
+    "enter, exit or drive in a roundabout at the same time" / right-yields-to-left phrasing
+    near-verbatim; another answer mirrored the same yield sentence with only verb-tense changes.
+    Content unchanged.
+- roundabout-yield-large-vehicle (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem and answer both copied the handbook's
+    "Colorado law requires drivers to yield the right-of-way to ... truck, bus, emergency vehicle
+    or recreational vehicle" sentence near-verbatim; content unchanged.
+- roundabout-yield-no-large-vehicle (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem and answer closely mirrored the handbook's
+    "if no large trucks are present, you must yield to approaching traffic on the left" sentence;
+    content unchanged.
 
 ## school-bus-stop-law
 - school-bus-20-foot-rule (3 questions, status: approved)
@@ -776,22 +836,40 @@ correct throughout, only wording changed while keeping the same meaning and answ
 - snowplow-caution-general (3 questions, status: pending_review)
 
 ## speed-limits-and-stopping-distance
-- co-speed-business-district-25 (3 questions, status: pending_review)
-- co-speed-mountain-narrow-20 (3 questions, status: pending_review)
-- co-speed-open-mountain-40 (3 questions, status: pending_review)
-- co-speed-residence-district-30 (3 questions, status: pending_review)
-- co-speed-rural-interstate-65-75 (3 questions, status: pending_review)
-- co-speed-trash-hauling-45 (3 questions, status: pending_review)
-- co-speed-urban-interstate-55 (3 questions, status: pending_review)
-- local-ordinance-lower-speed-limits (3 questions, status: pending_review)
-- min-speed-limit-violation (3 questions, status: pending_review)
-- reduced-speed-zone-signs (3 questions, status: pending_review)
-- speed-severity-factor (3 questions, status: pending_review)
-- stopping-distance-55mph-200ft (3 questions, status: pending_review)
-- stopping-distance-definition (3 questions, status: pending_review)
-- stopping-distance-factors (3 questions, status: pending_review)
-- sudden-stopping-danger (3 questions, status: pending_review)
-- work-zone-double-fines (3 questions, status: pending_review)
+NOTE (chunk-wide): all facts verified against handbook p.15 (the "Unless otherwise posted,
+Colorado speed limits are as follows" list and the SPEED / Stopping distance section); no
+sourceRef errors found and no fabricated numbers. 12 of 48 questions were auto-reworded to drop
+self-referential "according to the handbook / the handbook says / based on the handbook" framing
+per rule 6, all in the speed-severity-factor, stopping-distance-55mph-200ft,
+stopping-distance-definition, stopping-distance-factors, and sudden-stopping-danger concepts;
+content and correct answers were unchanged. 36 questions approved as-is.
+- co-speed-business-district-25 (3 questions, status: approved)
+- co-speed-mountain-narrow-20 (3 questions, status: approved)
+- co-speed-open-mountain-40 (3 questions, status: approved)
+- co-speed-residence-district-30 (3 questions, status: approved)
+- co-speed-rural-interstate-65-75 (3 questions, status: approved)
+- co-speed-trash-hauling-45 (3 questions, status: approved)
+- co-speed-urban-interstate-55 (3 questions, status: approved)
+- local-ordinance-lower-speed-limits (3 questions, status: approved)
+- min-speed-limit-violation (3 questions, status: approved)
+- reduced-speed-zone-signs (3 questions, status: approved)
+- speed-severity-factor (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — dropped "according to the handbook" framing;
+    content unchanged.
+- stopping-distance-55mph-200ft (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — dropped "cited in the handbook" framing (kept
+    the National Safety Council attribution, since it disambiguates which stopping-distance figure
+    is meant); content unchanged.
+- stopping-distance-definition (3 questions, status: approved)
+  - NOTE: 2 of 3 questions reworded during review — dropped "defined in the Colorado Driver
+    Handbook" / "based on the handbook" framing; content unchanged.
+- stopping-distance-factors (3 questions, status: approved)
+  - NOTE: 1 of 3 questions reworded during review — dropped "listed in the handbook" framing;
+    content unchanged.
+- sudden-stopping-danger (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — dropped "the handbook says/warns/recommends"
+    framing; content unchanged.
+- work-zone-double-fines (3 questions, status: approved)
 
 ## traffic-flow-and-being-pulled-over
 - pulled-over-disagree-procedure (4 questions, status: pending_review)
@@ -946,16 +1024,33 @@ questions approved as-is (aside from the sourceRef fix).
     sentence with only articles removed; content unchanged.
 
 ## turning-signaling-and-lane-position
-- avoid-short-wide-late-turns-straddling (3 questions, status: pending_review)
-- hand-signals-if-turn-signal-fails (3 questions, status: pending_review)
-- left-turn-lane-position (2 questions, status: pending_review)
-- multi-lane-turn-markings (2 questions, status: pending_review)
-- right-turn-lane-position (3 questions, status: pending_review)
-- turn-correct-path-center-lane (3 questions, status: pending_review)
-- turn-signal-3-second-rule (3 questions, status: pending_review)
-- turn-signal-general-requirement (3 questions, status: pending_review)
-- turn-signal-highway-200ft (3 questions, status: pending_review)
-- turn-signal-urban-100ft (3 questions, status: pending_review)
+NOTE (chunk-wide): 23 of 28 questions approved as-is; 5 questions reworded during review because
+their correct-answer choice (or, in one case, the stem) reproduced handbook wording near-verbatim
+(an 8+ word run, or the same clause with only clauses reordered) or used "described in the
+handbook" framing; content/meaning unchanged in every case. Facts were correct throughout; no
+questions flagged.
+- avoid-short-wide-late-turns-straddling (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one stem removed "is described in the handbook as"
+    framing (p.16); one correct answer was a near-verbatim copy of the handbook's "short turns
+    (cutting corners), wide turns, late turns and straddling lanes" list (p.16). Content unchanged.
+- hand-signals-if-turn-signal-fails (3 questions, status: approved)
+- left-turn-lane-position (2 questions, status: approved)
+- multi-lane-turn-markings (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was a near-verbatim copy of the
+    handbook sentence "traffic signs, signals and/or lane markings will clearly indicate correct
+    turning lanes" (p.15); content unchanged.
+- right-turn-lane-position (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer reproduced the handbook clause
+    "right most part of your lane and as close to the curb as possible" (p.15) with only the two
+    clauses reordered; content unchanged.
+- turn-correct-path-center-lane (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was a near-verbatim copy of the
+    handbook clause "in the center of the correct lane ... usually the lane closest to you"
+    (p.15); content unchanged.
+- turn-signal-3-second-rule (3 questions, status: approved)
+- turn-signal-general-requirement (3 questions, status: approved)
+- turn-signal-highway-200ft (3 questions, status: approved)
+- turn-signal-urban-100ft (3 questions, status: approved)
 
 ## vehicle-breakdown-emergencies
 - brake-failure-first-step (3 questions, status: pending_review)
