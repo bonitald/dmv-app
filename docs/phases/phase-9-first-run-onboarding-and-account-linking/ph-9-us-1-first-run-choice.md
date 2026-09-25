@@ -3,7 +3,7 @@
 **ID:** ph-9-us-1
 **Layer:** Parent
 **Children:** ph-9-us-2 (Backend), ph-9-us-3 (Frontend)
-**Status:** Not Started
+**Status:** Complete (Slice 1, 2026-09-25)
 
 ## Story
 As a teen user opening the app for the first time,
@@ -26,13 +26,13 @@ So that I start in the place that suits me, without being locked into it.
   exists.
 
 ## Acceptance Criteria
-- [ ] Given a brand-new install, when the app opens after sign-in, then onboarding shows before
+- [x] Given a brand-new install, when the app opens after sign-in, then onboarding shows before
   any tab.
-- [ ] Given onboarding, when the user picks "Test what I know", then they land in the baseline
+- [x] Given onboarding, when the user picks "Test what I know", then they land in the baseline
   intro. When they pick "Learn first", they land on the concept list.
-- [ ] Given the user has finished onboarding, when they open the app again, then onboarding
+- [x] Given the user has finished onboarding, when they open the app again, then onboarding
   doesn't show; they land on Home (ph-9-us-7).
-- [ ] Given either choice, when the user is anywhere in the app afterward, then they can still
+- [x] Given either choice, when the user is anywhere in the app afterward, then they can still
   start a test or open any concept.
 
 ## Dependencies

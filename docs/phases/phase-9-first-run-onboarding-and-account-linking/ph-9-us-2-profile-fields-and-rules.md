@@ -3,7 +3,7 @@
 **ID:** ph-9-us-2
 **Layer:** Backend
 **Parent:** ph-9-us-1
-**Status:** Built (Slice 1, 2026-09-24) — awaiting device test and rules deploy
+**Status:** Complete (Slice 1, 2026-09-25) — rules deploy still pending
 
 ## Story
 As a developer,
@@ -31,20 +31,20 @@ write arbitrary data onto its profile.
   onboarding is that feature.
 
 ## Acceptance Criteria
-- [ ] Given a signed-in user, when they read their own `users/{uid}`, then it succeeds; another
+- [x] Given a signed-in user, when they read their own `users/{uid}`, then it succeeds; another
   user's doc is denied (unchanged).
-- [ ] Given the first-launch create in `AuthProvider`, when it writes `{ createdAt }`, then it
+- [x] Given the first-launch create in `AuthProvider`, when it writes `{ createdAt }`, then it
   still succeeds (create allows only `createdAt`, and it must be `request.time`).
-- [ ] Given an update that changes only `onboarding` and/or `testDate`, when the values are valid,
+- [x] Given an update that changes only `onboarding` and/or `testDate`, when the values are valid,
   then it succeeds:
   - `onboarding`: `{ choice: 'baseline' | 'learn', completedAt: request.time }`
   - `testDate`: a `YYYY-MM-DD` string, or `null` to clear it
-- [ ] Given an update that touches any other field (including `createdAt`), or an invalid value
+- [x] Given an update that touches any other field (including `createdAt`), or an invalid value
   (unknown choice, badly formatted date, client-chosen `completedAt`), when it reaches Firestore,
   then it's denied.
-- [ ] Given a client tries to delete its profile doc, when it reaches Firestore, then it's denied
+- [x] Given a client tries to delete its profile doc, when it reaches Firestore, then it's denied
   (account deletion goes through ph-9-us-9's function).
-- [ ] Given the dev smoke test, when this ships, then it's removed from `App.tsx`.
+- [x] Given the dev smoke test, when this ships, then it's removed from `App.tsx`.
 
 ## Data and API
 - **Firestore schema** — `users/{uid}`:
@@ -72,10 +72,10 @@ write arbitrary data onto its profile.
   '2026-13-40'` or `'next week'`, client `completedAt`, delete, other user's doc — all denied.
 
 ## Tasks
-- [ ] Rewrite the `users/{uid}` rule in `firestore.rules`.
-- [ ] Add allow and deny cases to `firestore-tests/rules.test.ts` (`npm run test:rules`).
-- [ ] Remove the dev smoke test from `App.tsx`.
-- [ ] Document the profile fields (a short comment in the rules plus a line in the README's data
+- [x] Rewrite the `users/{uid}` rule in `firestore.rules`.
+- [x] Add allow and deny cases to `firestore-tests/rules.test.ts` (`npm run test:rules`).
+- [x] Remove the dev smoke test from `App.tsx`.
+- [x] Document the profile fields (a short comment in the rules plus a line in the README's data
   section).
 
 ## Questions

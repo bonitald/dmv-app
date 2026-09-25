@@ -3,7 +3,7 @@
 **ID:** ph-9-us-5
 **Layer:** Frontend
 **Parent:** ph-9-us-4
-**Status:** Built (Slice 1, 2026-09-24) — awaiting device test
+**Status:** Complete (Slice 1, 2026-09-25)
 
 ## Story
 As a teen user,
@@ -24,20 +24,20 @@ So that setting and updating my test date takes seconds.
   exists for both platforms before adding any other dependency.
 
 ## Acceptance Criteria
-- [ ] Given the date step, when it shows, then the picker starts at about 4 weeks from today, and
+- [x] Given the date step, when it shows, then the picker starts at about 4 weeks from today, and
   only dates from today to 12 months ahead can be picked.
-- [ ] Given the user picks a date and continues, when it's saved, then `testDate` is written as
+- [x] Given the user picks a date and continues, when it's saved, then `testDate` is written as
   `YYYY-MM-DD`.
-- [ ] Given the user taps Skip, when they continue, then nothing is written and nothing is blocked.
-- [ ] Given a test date N days away, when the countdown card renders, then it shows "N days until
+- [x] Given the user taps Skip, when they continue, then nothing is written and nothing is blocked.
+- [x] Given a test date N days away, when the countdown card renders, then it shows "N days until
   your test" (N ≥ 2), "Your test is tomorrow" (1), or "Test day — good luck!" (0).
-- [ ] Given the date is in the past, when the card renders, then it shows a neutral "Your test
+- [x] Given the date is in the past, when the card renders, then it shows a neutral "Your test
   date has passed" state (Phase 5 adds the outcome prompt here).
-- [ ] Given no date, when Home renders, then an "Add your test date" card shows. Dismissing it
+- [x] Given no date, when Home renders, then an "Add your test date" card shows. Dismissing it
   hides it (remembered locally); the date can still be added later from Settings.
-- [ ] Given the user taps the countdown card, when the editor opens, then they can change the date
+- [x] Given the user taps the countdown card, when the editor opens, then they can change the date
   or remove it (`testDate: null`).
-- [ ] Given the device is offline, when the date is saved, then the card updates immediately and
+- [x] Given the device is offline, when the date is saved, then the card updates immediately and
   the write syncs later (Firestore offline persistence).
 
 ## UI/UX Notes
@@ -58,11 +58,11 @@ So that setting and updating my test date takes seconds.
   as no date).
 
 ## Tasks
-- [ ] Add a pure `daysUntil(dateString, today)` helper with the copy rules, unit-tested with
+- [x] Add a pure `daysUntil(dateString, today)` helper with the copy rules, unit-tested with
   `npm run test:app`.
-- [ ] Build the date step (picker, Skip, Continue) as a reusable component.
-- [ ] Build the countdown card and the "add date" card for Home.
-- [ ] Add the editor sheet (change / remove).
+- [x] Build the date step (picker, Skip, Continue) as a reusable component.
+- [x] Build the countdown card and the "add date" card for Home.
+- [x] Add the editor sheet (change / remove).
 
 ## Implementation notes (Slice 1)
 - The picker is a JS month calendar (`src/profile/CalendarPicker.tsx`) rather than `@expo/ui`'s

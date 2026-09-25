@@ -1,6 +1,6 @@
 # Phase 9: First-Run Onboarding & Account Linking — Summary
 
-## Status: In Progress (Slice 1 built 2026-09-24)
+## Status: In Progress (Slice 1 complete 2026-09-25)
 
 Numbered last, but onboarding is the first thing a new user sees. It routes into Phase 2 (concept
 list), Phase 3 (baseline) and Phase 4 (results), so in build order it comes as soon as the
@@ -11,13 +11,13 @@ but it must ship before Phase 8 (beta).
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
-| ph-9-us-1 | First-run choice: "test what I know" or "learn first" | Parent | — | Not Started |
-| ph-9-us-2 | Profile fields for onboarding and test date, with tightened rules | Backend | ph-9-us-1 | Built, awaiting rules deploy |
-| ph-9-us-3 | Onboarding flow: welcome, route choice, optional test date | Frontend | ph-9-us-1 | Built, awaiting device test |
-| ph-9-us-4 | Tentative test date and countdown | Parent | — | Not Started |
-| ph-9-us-5 | Test date step and countdown card | Frontend | ph-9-us-4 | Built, awaiting device test |
-| ph-9-us-6 | Home screen with both routes, onboarding shown only once | Parent | — | Not Started |
-| ph-9-us-7 | Home tab | Frontend | ph-9-us-6 | In Progress (fills in per slice) |
+| ph-9-us-1 | First-run choice: "test what I know" or "learn first" | Parent | — | Complete |
+| ph-9-us-2 | Profile fields for onboarding and test date, with tightened rules | Backend | ph-9-us-1 | Complete (rules deploy pending) |
+| ph-9-us-3 | Onboarding flow: welcome, route choice, optional test date | Frontend | ph-9-us-1 | Complete (sign-in link → ph-9-us-10) |
+| ph-9-us-4 | Tentative test date and countdown | Parent | — | Complete |
+| ph-9-us-5 | Test date step and countdown card | Frontend | ph-9-us-4 | Complete |
+| ph-9-us-6 | Home screen with both routes, onboarding shown only once | Parent | — | In Progress (Slice 1 part complete) |
+| ph-9-us-7 | Home tab | Frontend | ph-9-us-6 | In Progress (Slice 1 part complete) |
 | ph-9-us-8 | "Save your progress": link to a real sign-in and recover on a new phone | Parent | — | Not Started |
 | ph-9-us-9 | Sign-in providers and the `deleteAccount` function | Backend | ph-9-us-8 | Not Started |
 | ph-9-us-10 | Linking prompts, sign-in on a new phone, and Settings | Frontend | ph-9-us-8 | Not Started |

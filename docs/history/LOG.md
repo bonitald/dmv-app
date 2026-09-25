@@ -39,3 +39,6 @@
 ### 2026-09-24
 - Ordered the Phase 2/3/4/9 stories into six user-journey build slices in docs/build-order.md (first launch → baseline → results → learning path → practice tests → save progress); split ph-4-us-6 across Slices 3/4b/5a, moved jest-expo setup to onboarding; linked from phases.md. Docs only. Next: start Slice 1 (ph-9-us-2).
 - Built Slice 1 (first launch): tightened `users/{uid}` rules for `onboarding`/`testDate` (+20 rules tests), removed the dev smoke test, onboarding gate + welcome/choice/test-date flow, Home tab (countdown, baseline and study cards, Settings with test date), JS calendar picker, jest-expo component tests (`npm run test:components`). Uncommitted; next: deploy rules, device-test Slice 1, then Slice 2 (ph-3-us-4).
+
+### 2026-09-25
+- Slice 1 (first launch) complete: ph-9-us-1/2/3/4/5 marked Complete; ph-9-us-6/7 and ph-3-us-11 have their Slice 1 parts done. Verified on the Android emulator after rebuilding the dev client (the old build lacked the AsyncStorage native module, causing "runtime not ready"); fixed dark status bar. Next: deploy Firestore rules, rebuild the phone's dev client, commit, then Slice 2 (ph-3-us-4).

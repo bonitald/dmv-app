@@ -39,7 +39,7 @@ slices).
 **Moved into this slice:** the `jest-expo` component-test config (a task on ph-2-us-3) lands
 with the first screen, which is now onboarding.
 
-**Status (2026-09-24):** built; awaiting device test and a rules deploy (see ph-9-us-2).
+**Status: Complete (2026-09-25).** Tested on the Android emulator (onboarding → baseline stub → Home countdown; relaunch skips onboarding). Rules deploy still pending. ph-9-us-6/us-7 and ph-3-us-11 stay open for their later-slice parts.
 
 ---
 

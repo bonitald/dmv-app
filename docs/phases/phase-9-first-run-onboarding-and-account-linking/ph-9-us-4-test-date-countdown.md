@@ -3,7 +3,7 @@
 **ID:** ph-9-us-4
 **Layer:** Parent
 **Children:** ph-9-us-5 (Frontend)
-**Status:** Not Started
+**Status:** Complete (Slice 1, 2026-09-25)
 
 ## Story
 As a teen user,
@@ -22,14 +22,14 @@ So that I always know how much study time I have left.
 - Optional everywhere: skipping never blocks anything.
 
 ## Acceptance Criteria
-- [ ] Given onboarding, when the user reaches the date step, then they can pick a date or skip.
-- [ ] Given a test date is set, when the user opens Home, then a countdown shows ("12 days until
+- [x] Given onboarding, when the user reaches the date step, then they can pick a date or skip.
+- [x] Given a test date is set, when the user opens Home, then a countdown shows ("12 days until
   your test", "Your test is tomorrow", "Test day — good luck!").
-- [ ] Given no test date, when the user opens Home, then a small "Add your test date" prompt shows
+- [x] Given no test date, when the user opens Home, then a small "Add your test date" prompt shows
   instead, which they can dismiss.
-- [ ] Given a test date is set, when the user taps the countdown, then they can change or remove
+- [x] Given a test date is set, when the user taps the countdown, then they can change or remove
   the date.
-- [ ] Given the date has passed, when Home shows, then the countdown is replaced by a neutral card
+- [x] Given the date has passed, when Home shows, then the countdown is replaced by a neutral card
   that Phase 5 turns into the outcome prompt.
 
 ## Dependencies

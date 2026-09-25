@@ -3,7 +3,7 @@
 **ID:** ph-9-us-3
 **Layer:** Frontend
 **Parent:** ph-9-us-1
-**Status:** Built (Slice 1, 2026-09-24) — awaiting device test
+**Status:** Complete (Slice 1, 2026-09-25) — "Sign in" on the welcome step moves to ph-9-us-10 (Slice 6)
 
 ## Story
 As a teen user opening the app for the first time,
@@ -29,22 +29,22 @@ So that I'm studying within a minute without filling in forms.
   Then save `onboarding` (and `testDate` if given) and navigate into the chosen route.
 
 ## Acceptance Criteria
-- [ ] Given auth is ready and the profile has no `onboarding`, when the app opens, then the
+- [x] Given auth is ready and the profile has no `onboarding`, when the app opens, then the
   welcome step shows instead of the tabs.
-- [ ] Given the choice step, when the user picks a route, then the test date step shows, with
+- [x] Given the choice step, when the user picks a route, then the test date step shows, with
   Skip and Continue.
-- [ ] Given the user finishes the date step (skip or date), when they continue, then
+- [x] Given the user finishes the date step (skip or date), when they continue, then
   `onboarding: { choice, completedAt }` is saved, the local flag is set, and they land in the
   baseline intro (ph-3-us-13) or the concept list (ph-2-us-7), with the tabs underneath so Back
   reaches Home.
-- [ ] Given onboarding was finished, when the app opens again (even offline), then it goes straight
+- [x] Given onboarding was finished, when the app opens again (even offline), then it goes straight
   to Home (ph-9-us-7).
-- [ ] Given the save fails because the device is offline, when the user continues, then they
+- [x] Given the save fails because the device is offline, when the user continues, then they
   still go into their route. The write is queued by Firestore offline persistence and the local
   flag stops onboarding from repeating.
 - [ ] Given a user signs in to an existing account from the welcome step (ph-9-us-10), when that
   account already has `onboarding`, then onboarding is skipped and they land on Home.
-- [ ] Given the whole flow, when timed from first screen to the first question or concept, then it
+- [x] Given the whole flow, when timed from first screen to the first question or concept, then it
   takes three taps if the date is skipped.
 
 ## UI/UX Notes
@@ -70,11 +70,11 @@ So that I'm studying within a minute without filling in forms.
   onboarding); save rejected by rules (log, still navigate).
 
 ## Tasks
-- [ ] Add an onboarding gate between `AuthProvider` and `RootNavigator` (profile `onboarding` +
+- [x] Add an onboarding gate between `AuthProvider` and `RootNavigator` (profile `onboarding` +
   local flag).
-- [ ] Build the welcome and choice steps; embed ph-9-us-5's date step.
-- [ ] Save the profile fields and navigate into the chosen route.
-- [ ] Log a simple analytics event with the chosen route (`onboarding_complete`, `{ choice }`) —
+- [x] Build the welcome and choice steps; embed ph-9-us-5's date step.
+- [x] Save the profile fields and navigate into the chosen route.
+- [x] Log a simple analytics event with the chosen route (`onboarding_complete`, `{ choice }`) —
   for insight only, not a success metric.
 
 ## Implementation notes (Slice 1)

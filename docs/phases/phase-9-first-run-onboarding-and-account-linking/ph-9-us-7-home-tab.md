@@ -3,7 +3,7 @@
 **ID:** ph-9-us-7
 **Layer:** Frontend
 **Parent:** ph-9-us-6
-**Status:** In Progress (Slice 1: countdown, test and study cards, Settings entry)
+**Status:** In Progress (Slice 1 part complete 2026-09-25; remaining cards land in Slices 2–6)
 
 ## Story
 As a teen user,
@@ -33,17 +33,17 @@ So that every time I open the app I can get straight into studying or testing.
 - A settings gear in Home's header opens Settings (account, test date, delete data — ph-9-us-10).
 
 ## Acceptance Criteria
-- [ ] Given onboarding is done, when the app opens, then it lands on the Home tab, the first tab.
+- [x] Given onboarding is done, when the app opens, then it lands on the Home tab, the first tab.
 - [ ] Given the baseline isn't finished, when Home renders, then the test card offers Start or
   Resume. Given it's finished, then it offers a practice test with the latest score.
 - [ ] Given concept progress, when Home renders, then "Continue learning" opens the right
   concept's flashcards, and "All concepts" opens the concept list.
-- [ ] Given the user picked "Learn first" at onboarding, when Home renders, then the test card is
+- [x] Given the user picked "Learn first" at onboarding, when Home renders, then the test card is
   still there. Given "Test what I know", the study card is still there. The route choice never
   hides either.
 - [ ] Given the concept report has likely gap / Missed it topics, when Home renders, then up to 3
   show as weak spots with links. Given none, the section is hidden.
-- [ ] Given a feature a card depends on isn't built yet, when Home renders, then that card is
+- [x] Given a feature a card depends on isn't built yet, when Home renders, then that card is
   absent (not an error or an empty box).
 - [ ] Given data is loading or offline, when Home renders, then cards show skeletons or cached
   values, and each card fails on its own without blanking the screen.
@@ -68,10 +68,10 @@ So that every time I open the app I can get straight into studying or testing.
 - **Failure modes**: offline cold start with cached data; one card's data read fails.
 
 ## Tasks
-- [ ] Add the Home tab and stack to `RootNavigator` as the first tab.
+- [x] Add the Home tab and stack to `RootNavigator` as the first tab.
 - [ ] Build Home with the cards above, each as its own component reading its own data.
 - [ ] Add a pure `nextConceptToStudy(topics, progress)` helper, unit-tested.
-- [ ] Add the Settings entry point (screen content in ph-9-us-10).
+- [x] Add the Settings entry point (screen content in ph-9-us-10).
 
 ## Implementation notes (Slice 1)
 - Built: Home tab (first of five), test date card, "Start your baseline" card (→ `Baseline`

@@ -2,7 +2,7 @@
 
 **ID:** ph-3-us-11
 **Layer:** Parent
-**Status:** In Progress (Slice 1: copy on the placeholders, review checklist line)
+**Status:** In Progress (Slice 1 part complete 2026-09-25; Colorado line goes on the real Practice tab and baseline intro in Slices 2 and 5)
 
 ## Story
 As a teen user,
@@ -19,11 +19,11 @@ So that I'm not confused by other states' laws or asked to pick a state.
   making sure the copy says Colorado where it matters.
 
 ## Acceptance Criteria
-- [ ] Given any screen in the app, when it's reviewed, then there's no state selector, state
+- [x] Given any screen in the app, when it's reviewed, then there's no state selector, state
   setting, or "choose your state" onboarding step.
 - [ ] Given the Practice tab and the baseline intro, when they render, then their copy says the
   tests are based on the Colorado driver handbook.
-- [ ] Given questions in the bank, when content is reviewed (the human review already underway),
+- [x] Given questions in the bank, when content is reviewed (the human review already underway),
   then any question that depends on another state's rule, or on federal/general info that
   contradicts CO law, is flagged or rejected — checked as part of review, not by code.
 
@@ -43,7 +43,7 @@ So that I'm not confused by other states' laws or asked to pick a state.
 
 ## Tasks
 - [ ] Add the Colorado line to the Practice tab home and baseline intro copy.
-- [ ] Add "no other-state rules" to the content review checklist in
+- [x] Add "no other-state rules" to the content review checklist in
   `scripts/question-bank/README.md`.
 
 ## Questions

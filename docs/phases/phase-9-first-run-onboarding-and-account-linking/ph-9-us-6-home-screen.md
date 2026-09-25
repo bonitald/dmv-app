@@ -3,7 +3,7 @@
 **ID:** ph-9-us-6
 **Layer:** Parent
 **Children:** ph-9-us-7 (Frontend)
-**Status:** Not Started
+**Status:** In Progress (Slice 1 part complete 2026-09-25; test entry switches to practice tests in Slice 5)
 
 ## Story
 As a teen user who has finished onboarding,
@@ -22,11 +22,11 @@ So that the choice I made on day one never limits what I do next.
   adds Home as the first tab.
 
 ## Acceptance Criteria
-- [ ] Given onboarding is done, when the app opens, then it lands on Home.
+- [x] Given onboarding is done, when the app opens, then it lands on Home.
 - [ ] Given Home, when it renders, then it offers both a test entry (baseline if not finished,
   otherwise a practice test) and a study entry (continue learning / concept list), whichever
   route was picked at onboarding.
-- [ ] Given Home, when it renders, then it shows the test-date countdown or "add date" card
+- [x] Given Home, when it renders, then it shows the test-date countdown or "add date" card
   (ph-9-us-5).
 
 ## Dependencies

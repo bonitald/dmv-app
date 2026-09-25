@@ -21,7 +21,7 @@ mix and repeat-avoidance in `assembleTest`, and recording `timing` in `scoreTest
 | ph-3-us-8 | Record test mode and duration on the Test Attempt | Backend | ph-3-us-7 | Not Started |
 | ph-3-us-9 | Timed mode picker and countdown | Frontend | ph-3-us-7 | Not Started |
 | ph-3-us-10 | Every Test Attempt is recorded | Parent | — | Complete (delivered by ph-1-us-11) |
-| ph-3-us-11 | Colorado-only content, no state selector | Parent | — | In Progress |
+| ph-3-us-11 | Colorado-only content, no state selector | Parent | — | In Progress (Slice 1 part complete) |
 | ph-3-us-12 | Take the baseline diagnostic, with pauses between sections | Parent | — | Not Started |
 | ph-3-us-13 | Baseline flow: intro, sections, "keep going?" and resume | Frontend | ph-3-us-12 | Not Started |
 | ph-3-us-14 | Baseline recorded as its own attempt type, marks the free test used | Parent | — | Complete (delivered by ph-1-us-8/11) |
