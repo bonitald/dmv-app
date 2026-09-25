@@ -14,10 +14,19 @@ So that I get comfortable reasoning through road situations, not just recalling 
 - **Product area**: Phase 2 (`docs/phases.md`)
 - **Layer**: Frontend (Expo/React Native) — no Backend split. The `type` flag distinguishing
   `fact` vs. `scenario` questions already exists on the `Question` schema (ph-1-us-1) and is
-  already returned by both `assembleTest` (ph-1-us-4) and `listFlashcardsByTopic` (ph-2-us-2).
+  already returned by `assembleTest` (ph-1-us-4), `assembleMiniQuiz` (ph-1-us-7) and
+  `getFlashcards` (ph-1-us-10).
   This story is purely about how the frontend renders that existing flag — no new backend work.
 - `prd.md` Section 1 and Section 5 call this out as the app's core differentiator: scenario cards
   must be "woven into the regular flashcard flow... not siloed into a separate mode."
+- The visual design already exists: the "Scenario question card" mockup (`docs/design/mockups.md`)
+  has the SCENARIO badge. The badge maps to the `caption` style
+  (coral) in `src/theme/tokens.ts`. The mockup's intersection diagram isn't supported: the schema
+  has no image/diagram field. Leave it out for MVP.
+- The scenario treatment goes on both card types: the flip flashcard (ph-2-us-3) and the quiz
+  question card (ph-2-us-8, reused in Phase 3 tests). Build the badge as a small shared piece
+  both use. The mockup's answer feedback states (right/wrong marking) belong to the quiz card,
+  not the flashcard.
 
 ## Acceptance Criteria
 - [ ] Given a topic's flashcard set contains both `fact` and `scenario` type cards, when the user
@@ -45,8 +54,8 @@ So that I get comfortable reasoning through road situations, not just recalling 
   `fact` treatment rather than crashing the viewer.
 
 ## Tasks
-- [ ] Design the visual treatment for `scenario` cards (badge/color/layout) consistent with the
-  app's broader visual style (coordinate with any existing design-system work).
+- [ ] Apply the mockup's scenario treatment (SCENARIO badge, accent) using existing tokens only —
+  no new colors/sizes outside `src/theme/tokens.ts`.
 - [ ] Implement the type-aware rendering in the flashcard viewer component from ph-2-us-3.
 - [ ] Verify layout handles longer scenario-card text without overflow on smaller device sizes.
 

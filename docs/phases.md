@@ -6,6 +6,9 @@
 > Firebase data/config together rather than being split into separate docs. Phase numbers are
 > roughly build order, not strict dependencies, except where a phase explicitly says it depends on
 > an earlier one.
+>
+> **Build order:** stories are built in user-journey slices that cut across phases — see
+> `build-order.md`.
 
 ## Out of Scope (matches `prd.md` Section 3 — do not build ahead of scope)
 
@@ -286,6 +289,12 @@ Depends on: Phase 4, 5, 6, 7, 9 (a usable end-to-end app to put in front of test
 - [ ] As a product owner, I have a defined (even if rough) beta group size and time window before
   deciding whether pass-rate results are meaningful — currently undefined, needs a decision before
   this phase starts in earnest.
+- [ ] As a product owner, a privacy review for minor users is done before any beta tester installs
+  the app: current Colorado and federal rules for 15-16 year olds, now that optional account
+  linking (Phase 9, ph-9-us-8) can hold an email address. Covers what's collected (anonymous
+  uid by default; email + auth ID only if linked), in-app data deletion (ph-9-us-9), and any
+  consent or privacy-policy wording needed for the store listings. Not an engineering task, but a
+  **gate for this phase** (`prd.md` Sections 8 and 9). Noted 2026-09-23.
 
 ---
 

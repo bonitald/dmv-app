@@ -90,6 +90,10 @@ Input JSON shape (array of questions — write all of one chunk's questions in a
 otherwise. Nothing written by this script is ever `approved` — that only happens via human
 review in the Firebase console.
 
+When reviewing, also reject (or flag) any question that depends on another state's rule, or on
+general or federal information that contradicts Colorado law. The app is Colorado-only and has
+no state selector (ph-3-us-11).
+
 ## `qb:publish-topics` (after review, repeatable)
 
 ```bash

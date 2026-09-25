@@ -6,55 +6,63 @@
 
 ## Story
 As a teen user,
-I want the app to remember which flashcards I've seen and gotten wrong,
-So that the app can prioritize showing me what I actually need to practice (ph-2-us-4), without
-me having to manually flag "weak" cards myself.
+I want the app to remember which questions I've gotten wrong in quizzes,
+So that my flashcards can put what I actually need to practice first (ph-2-us-4), without me
+having to flag "weak" cards myself.
 
 ## Context
 - **Product area**: Phase 2 (`docs/phases.md`)
 - **Layer**: Frontend (Expo/React Native) — no Backend split. `docs/phases.md`'s Phase 2 bullet
-  is explicit that this is tracked "locally," and `prd.md` doesn't call for cross-device sync of
-  study performance — only the driving log and pass/fail outcome are described as
-  device-identifier-linked Firestore data (`prd.md` Section 7). Treat local-only as the deliberate
-  MVP scope, not an oversight.
-- This is the data source ph-2-us-4's weighting logic reads from — build this first, or at least
-  land its interface first, since ph-2-us-4 is blocked on it.
+  says this is tracked "locally", and `prd.md` doesn't call for cross-device sync of study
+  performance (`prd.md` Section 7). Local-only is the deliberate MVP scope. Concept-level progress
+  is saved server-side separately (ph-2-us-10).
+- **Where results come from** (changed 2026-09-23): flashcards have no per-card marking (ph-2-us-3).
+  Results come from graded quizzes: `scoreTest` returns `perQuestion` —
+  `{ questionId, chunkId, choice, correctAnswer, correct }` for each question — after a mini-quiz
+  (ph-2-us-8). Practice tests and the completed baseline are recorded the same way by
+  ph-4-us-5.
+- A question's `id` is the same in quizzes and flashcards, so a quiz result applies directly to
+  that question's flashcard.
+- This is the data source ph-2-us-4's ordering reads from — land its interface first.
 
 ## Acceptance Criteria
-- [ ] Given a teen user answers a flashcard (correct/incorrect, or reveals-and-self-assesses,
-  depending on the viewer's interaction model from ph-2-us-3), when the result is recorded, then
-  local storage is updated with that card's seen count, miss count, and last-seen result.
-- [ ] Given the app is closed and reopened, when the user returns to a previously-studied topic,
-  then their prior performance history for those cards is still present (not reset).
-- [ ] Given a card has been seen before, when performance data is read, then it correctly reflects
-  cumulative history (not just the most recent single result) — miss count and seen count must
-  both persist and accumulate.
-- [ ] Given local storage is empty/uninitialized for a card (first time seeing it), when
-  performance is read, then it returns a clear "no history" result rather than throwing or
-  returning a misleading zero/default that looks the same as "answered correctly every time."
+- [ ] Given a mini-quiz is scored, when `scoreTest` returns `perQuestion`, then local storage is
+  updated for each graded question with its graded count, miss count, and last result.
+- [ ] Given a `perQuestion` entry is `unavailable` (question deleted) or has a null `correct`,
+  when results are recorded, then that entry is skipped, not counted as a miss.
+- [ ] Given the app is closed and reopened, when the user returns to a previously studied topic,
+  then its history is still there (not reset).
+- [ ] Given a question has been graded before, when its history is read, then it reflects
+  cumulative history (not just the latest result) — graded count and miss count both persist and
+  accumulate.
+- [ ] Given a question has never been graded, when its history is read, then it returns a clear
+  "no history" result rather than throwing or returning a zero default that looks the same as
+  "answered correctly every time."
 
 ## Dependencies
-- **Blocked by**: ph-2-us-3 (flashcard viewer this hooks into for capturing results).
-- Feeds: ph-2-us-4 (weak-card resurfacing reads this data).
+- **Blocked by**: nothing for the storage module itself (build it first — ph-2-us-4 needs its
+  interface). The "record quiz results" task is blocked by ph-2-us-8 (mini-quiz).
+- Feeds: ph-2-us-4 (weak-card ordering reads this data).
 
 ## Test Notes
-- **Happy path**: answer a card wrong twice, right once; stored history reflects 3 seen, 2
-  missed, most-recent result correct.
-- **Edge cases**: a card studied across two separate app sessions (persistence survives app
-  restart); very large history (many topics/cards) doesn't noticeably slow the app.
-- **Failure modes**: local storage read/write failure (e.g. storage full or corrupted) should
-  degrade to treating the card as "no history" rather than crashing the flashcard flow.
+- **Happy path**: a question answered wrong in two quizzes and right in a third has 3 graded,
+  2 missed, most recent result correct.
+- **Edge cases**: history spanning two app sessions (survives restart); `unavailable` entries;
+  many topics' history doesn't noticeably slow loading a topic.
+- **Failure modes**: a storage read/write failure (storage full or corrupted) degrades to "no
+  history" rather than crashing the flashcard or results screens.
 
 ## Tasks
-- [ ] Choose and set up the local storage mechanism (e.g. AsyncStorage, or SQLite if the driving
-  logger's storage work from Phase 6 lands first and a shared mechanism makes sense) — keep the
-  read/write interface isolated so ph-2-us-4 doesn't need to know the storage implementation.
-- [ ] Implement record-result and read-history functions keyed by card id.
-- [ ] Wire result recording into the flashcard viewer's reveal/advance interaction (ph-2-us-3).
+- [ ] Implement as `src/study/cardPerformance.ts` on AsyncStorage (already installed; follow the
+  `src/study/testCache.ts` pattern), one key per topic (`dmv-app:card-perf:{chunkId}`) so a
+  topic's history loads in one read. Keep the interface storage-agnostic so ph-2-us-4 doesn't
+  depend on AsyncStorage.
+- [ ] Implement `recordQuizResults(perQuestion)` and `readTopicHistory(chunkId)`.
+- [ ] Call `recordQuizResults` when a mini-quiz's `scoreTest` result arrives (ph-2-us-8).
 
 ## Questions
-- Whether this local performance data should ever sync to Firestore (e.g. to survive a
-  reinstall, or to feed the pass-rate analysis in Phase 5/8) is not addressed in `prd.md` —
-  flagging as a future consideration rather than building sync now, consistent with the
-  device-identity-doesn't-survive-reinstall limitation already accepted in `docs/phases.md`
-  Phase 0.
+- Whether this local data should ever sync to Firestore (to survive a reinstall, or feed the
+  Phase 5/8 pass-rate analysis) isn't addressed in `prd.md`. Flagged as a future consideration,
+  consistent with the device-identity-doesn't-survive-reinstall limitation accepted in
+  `docs/phases.md` Phase 0. The full quiz history is already server-side in `testAttempts`, so it
+  could be rebuilt from there if needed.

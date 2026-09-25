@@ -97,3 +97,49 @@ npm run web
 ```
 npx tsc --noEmit
 ```
+
+## Tests
+
+```
+npm run test:app          # plain-Node logic tests (src/**/*.test.ts)
+npm run test:components   # React Native component tests via jest-expo (src/**/*.test.tsx)
+npm run test:rules        # Firestore security rules, against the emulator
+npm run test:functions    # Cloud Functions, against the emulator
+```
+
+## Deploying Firestore rules
+
+`firebase-tools` is a dev dependency, so run it through `npx` (no global install needed).
+Sign in once per machine; the login is remembered.
+
+```
+npx firebase login                            # opens a browser to sign in with Google
+npx firebase login --reauth
+npx firebase login --no-localhost             # use this if the browser can't open
+npx firebase login:list                       # check which account is signed in
+```
+
+Run the rules tests first, then deploy:
+
+```
+npm run test:rules
+npx firebase deploy --only firestore:rules                  # dev (dmv-app-dev, the default)
+npx firebase deploy --only firestore:rules --project prod   # production (dmv-app-prod)
+```
+
+Project aliases live in `.firebaserc` (`dev`/`staging` → `dmv-app-dev`, `prod` →
+`dmv-app-prod`). Deploy to dev and try the app against it before deploying to prod.
+
+## Troubleshooting
+
+- **"Runtime not ready" / `NativeModule: ... is null` on launch**: the installed dev client was
+  built before a native module was added to `package.json`. Rebuild it with `npm run android`
+  (or `npm run ios`) and reinstall on each device.
+
+## Data
+
+- `users/{uid}` (profile, ph-9-us-2): `createdAt`, `onboarding { choice: 'baseline' | 'learn',
+  completedAt }` and `testDate` (`'YYYY-MM-DD'` or `null`). The client may create it with only
+  `createdAt` and later change only `onboarding` and `testDate`; see `firestore.rules`.
+- Local device flags (AsyncStorage, `src/profile/localFlags.ts`), keyed by uid:
+  `dmv-app:onboarding-done:{uid}` and `dmv-app:home:add-date-dismissed:{uid}`.

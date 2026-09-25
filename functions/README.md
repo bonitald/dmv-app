@@ -35,8 +35,8 @@ authenticated caller. This is the **only** sanctioned way for a client to read q
 Deliberately omits `sourceRef`, `selfCheck`, and review metadata — the client never needs those.
 
 **Selection**: reads only `status == 'approved'` questions, shuffles them (Fisher-Yates,
-injectable random source for testing), and returns up to `DEFAULT_QUESTION_COUNT` (currently 25
-— exact per-test count is still an open product question, see `prd.md` Section 9). Randomization
+injectable random source for testing), and returns up to `DEFAULT_QUESTION_COUNT` (25 — the
+same as the real Colorado written knowledge test, `prd.md` Section 9). Randomization
 strategy is intentionally simple for MVP: fully random each call, repeats across a user's tests
 allowed. Revisit if practice starts feeling repetitive.
 

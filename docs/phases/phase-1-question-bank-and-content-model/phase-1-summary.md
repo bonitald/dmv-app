@@ -64,9 +64,11 @@ test-taking screen uses `src/study/testCache.ts`. They moved to **ph-3-us-1**
   real account (Phase 9) is what closes it later.
 - Mini-quiz recommendation threshold and flashcard rate limit are implemented as tunable
   constants (80%; 30 calls / 10 min) but still unvalidated product values.
-- Whether Concept Progress status is updated by `scoreTest` or stays a client action
-  (ph-1-us-11).
-- Exact per-test question count (`prd.md` Section 9, still undefined) — ph-1-us-4.
+- ~~Whether Concept Progress status is updated by `scoreTest` or stays a client action
+  (ph-1-us-11).~~ — resolved in Phase 2: `scoreTest` writes the score, the client writes status
+  (ph-2-us-10/11, 2026-09-23).
+- ~~Exact per-test question count (`prd.md` Section 9) — ph-1-us-4.~~ — resolved 2026-09-23:
+  25, matching the real CO test (25 questions, 60 minutes, 20 correct to pass).
 - Resume-vs-clear UX for a stale cached test after a force-quit — now owned by ph-3-us-1.
 - Randomization/repeat-avoidance strategy across a user's multiple tests — flagged in ph-1-us-4,
   simplest behavior acceptable to start.

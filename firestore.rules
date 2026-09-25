@@ -2,9 +2,40 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ph-0-us-6: baseline per-user scoping for the user's own top-level profile doc.
+    // ph-0-us-6 / ph-9-us-2: the user's own profile doc. Fields:
+    //   createdAt   timestamp, set once by AuthProvider on first launch
+    //   onboarding  { choice: 'baseline' | 'learn', completedAt: server timestamp }
+    //   testDate    'YYYY-MM-DD' string, or null when cleared
+    // The owner may create it with only createdAt, and afterwards change only onboarding and
+    // testDate. Delete is denied: account deletion goes through a Cloud Function (ph-9-us-9).
+    // The date regex checks format only; the client validates real calendar dates.
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      function isOwner() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+      function validOnboarding(o) {
+        return o is map
+          && o.keys().hasOnly(['choice', 'completedAt'])
+          && o.keys().hasAll(['choice', 'completedAt'])
+          && o.choice in ['baseline', 'learn']
+          && o.completedAt == request.time;
+      }
+      function validTestDate(d) {
+        return d == null
+          || (d is string && d.matches('^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'));
+      }
+
+      allow read: if isOwner();
+      allow create: if isOwner()
+        && request.resource.data.keys().hasOnly(['createdAt'])
+        && request.resource.data.createdAt == request.time;
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['onboarding', 'testDate'])
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['onboarding'])
+          || validOnboarding(request.resource.data.onboarding))
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['testDate'])
+          || validTestDate(request.resource.data.testDate));
+      allow delete: if false;
     }
 
     // ph-1-us-8/ph-1-us-11: server-owned records under users/{uid} — written only by Cloud

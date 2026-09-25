@@ -1,5 +1,13 @@
 import * as fs from 'fs';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import {
+  deleteDoc,
+  deleteField,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import {
   assertFails,
   assertSucceeds,
@@ -31,10 +39,121 @@ afterEach(async () => {
   await testEnv.clearFirestore();
 });
 
-test('a signed-in device can read/write its own users/{uid} document', async () => {
+test('a signed-in device can create and read its own users/{uid} document', async () => {
   const alice = testEnv.authenticatedContext('alice-uid').firestore();
 
-  await assertSucceeds(setDoc(doc(alice, 'users/alice-uid'), { createdAt: new Date() }));
+  await assertSucceeds(setDoc(doc(alice, 'users/alice-uid'), { createdAt: serverTimestamp() }));
+  await assertSucceeds(getDoc(doc(alice, 'users/alice-uid')));
+});
+
+// ph-9-us-2: the profile doc may be created with only createdAt (a server timestamp), and
+// afterwards the owner may change only `onboarding` and `testDate`, with valid values.
+describe('users/{uid} profile fields (ph-9-us-2)', () => {
+  const profile = () => doc(testEnv.authenticatedContext('alice-uid').firestore(), 'users/alice-uid');
+
+  beforeEach(async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'users/alice-uid'), { createdAt: new Date() });
+    });
+  });
+
+  test('create with a client-chosen createdAt is denied', async () => {
+    const bob = testEnv.authenticatedContext('bob-uid').firestore();
+    await assertFails(setDoc(doc(bob, 'users/bob-uid'), { createdAt: new Date(2020, 0, 1) }));
+  });
+
+  test('create with any field besides createdAt is denied', async () => {
+    const bob = testEnv.authenticatedContext('bob-uid').firestore();
+    await assertFails(
+      setDoc(doc(bob, 'users/bob-uid'), { createdAt: serverTimestamp(), testDate: '2026-10-01' })
+    );
+  });
+
+  test.each(['baseline', 'learn'])('setting onboarding with choice %s succeeds', async (choice) => {
+    await assertSucceeds(
+      updateDoc(profile(), { onboarding: { choice, completedAt: serverTimestamp() } })
+    );
+  });
+
+  test('re-running onboarding overwrites it', async () => {
+    await assertSucceeds(
+      updateDoc(profile(), { onboarding: { choice: 'learn', completedAt: serverTimestamp() } })
+    );
+    await assertSucceeds(
+      updateDoc(profile(), { onboarding: { choice: 'baseline', completedAt: serverTimestamp() } })
+    );
+  });
+
+  test('setting onboarding and testDate in one write succeeds', async () => {
+    await assertSucceeds(
+      updateDoc(profile(), {
+        onboarding: { choice: 'baseline', completedAt: serverTimestamp() },
+        testDate: '2026-10-22',
+      })
+    );
+  });
+
+  test('setting testDate before onboarding, then clearing it with null, succeeds', async () => {
+    await assertSucceeds(updateDoc(profile(), { testDate: '2026-10-22' }));
+    await assertSucceeds(updateDoc(profile(), { testDate: null }));
+  });
+
+  test('an unknown onboarding choice is denied', async () => {
+    await assertFails(
+      updateDoc(profile(), { onboarding: { choice: 'other', completedAt: serverTimestamp() } })
+    );
+  });
+
+  test('a client-chosen completedAt is denied', async () => {
+    await assertFails(
+      updateDoc(profile(), { onboarding: { choice: 'learn', completedAt: new Date() } })
+    );
+  });
+
+  test('extra keys inside onboarding are denied', async () => {
+    await assertFails(
+      updateDoc(profile(), {
+        onboarding: { choice: 'learn', completedAt: serverTimestamp(), age: 15 },
+      })
+    );
+  });
+
+  test.each(['2026-13-40', 'next week', '2026-1-5', ''])('testDate %p is denied', async (value) => {
+    await assertFails(updateDoc(profile(), { testDate: value }));
+  });
+
+  test('a non-string testDate is denied', async () => {
+    await assertFails(updateDoc(profile(), { testDate: new Date() }));
+  });
+
+  test('removing the onboarding field is denied', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await updateDoc(doc(context.firestore(), 'users/alice-uid'), {
+        onboarding: { choice: 'learn', completedAt: new Date() },
+      });
+    });
+    await assertFails(updateDoc(profile(), { onboarding: deleteField() }));
+  });
+
+  test('changing createdAt is denied', async () => {
+    await assertFails(updateDoc(profile(), { createdAt: serverTimestamp() }));
+  });
+
+  test('writing any other field is denied', async () => {
+    await assertFails(updateDoc(profile(), { name: 'Alex' }));
+  });
+
+  test('deleting the profile doc is denied', async () => {
+    await assertFails(deleteDoc(profile()));
+  });
+
+  test("updating another user's profile is denied", async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), 'users/bob-uid'), { createdAt: new Date() });
+    });
+    const alice = testEnv.authenticatedContext('alice-uid').firestore();
+    await assertFails(updateDoc(doc(alice, 'users/bob-uid'), { testDate: '2026-10-22' }));
+  });
 });
 
 test("a signed-in device cannot write another device's users/{uid} document", async () => {
