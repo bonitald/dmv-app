@@ -544,22 +544,42 @@ approved as-is.
 - stop-sign-running-collision (3 questions, status: pending_review)
 
 ## parking-rules-and-technique
-- hill-parking-downhill-with-curb (3 questions, status: pending_review)
-- hill-parking-no-curb (3 questions, status: pending_review)
-- hill-parking-uphill-with-curb (3 questions, status: pending_review)
-- no-park-bike-lane (3 questions, status: pending_review)
-- no-park-crosswalk-sidewalk-bridge (3 questions, status: pending_review)
-- no-park-fire-hydrant-distance (3 questions, status: pending_review)
-- no-park-intersection-tunnel-ramp-driveway (3 questions, status: pending_review)
-- no-park-signal-stopsign-railcrossing-distance (3 questions, status: pending_review)
-- parallel-parking-curb-distance (3 questions, status: pending_review)
-- parallel-parking-final-step (1 questions, status: pending_review)
-- parallel-parking-first-step (1 questions, status: pending_review)
-- parallel-parking-second-step (1 questions, status: pending_review)
-- parking-gear-automatic-transmission (1 questions, status: pending_review)
-- parking-gear-manual-downhill (1 questions, status: pending_review)
-- parking-gear-manual-uphill (1 questions, status: pending_review)
-- pulling-away-from-parallel-park (3 questions, status: pending_review)
+NOTE (chunk-wide): 6 of 36 questions reworded during review — either to drop
+"according to the Colorado Driver Handbook" framing or to break an 8+ word verbatim/near-verbatim
+run with the handbook text (mostly in the parallel-parking maneuver and pull-away steps, which the
+handbook states as short imperative clauses that are easy to lift word-for-word); facts were
+correct throughout. 30 questions approved as-is. sourceRefs were verified against PDF pages 16-17
+(the chunk plan's printed pages 17-18) and all were already correct; no sourceRef corrections were
+needed.
+- hill-parking-downhill-with-curb (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — dropped "according to the Colorado Driver Handbook"
+    framing; content unchanged.
+- hill-parking-no-curb (3 questions, status: approved)
+- hill-parking-uphill-with-curb (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — dropped "According to the Colorado Driver Handbook"
+    framing; content unchanged.
+- no-park-bike-lane (3 questions, status: approved)
+- no-park-crosswalk-sidewalk-bridge (3 questions, status: approved)
+- no-park-fire-hydrant-distance (3 questions, status: approved)
+- no-park-intersection-tunnel-ramp-driveway (3 questions, status: approved)
+- no-park-signal-stopsign-railcrossing-distance (3 questions, status: approved)
+- parallel-parking-curb-distance (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct choice shared an 8-word run with the
+    handbook ("must be within 12 inches of the curb"); content unchanged.
+- parallel-parking-final-step (1 question, status: approved)
+  - NOTE: reworded during review — correct answer reused the near-verbatim handbook clause "turn
+    the wheel sharply right and pull towards the curb"; content unchanged.
+- parallel-parking-first-step (1 question, status: approved)
+  - NOTE: reworded during review — correct answer copied the handbook clause "Turn the wheel
+    sharply right and back slowly toward the vehicle behind" verbatim; content unchanged.
+- parallel-parking-second-step (1 question, status: approved)
+- parking-gear-automatic-transmission (1 question, status: approved)
+- parking-gear-manual-downhill (1 question, status: approved)
+- parking-gear-manual-uphill (1 question, status: approved)
+- pulling-away-from-parallel-park (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was a near-verbatim rendering of
+    "activate your signal, check your mirrors and blind spots, and pull away when safe"; content
+    unchanged.
 
 ## pavement-markings
 NOTE (chunk-wide): 10 of 27 questions reworded during review — correct answers reused
@@ -826,14 +846,35 @@ correct throughout, only wording changed while keeping the same meaning and answ
 - truck-bus-wide-turns (3 questions, status: pending_review)
 
 ## snow-and-ice-driving
-- abs-skid-technique (3 questions, status: pending_review)
-- bridges-overpasses-ice-first (3 questions, status: pending_review)
-- extra-space-pedestrians-bicyclists-winter (3 questions, status: pending_review)
-- illegal-pass-snowplow (3 questions, status: pending_review)
-- increase-following-distance-snow-ice (3 questions, status: pending_review)
-- lose-traction-response (3 questions, status: pending_review)
-- non-abs-threshold-braking (3 questions, status: pending_review)
-- snowplow-caution-general (3 questions, status: pending_review)
+NOTE (chunk-wide): all sourceRefs already correctly point to p.20 (PDF page 20 = printed page 17,
+which holds the full seasonal-driving/snow-plow bullet list); the chunk plan's "page 21" was the
+printed-vs-PDF mixup, not the export. Facts were verified against handbook p.20 throughout; no
+fabrications found and no questions flagged. 17 of 24 questions approved as-is; 7 reworded during
+review because a correct answer reused a distinctive handbook clause near-verbatim or as a simple
+synonym swap — content and meaning unchanged in every case.
+- abs-skid-technique (3 questions, status: approved)
+- bridges-overpasses-ice-first (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was a synonym-swapped near-copy of
+    "shaded areas and snow packed portions of the road"; content unchanged.
+- extra-space-pedestrians-bicyclists-winter (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied "maneuver around snow or ice
+    on sidewalks or in the roadway" near-verbatim (an 8-word handbook run persisted through one
+    reword pass and required a second); content unchanged.
+- illegal-pass-snowplow (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was a near-verbatim synonym-swap of
+    the handbook's "city, county or state-operated ... yellow lights flashing ... in tandem with
+    ... other snow plows" sentence; content unchanged.
+- increase-following-distance-snow-ice (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer opened with a near-verbatim copy of
+    "Maintain an extra large space ... and don't forget to slow down"; content unchanged.
+- lose-traction-response (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one copied the handbook's closing clause "in the
+    direction you want the car to go" verbatim (9 words), the other copied the opening clause
+    "Take your foot off both the brake and the accelerator" verbatim (10 words); content unchanged.
+- non-abs-threshold-braking (3 questions, status: approved)
+- snowplow-caution-general (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer opened with a near-verbatim copy of
+    "use extreme caution when approaching or passing"; content unchanged.
 
 ## speed-limits-and-stopping-distance
 NOTE (chunk-wide): all facts verified against handbook p.15 (the "Unless otherwise posted,
@@ -1062,13 +1103,32 @@ questions flagged.
 - tire-blowout-response (3 questions, status: pending_review)
 
 ## weather-and-hydroplaning
-- hydroplaning-step-foot-off-gas (2 questions, status: pending_review)
-- hydroplaning-step-slow-steering-no-jerk (2 questions, status: pending_review)
-- hydroplaning-step-steer-into-direction (2 questions, status: pending_review)
-- hydroplaning-step-wait-to-stop-turn (2 questions, status: pending_review)
-- hydroplaning-tire-tread-risk (2 questions, status: pending_review)
-- hydroplaning-what-it-is (3 questions, status: pending_review)
-- weather-avoid-flooded-roads (3 questions, status: pending_review)
-- weather-headlights-poor-visibility (2 questions, status: pending_review)
-- weather-no-cruise-control-wet-icy (2 questions, status: pending_review)
-- weather-slow-and-follow (3 questions, status: pending_review)
+NOTE (chunk-wide): 11 of 23 questions reworded during review — stems framed as "According to the
+handbook...", "the handbook says/advises/warns...", "based on the handbook..." or similar, reworded
+to read as normal driving-knowledge questions; content unchanged. Facts were correct throughout;
+no fabrications found. sourceRefs (all p.19) verified correct as exported — the entire WEATHER
+section (headlights, cruise control, avoiding flooded roads, and the hydroplaning bullets) appears
+on PDF page 19 (printed page 16), under the "WEATHER" heading; the chunk plan's page 20-21 range
+was off (those pages cover snow/ice, mountain/rural driving and construction zones, not weather).
+12 questions approved as-is.
+- hydroplaning-step-foot-off-gas (2 questions, status: approved)
+- hydroplaning-step-slow-steering-no-jerk (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — "handbook" framing removed; content unchanged.
+- hydroplaning-step-steer-into-direction (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — "handbook" framing removed; content unchanged.
+- hydroplaning-step-wait-to-stop-turn (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — "handbook" framing removed, and its correct-answer
+    choice shared an 8-word run with the handbook per verbatim.py; both fixed, content unchanged.
+- hydroplaning-tire-tread-risk (2 questions, status: approved)
+  - NOTE: both questions reworded during review — "handbook" framing removed; content unchanged.
+- hydroplaning-what-it-is (3 questions, status: approved)
+- weather-avoid-flooded-roads (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — "handbook" framing removed; content unchanged.
+- weather-headlights-poor-visibility (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — "handbook" framing removed; content unchanged.
+- weather-no-cruise-control-wet-icy (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — "handbook" framing removed; content unchanged.
+- weather-slow-and-follow (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one had "handbook" framing removed, the other was a
+    near-verbatim synonym-swapped paraphrase of the handbook's "two most important actions" sentence
+    (no explicit handbook mention, but caught by rule 6); content unchanged.
