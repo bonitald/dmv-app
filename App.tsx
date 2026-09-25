@@ -88,7 +88,12 @@ function OnboardingGate({ uid }: { uid: string }) {
     );
   }
 
-  return <RootNavigator initialRoute={initialRoute} />;
+  return (
+    <>
+      <StatusBar style="dark" />
+      <RootNavigator initialRoute={initialRoute} />
+    </>
+  );
 }
 
 export default function App() {
