@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Text } from 'react-native';
-import { act, fireEvent, render, screen } from '@testing-library/react-native';
+import { Alert, Text } from 'react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { logEvent } from '@react-native-firebase/analytics';
@@ -22,8 +22,28 @@ jest.mock('../auth/AuthProvider', () => ({ useAuth: () => ({ status: 'ready', ui
 jest.mock('../api/callables', () => ({ startOrResumeBaseline: jest.fn(), scoreTest: jest.fn() }));
 let mockProgress: BaselineProgress = { status: 'not-started' };
 jest.mock('./useBaselineProgress', () => ({ useBaselineProgress: () => mockProgress }));
+// A subscribable stand-in for NetInfo, so tests can flip the connection mid-flow.
 let mockOnline = true;
-jest.mock('../network/useIsOnline', () => ({ useIsOnline: () => mockOnline }));
+const mockOnlineListeners = new Set<() => void>();
+jest.mock('../network/useIsOnline', () => {
+  const { useSyncExternalStore } = jest.requireActual('react');
+  return {
+    useIsOnline: () =>
+      useSyncExternalStore(
+        (listener: () => void) => {
+          mockOnlineListeners.add(listener);
+          return () => mockOnlineListeners.delete(listener);
+        },
+        () => mockOnline
+      ),
+  };
+});
+async function setOnline(online: boolean) {
+  await act(() => {
+    mockOnline = online;
+    mockOnlineListeners.forEach((listener) => listener());
+  });
+}
 
 const mockStart = startOrResumeBaseline as jest.Mock;
 const mockScore = scoreTest as jest.Mock;
@@ -87,6 +107,7 @@ beforeEach(async () => {
   await AsyncStorage.clear();
   mockProgress = { status: 'not-started' };
   mockOnline = true;
+  mockOnlineListeners.clear();
 });
 
 test('first time: intro, then section 1 in the runner', async () => {
@@ -252,4 +273,71 @@ test('double-tapping Submit calls scoreTest once', async () => {
   await act(async () => resolve(graded(1)));
   await screen.findByText('Section 1 done');
   expect(mockScore).toHaveBeenCalledTimes(1);
+});
+
+describe('offline and leaving (ph-3-us-1)', () => {
+  test('offline at submit: answers are held, then submitted once when the connection returns', async () => {
+    mockStart.mockResolvedValueOnce(sectionOf(1));
+    mockScore.mockResolvedValueOnce(graded(1));
+    await renderFlow();
+    await fireEvent.press(await screen.findByText('Start section 1'));
+    await screen.findByText('Section 1 of 3');
+
+    await setOnline(false);
+    expect(
+      screen.getByText("You're offline. Keep going — your answers are saved on this phone.")
+    ).toBeTruthy();
+    await answerAllAndSubmit(1);
+    expect(
+      await screen.findByText("Your answers are saved. We'll submit as soon as you're back online.")
+    ).toBeTruthy();
+    expect(mockScore).not.toHaveBeenCalled();
+
+    await setOnline(true);
+    expect(await screen.findByText('Section 1 done')).toBeTruthy();
+    expect(mockScore).toHaveBeenCalledTimes(1);
+  });
+
+  test('server unreachable while the phone looks online: keeps answers, offers Try again, no retry loop', async () => {
+    mockStart.mockResolvedValueOnce(sectionOf(1));
+    mockScore.mockRejectedValueOnce(new CallableError('offline', 'unavailable', 'offline'));
+    await renderFlow();
+    await fireEvent.press(await screen.findByText('Start section 1'));
+    await screen.findByText('Section 1 of 3');
+    await answerAllAndSubmit(1);
+    expect(await screen.findByText("Couldn't submit. Your answers are saved.")).toBeTruthy();
+    expect(mockScore).toHaveBeenCalledTimes(1);
+    expect((await getActiveSession('u1'))?.answers).toEqual({ q11: 'A11', q12: 'A12' });
+  });
+
+  test('offline on reopen with a cached section: keeps going from the cache', async () => {
+    mockProgress = { status: 'in-progress', currentSection: 2, totalSections: 3 };
+    await startSession('u1', 'baseline-v1-2', 'baseline', sectionOf(2).questions);
+    await saveAnswers('u1', 'baseline-v1-2', { q21: 'A21' });
+    mockStart.mockRejectedValueOnce(new CallableError('offline', 'unavailable', 'offline'));
+    await renderFlow();
+    expect(await screen.findByText('Section 2 of 3')).toBeTruthy();
+    expect(screen.getByLabelText('Question 1, answered')).toBeTruthy();
+  });
+
+  test('leaving mid-section asks first, and leaving keeps the session', async () => {
+    const alert = jest.spyOn(Alert, 'alert');
+    mockStart.mockResolvedValueOnce(sectionOf(1));
+    await renderFlow();
+    await fireEvent.press(await screen.findByText('Start section 1'));
+    await screen.findByText('Section 1 of 3');
+    await fireEvent.press(screen.getByText('A11'));
+
+    // Same path as the header's back button and Android back: a goBack that usePreventRemove sees.
+    await act(() => navRef.goBack());
+    await waitFor(() =>
+      expect(alert).toHaveBeenCalledWith('Take a break?', expect.any(String), expect.any(Array))
+    );
+    expect(screen.getByText('Section 1 of 3')).toBeTruthy();
+
+    await act(() => alert.mock.calls[0][2]!.find((b) => b.text === 'Leave')!.onPress!());
+    expect(await screen.findByText('Home screen')).toBeTruthy();
+    expect((await getActiveSession('u1'))?.answers).toEqual({ q11: 'A11' });
+    alert.mockRestore();
+  });
 });

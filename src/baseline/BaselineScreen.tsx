@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { Alert, StyleSheet, View } from 'react-native';
+import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import { getApp } from '@react-native-firebase/app';
 import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import { scoreTest, startOrResumeBaseline } from '../api/callables';
@@ -60,6 +60,7 @@ export function BaselineScreen() {
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const decidedRef = useRef(false);
   const submittingRef = useRef(false);
+  const heldAnswersRef = useRef<Answers | null>(null);
 
   const goHome = useCallback(
     () => navigation.navigate('Main', { screen: 'Home' }),
@@ -132,6 +133,12 @@ export function BaselineScreen() {
   const submit = useCallback(
     async (answers: Answers) => {
       if (phase.kind !== 'running' || !uid || submittingRef.current) return;
+      // ph-3-us-1: offline, hold the answers; the reconnect effect below sends them.
+      if (!isOnline) {
+        heldAnswersRef.current = answers;
+        setSubmitState('waiting-for-connection');
+        return;
+      }
       submittingRef.current = true;
       const { section } = phase;
       setSubmitState('submitting');
@@ -148,6 +155,9 @@ export function BaselineScreen() {
         }
       } catch (raw) {
         const error = toCallableError(raw);
+        // Includes 'offline' while NetInfo says online (e.g. the server can't be reached):
+        // holding for a reconnect that never comes would stall, and re-sending at once would
+        // loop, so the user gets Try again. Answers stay in quizSession either way.
         if (error.kind !== 'already-exists') {
           console.warn('[baseline] submit failed', error);
           setSubmitState('error');
@@ -156,6 +166,7 @@ export function BaselineScreen() {
         }
         // Already graded (e.g. the response was lost on an earlier try): move on.
       }
+      heldAnswersRef.current = null;
       await endSession(uid, section.testId);
       submittingRef.current = false;
       setSubmitState('idle');
@@ -169,8 +180,32 @@ export function BaselineScreen() {
         setPhase({ kind: 'complete', correctCount, totalCount });
       }
     },
-    [phase, uid]
+    [phase, uid, isOnline]
   );
+
+  // ph-3-us-1: answers held while offline go out once the connection is back. `submit` moves
+  // submitState on to 'submitting', so one hold is sent once. The answers also stay in
+  // quizSession until grading, so a force-quit while waiting resumes like any other.
+  useEffect(() => {
+    if (isOnline && submitState === 'waiting-for-connection' && heldAnswersRef.current) {
+      const answers = heldAnswersRef.current;
+      heldAnswersRef.current = null;
+      void submit(answers);
+    }
+  }, [isOnline, submitState, submit]);
+
+  // ph-3-us-4: leaving mid-section asks first. Leaving keeps the section on the phone, so it
+  // resumes next time.
+  usePreventRemove(phase.kind === 'running' && submitState !== 'submitting', ({ data }) => {
+    Alert.alert(
+      'Take a break?',
+      'Your answers are saved on this phone. Pick up where you left off any time.',
+      [
+        { text: 'Stay', style: 'cancel' },
+        { text: 'Leave', style: 'destructive', onPress: () => navigation.dispatch(data.action) },
+      ]
+    );
+  });
 
   switch (phase.kind) {
     case 'loading':
