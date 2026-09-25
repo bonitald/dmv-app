@@ -29,6 +29,7 @@ let mockBaselineProgress: BaselineProgress = { status: 'not-started' };
 jest.mock('../baseline/useBaselineProgress', () => ({
   useBaselineProgress: () => mockBaselineProgress,
 }));
+jest.mock('../network/useIsOnline', () => ({ useIsOnline: () => true }));
 jest.mock('../api/callables', () => ({
   startOrResumeBaseline: jest.fn(() => new Promise(() => {})),
   scoreTest: jest.fn(),

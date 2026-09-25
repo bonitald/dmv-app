@@ -1,9 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { colors, spacing, typography } from '../theme/tokens';
 
-// ph-0-us-8: shared placeholder for screens whose feature isn't built yet (tab roots, and the
-// Baseline route until ph-3-us-13). Later slices replace each use — this component itself goes
-// away once nothing needs it anymore. `note` is an optional line under "Coming soon".
+// ph-0-us-8: shared placeholder for screens whose feature isn't built yet (tab roots). Later
+// slices replace each use — this component itself goes away once nothing needs it anymore. `note` is an optional line under "Coming soon".
 export function PlaceholderScreen({ label, note }: { label: string; note?: string }) {
   return (
     <View style={styles.container}>

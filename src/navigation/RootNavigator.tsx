@@ -8,6 +8,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography } from '../theme/tokens';
 import { PlaceholderScreen } from '../screens/PlaceholderScreen';
+import { BaselineScreen } from '../baseline/BaselineScreen';
 import { HomeScreen } from '../home/HomeScreen';
 import { SettingsScreen } from '../settings/SettingsScreen';
 import { WelcomeScreen } from '../onboarding/WelcomeScreen';
@@ -132,15 +133,6 @@ function MainTabs() {
   );
 }
 
-function BaselinePlaceholder() {
-  return (
-    <PlaceholderScreen
-      label="Baseline test"
-      note="Based on the Colorado Driver Handbook. The baseline test arrives in the next build."
-    />
-  );
-}
-
 /** `initialRoute` comes from the onboarding gate and is only read on first mount. */
 export function RootNavigator({ initialRoute }: { initialRoute: InitialRoute }) {
   return (
@@ -158,7 +150,7 @@ export function RootNavigator({ initialRoute }: { initialRoute: InitialRoute }) 
         />
         <RootStack.Screen
           name="Baseline"
-          component={BaselinePlaceholder}
+          component={BaselineScreen}
           options={{ title: 'Baseline' }}
         />
         <RootStack.Screen
