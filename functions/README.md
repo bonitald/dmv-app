@@ -244,5 +244,16 @@ npm install        # from functions/
 npm run build       # tsc -> lib/
 ```
 
-Deployment isn't wired up yet (no `firebase deploy --only functions` has been run against a real
-project) — this story only covers building and testing the function.
+Deploy to dev (first done 2026-09-25; the project is on the Blaze plan):
+
+```bash
+FUNCTIONS_DISCOVERY_TIMEOUT=90 npx firebase deploy --only functions --project dev
+```
+
+- `firebase.json` runs `npm run build` before every deploy.
+- `FUNCTIONS_DISCOVERY_TIMEOUT=90` gives the CLI longer than its 10-second default to load the
+  code; loading from the OneDrive folder can take longer than that.
+- A new project's first deploy may fail on "missing permission on the build service account":
+  grant `roles/cloudbuild.builds.builder` to `<project-number>-compute@developer.gserviceaccount.com`.
+- **Runtime: Node 20, which Google decommissions on 2026-10-30.** After that date no function can
+  be deployed until `engines.node` moves to 22.
