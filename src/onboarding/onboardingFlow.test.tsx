@@ -4,6 +4,7 @@ import { logEvent } from '@react-native-firebase/analytics';
 import { RootNavigator } from '../navigation/RootNavigator';
 import { saveOnboarding, saveTestDate } from '../profile/profile';
 import type { Profile } from '../profile/profileData';
+import type { BaselineProgress } from '../baseline/baselineProgressData';
 import { addDays, longDateLabel, toDateString } from '../profile/testDate';
 
 // Slice 1 journey (docs/build-order.md) through the real navigator and screens. Only the
@@ -24,10 +25,21 @@ jest.mock('../profile/ProfileProvider', () => ({
   useProfile: () => ({ status: 'ready', profile: mockProfile }),
 }));
 
+let mockBaselineProgress: BaselineProgress = { status: 'not-started' };
+jest.mock('../baseline/useBaselineProgress', () => ({
+  useBaselineProgress: () => mockBaselineProgress,
+}));
+jest.mock('../network/useIsOnline', () => ({ useIsOnline: () => true }));
+jest.mock('../api/callables', () => ({
+  startOrResumeBaseline: jest.fn(() => new Promise(() => {})),
+  scoreTest: jest.fn(),
+}));
+
 beforeEach(async () => {
   jest.clearAllMocks();
   await AsyncStorage.clear();
   mockProfile = { onboarding: null, testDate: null };
+  mockBaselineProgress = { status: 'not-started' };
 });
 
 const today = toDateString(new Date());
@@ -87,6 +99,21 @@ describe('Home (ph-9-us-7 / ph-9-us-5)', () => {
     expect(await screen.findByText('Add your test date')).toBeTruthy();
     expect(screen.getByText('Start your baseline')).toBeTruthy();
     expect(screen.getByText('Learn concept by concept')).toBeTruthy();
+  });
+
+  test('the test card shows Resume with the section while the baseline is in progress', async () => {
+    mockProfile = { onboarding: { choice: 'baseline' }, testDate: null };
+    mockBaselineProgress = { status: 'in-progress', currentSection: 2, totalSections: 3 };
+    await render(<RootNavigator initialRoute="Main" />);
+    expect(await screen.findByText('Resume your baseline')).toBeTruthy();
+    expect(screen.getByText('Section 2 of 3. Pick up where you left off.')).toBeTruthy();
+  });
+
+  test('the test card shows Baseline done once it is complete', async () => {
+    mockProfile = { onboarding: { choice: 'baseline' }, testDate: null };
+    mockBaselineProgress = { status: 'complete' };
+    await render(<RootNavigator initialRoute="Main" />);
+    expect(await screen.findByText('Baseline done')).toBeTruthy();
   });
 
   test('shows the countdown for a saved date', async () => {

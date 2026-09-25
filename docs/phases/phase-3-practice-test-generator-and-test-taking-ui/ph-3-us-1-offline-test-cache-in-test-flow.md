@@ -2,7 +2,7 @@
 
 **ID:** ph-3-us-1
 **Layer:** Frontend
-**Status:** Not Started
+**Status:** In Progress (baseline use code-complete 2026-09-25, Slice 2. Decisions 2026-09-25: no launch "Resume / Discard" prompt yet (reopening the baseline restores answers; the prompt waits for practice tests), and cached answers don't expire. Answers are held while NetInfo reports offline and sent on reconnect; if the server is unreachable while the phone looks online, the user gets Try again. Practice-test and mini-quiz use land with Slices 5 and 4b)
 
 ## Story
 As a teen user,

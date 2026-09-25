@@ -3,7 +3,7 @@
 **ID:** ph-3-us-12
 **Layer:** Parent
 **Children:** ph-3-us-13 (Frontend)
-**Status:** Not Started
+**Status:** In Progress (code-complete 2026-09-25 via ph-3-us-13; closes after device testing, which needs `baselineTests/v1` published)
 
 ## Story
 As a teen user,

@@ -60,6 +60,13 @@ Parents closed: ph-3-us-12. (ph-3-us-14 was already delivered by Phase 1.)
 The runner is built for the baseline first, but it has to fit practice tests (Slice 5) and
 mini-quizzes (Slice 4) too; ph-3-us-4 already describes all three.
 
+**Status: Code complete (2026-09-25), device test pending.** Plan:
+`docs/superpowers/plans/2026-09-25-slice-2-baseline.md`. The baseline starts from Home and from
+onboarding; the Practice tab stays a placeholder until Slice 5. Device testing is blocked on
+content: `baselineTests/v1` isn't published, and only 21 of 45 topics have an approved question
+on dev (the `topics` catalog isn't published either). Functions need deploying to dev
+(`functions/README.md`).
+
 ---
 
 ## Slice 3 — Results

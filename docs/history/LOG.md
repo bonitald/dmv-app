@@ -42,3 +42,4 @@
 
 ### 2026-09-25
 - Slice 1 (first launch) complete: ph-9-us-1/2/3/4/5 marked Complete; ph-9-us-6/7 and ph-3-us-11 have their Slice 1 parts done. Verified on the Android emulator after rebuilding the dev client (the old build lacked the AsyncStorage native module, causing "runtime not ready"); fixed dark status bar. Next: deploy Firestore rules, rebuild the phone's dev client, commit, then Slice 2 (ph-3-us-4).
+- Slice 2 (baseline) code complete on `feat/baseline`: functions client + typed callables (`src/api/`), shared quiz runner, on-device session store (answers saved on every tap), baseline intro/sections/check-in/resume, NetInfo offline hold with auto-submit on reconnect, Home card Start/Resume/Done. Components 54/54, app 63/63. Functions deploy to dev unblocked (Blaze, build step, Cloud Build IAM); device test blocked: `baselineTests/v1` and `topics` unpublished, only 21/45 topics have an approved question.

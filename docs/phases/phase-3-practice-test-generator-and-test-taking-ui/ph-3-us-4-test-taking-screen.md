@@ -3,7 +3,7 @@
 **ID:** ph-3-us-4
 **Layer:** Frontend
 **Parent:** ph-3-us-2
-**Status:** Not Started
+**Status:** In Progress (baseline use code-complete 2026-09-25, Slice 2; device test pending the published baseline. Practice-tab criteria and the `assembleTest` flow land in Slice 5 (ph-4-us-1 / ph-3-us-3); `assembleTest`/`assembleMiniQuiz` wrappers already exist in `src/api/callables.ts`)
 
 ## Story
 As a teen user,

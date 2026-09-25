@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState, useCallback } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { AuthProvider, useAuth } from './src/auth/AuthProvider';
@@ -8,30 +8,21 @@ import { RootNavigator } from './src/navigation/RootNavigator';
 import { ProfileProvider, useProfile } from './src/profile/ProfileProvider';
 import { getLocalFlag, ONBOARDING_DONE, setLocalFlag } from './src/profile/localFlags';
 import { resolveInitialRoute, type InitialRoute } from './src/onboarding/onboardingGate';
-import { colors, fontsToLoad, radius, spacing, typography } from './src/theme/tokens';
+import { NoConnection } from './src/components/NoConnection';
+import { colors, fontsToLoad, spacing, typography } from './src/theme/tokens';
 
 SplashScreen.preventAutoHideAsync();
-
-function NoConnectionScreen({ onRetry }: { onRetry: () => void }) {
-  return (
-    <View style={styles.container}>
-      <Text style={typography.h1}>No connection</Text>
-      <Text style={[typography.body, styles.message]}>
-        DMV Prep needs a connection the first time you open it. Check your connection and try
-        again.
-      </Text>
-      <Pressable style={styles.button} onPress={onRetry} accessibilityRole="button">
-        <Text style={[typography.bodySemibold, styles.buttonText]}>Try again</Text>
-      </Pressable>
-    </View>
-  );
-}
 
 function AppContent() {
   const { status, uid, error, retry } = useAuth();
 
   if (status === 'offline') {
-    return <NoConnectionScreen onRetry={retry} />;
+    return (
+      <NoConnection
+        message="DMV Prep needs a connection the first time you open it. Check your connection and try again."
+        onRetry={retry}
+      />
+    );
   }
 
   if (status === 'loading') {
@@ -132,15 +123,5 @@ const styles = StyleSheet.create({
   message: {
     textAlign: 'center',
     color: colors.inkSoft,
-  },
-  button: {
-    marginTop: spacing.space5,
-    backgroundColor: colors.primary,
-    paddingVertical: spacing.space3,
-    paddingHorizontal: spacing.space6,
-    borderRadius: radius.button,
-  },
-  buttonText: {
-    color: colors.surface,
   },
 });

@@ -22,7 +22,7 @@ export type RootStackParamList = {
   Choice: undefined;
   OnboardingTestDate: { choice: OnboardingChoice };
   Main: NavigatorScreenParams<RootTabParamList> | undefined;
-  /** The baseline flow. A placeholder until ph-3-us-13 (Slice 2). */
+  /** The baseline flow (ph-3-us-13). */
   Baseline: undefined;
   TestDateEditor: undefined;
 };
