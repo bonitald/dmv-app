@@ -2,7 +2,7 @@
 
 **ID:** ph-3-us-11
 **Layer:** Parent
-**Status:** Not Started
+**Status:** In Progress (Slice 1: copy on the placeholders, review checklist line)
 
 ## Story
 As a teen user,

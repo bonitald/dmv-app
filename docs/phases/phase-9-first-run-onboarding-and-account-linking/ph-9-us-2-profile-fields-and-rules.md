@@ -3,7 +3,7 @@
 **ID:** ph-9-us-2
 **Layer:** Backend
 **Parent:** ph-9-us-1
-**Status:** Not Started
+**Status:** Built (Slice 1, 2026-09-24) — awaiting device test and rules deploy
 
 ## Story
 As a developer,

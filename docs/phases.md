@@ -6,6 +6,9 @@
 > Firebase data/config together rather than being split into separate docs. Phase numbers are
 > roughly build order, not strict dependencies, except where a phase explicitly says it depends on
 > an earlier one.
+>
+> **Build order:** stories are built in user-journey slices that cut across phases — see
+> `build-order.md`.
 
 ## Out of Scope (matches `prd.md` Section 3 — do not build ahead of scope)
 

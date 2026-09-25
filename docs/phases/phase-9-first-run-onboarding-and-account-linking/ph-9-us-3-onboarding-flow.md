@@ -3,7 +3,7 @@
 **ID:** ph-9-us-3
 **Layer:** Frontend
 **Parent:** ph-9-us-1
-**Status:** Not Started
+**Status:** Built (Slice 1, 2026-09-24) — awaiting device test
 
 ## Story
 As a teen user opening the app for the first time,
@@ -76,6 +76,13 @@ So that I'm studying within a minute without filling in forms.
 - [ ] Save the profile fields and navigate into the chosen route.
 - [ ] Log a simple analytics event with the chosen route (`onboarding_complete`, `{ choice }`) —
   for insight only, not a success metric.
+
+## Implementation notes (Slice 1)
+- Destinations are placeholders until Slice 2 (`Baseline` route) and Slice 4 (concept list =
+  Study tab root).
+- The welcome step's "Sign in" link is deferred to ph-9-us-10 (Slice 6).
+- Gate: `src/onboarding/onboardingGate.ts` (pure, unit-tested) + `OnboardingGate` in `App.tsx`;
+  finish step: `src/onboarding/finishOnboarding.ts`.
 
 ## Questions
 - Should the choice step mention the baseline is also the user's "free test" (`prd.md` Section 4)?

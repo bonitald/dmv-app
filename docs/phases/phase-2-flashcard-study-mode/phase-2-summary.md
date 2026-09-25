@@ -63,9 +63,9 @@ only new backend work is the Concept Progress record (ph-2-us-11).
   (here ph-2-us-3, or a Phase 3/9 journey story if it comes first) adds it and rebuilds the dev
   client.
 - Component tests need a `jest-expo` config (`jest.app.config.js` is Node-only); added with the
-  first screen (ph-2-us-3).
-- The mini-quiz's offline/force-quit resilience is ph-3-us-1's scope; ordering depends on the
-  user-journey sequencing still to be decided.
+  first screen, which in journey order is onboarding (ph-9-us-3, `build-order.md` Slice 1).
+- The mini-quiz's offline/force-quit resilience is ph-3-us-1's scope, built in `build-order.md`
+  Slice 2 (before the mini-quiz in Slice 4b).
 - About 900 questions still await review, so many topics may have no approved content yet.
   ph-2-us-7 shows them as "coming soon" rather than hiding them.
 - Unvalidated tunables: mini-quiz threshold (80%), flashcard rate limit (30 / 10 min),

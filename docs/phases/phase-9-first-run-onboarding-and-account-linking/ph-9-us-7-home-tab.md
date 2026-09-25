@@ -3,7 +3,7 @@
 **ID:** ph-9-us-7
 **Layer:** Frontend
 **Parent:** ph-9-us-6
-**Status:** Not Started
+**Status:** In Progress (Slice 1: countdown, test and study cards, Settings entry)
 
 ## Story
 As a teen user,
@@ -72,6 +72,13 @@ So that every time I open the app I can get straight into studying or testing.
 - [ ] Build Home with the cards above, each as its own component reading its own data.
 - [ ] Add a pure `nextConceptToStudy(topics, progress)` helper, unit-tested.
 - [ ] Add the Settings entry point (screen content in ph-9-us-10).
+
+## Implementation notes (Slice 1)
+- Built: Home tab (first of five), test date card, "Start your baseline" card (→ `Baseline`
+  placeholder), "Learn concept by concept" card (→ Study tab), Settings gear. Settings holds only
+  the test date until ph-9-us-10.
+- Still to come, per `docs/build-order.md`: Resume baseline (Slice 2), Continue learning (Slice
+  4a), weak spots (4b), practice test + latest score (5), save progress (6).
 
 ## Questions
 - Should the Study tab's own first screen stay the concept list (assumed yes), with Home only

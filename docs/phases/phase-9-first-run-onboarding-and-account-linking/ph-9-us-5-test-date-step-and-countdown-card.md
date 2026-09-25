@@ -3,7 +3,7 @@
 **ID:** ph-9-us-5
 **Layer:** Frontend
 **Parent:** ph-9-us-4
-**Status:** Not Started
+**Status:** Built (Slice 1, 2026-09-24) — awaiting device test
 
 ## Story
 As a teen user,
@@ -63,6 +63,13 @@ So that setting and updating my test date takes seconds.
 - [ ] Build the date step (picker, Skip, Continue) as a reusable component.
 - [ ] Build the countdown card and the "add date" card for Home.
 - [ ] Add the editor sheet (change / remove).
+
+## Implementation notes (Slice 1)
+- The picker is a JS month calendar (`src/profile/CalendarPicker.tsx`) rather than `@expo/ui`'s
+  native picker, so Slice 1 needs no new native module or dev-client rebuild. It can be swapped
+  later without changing callers.
+- The editor is a pushed screen (`TestDateEditor`), not a sheet, so it has a Back button on both
+  platforms.
 
 ## Questions
 None outstanding.

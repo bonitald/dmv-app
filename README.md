@@ -97,3 +97,20 @@ npm run web
 ```
 npx tsc --noEmit
 ```
+
+## Tests
+
+```
+npm run test:app          # plain-Node logic tests (src/**/*.test.ts)
+npm run test:components   # React Native component tests via jest-expo (src/**/*.test.tsx)
+npm run test:rules        # Firestore security rules, against the emulator
+npm run test:functions    # Cloud Functions, against the emulator
+```
+
+## Data
+
+- `users/{uid}` (profile, ph-9-us-2): `createdAt`, `onboarding { choice: 'baseline' | 'learn',
+  completedAt }` and `testDate` (`'YYYY-MM-DD'` or `null`). The client may create it with only
+  `createdAt` and later change only `onboarding` and `testDate`; see `firestore.rules`.
+- Local device flags (AsyncStorage, `src/profile/localFlags.ts`), keyed by uid:
+  `dmv-app:onboarding-done:{uid}` and `dmv-app:home:add-date-dismissed:{uid}`.
