@@ -22,5 +22,13 @@ module.exports = {
       'jest',
       'async-storage-mock.js'
     ),
+    '^@react-native-community/netinfo$': path.join(
+      __dirname,
+      'node_modules',
+      '@react-native-community',
+      'netinfo',
+      'jest',
+      'netinfo-mock.js'
+    ),
   },
 };
