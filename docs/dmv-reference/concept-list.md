@@ -84,17 +84,11 @@
 - impairment-plus-distraction-risk (2 questions, status: approved)
   - NOTE: both questions reworded during review — "according to the handbook" framing removed
     and near-verbatim "ability to manage multiple tasks" clause paraphrased; content unchanged.
-- mobile-device-manual-use-law (3 questions, status: flagged)
-  - ISSUE: question FGSnPBSGsgY4SRosJZ2F asks specifically when MANUAL use of a mobile device
-    is allowed, but its correct answer says "only with a hands-free device, or in an emergency
-    situation" — using a hands-free device is by definition NOT manual use, so it can't satisfy
-    a "manual use" exception. Handbook p.27: device use in general is barred unless hands-free or
-    an emergency, but manual use specifically (texting, tapping the screen) is only excused in an
-    emergency. Needs a content-team decision: either narrow correctAnswer to "Only in an
-    emergency situation," or broaden the question to ask about mobile device use generally
-    rather than manual use specifically. The other 2 questions in this concept were reworded for
-    verbatim phrasing (same hands-free/manual-use nuance was tightened in one of them without
-    changing its correct bottom-line answer) and approved.
+- mobile-device-manual-use-law (3 questions, status: approved)
+  - NOTE: question FGSnPBSGsgY4SRosJZ2F was previously flagged for asking about MANUAL device use
+    while answering with the hands-free exception. Resolved by broadening the stem to mobile
+    device use in general, which is what p.27 states (no use unless hands-free or in an
+    emergency). The other 2 questions were reworded for verbatim phrasing and approved earlier.
 - reckless-driving-definition (3 questions, status: approved)
   - NOTE: 1 question reworded during review — "the Colorado Driver Handbook" citation removed
     from stem and a 10+ word near-verbatim definition paraphrased; content unchanged.
@@ -274,15 +268,10 @@
 
 ## dui-penalties-and-underage-dui
 - dui-1st-offense-penalties (3 questions, status: approved)
-- dwai-1st-offense-penalties (3 questions, status: flagged)
-  - ISSUE: question yTC1ilhY4heSowNNRUDW is a scenario about a 17-year-old convicted of a first
-    DWAI, using jail-range figures (2-180 days) from handbook p.7's "Table 1: Possible Penalties
-    for Impaired Driving for 21 and Older." The handbook doesn't state that adult penalty ranges
-    apply unchanged to minors — its only stated under-21-specific consequences are license
-    revocation triggers (failing a court-ordered evaluation on a 1st conviction; automatic
-    revocation on a 2nd or 3rd). Needs a content-team decision: change the driver's age to 21+
-    so Table 1 applies cleanly, or rewrite to test the actual under-21 revocation rule instead.
-    The other 2 questions in this concept were reviewed and approved.
+- dwai-1st-offense-penalties (3 questions, status: approved)
+  - NOTE: question yTC1ilhY4heSowNNRUDW was previously flagged for applying p.7 Table 1 (21 and
+    older) to a 17-year-old. Resolved by changing the driver's age to 30 so Table 1 applies;
+    2-180 day jail range verified on p.7.
 - second-dui-dwai-penalties (3 questions, status: approved)
 - third-plus-dui-dwai-penalties (3 questions, status: approved)
 - underage-alcohol-possession-revocation (3 questions, status: approved)
@@ -491,21 +480,47 @@ distances) were verified against the handbook and were correct. 27 questions app
 - licensing-written-test-content (2 questions, status: approved)
 
 ## minor-permit-requirements
-- affidavit-foster-care-exemption (3 questions, status: pending_review)
-- affidavit-of-liability (3 questions, status: pending_review)
-- affidavit-signing-location (3 questions, status: pending_review)
-- affidavit-withdrawal (3 questions, status: pending_review)
-- curfew-exceptions (3 questions, status: pending_review)
-- curfew-under-18 (3 questions, status: pending_review)
-- passenger-restriction-after-1-year (3 questions, status: pending_review)
-- passenger-restriction-after-6-months (3 questions, status: pending_review)
-- passenger-restriction-exceptions (3 questions, status: pending_review)
-- passenger-restriction-first-6-months (3 questions, status: pending_review)
-- permit-bts-substitute-12-hours (3 questions, status: pending_review)
-- permit-bts-training-6-hours (3 questions, status: pending_review)
-- permit-driving-log-hours (3 questions, status: pending_review)
-- permit-duration-12-months (3 questions, status: pending_review)
-- permit-map-requirement (3 questions, status: pending_review)
+NOTE (chunk-wide): 14 of 45 questions reworded during review -- correct answers (and in two cases
+stems) reused distinctive handbook clauses from the p.5 "MINOR DRIVERS" section (e.g. affidavit
+signing/withdrawal language, passenger/seat-belt phrasing, the driving-school-substitution clause,
+the map-requirement clause) near-verbatim or with only a pronoun/synonym swap; content and meaning
+were unchanged. Facts were verified correct throughout; no factual errors found. 31 questions
+approved as-is.
+- affidavit-foster-care-exemption (3 questions, status: approved)
+  - NOTE: 1 question reworded during review -- reused "exempt from this requirement, provided
+    certain conditions are met" near-verbatim; content unchanged.
+- affidavit-of-liability (3 questions, status: approved)
+- affidavit-signing-location (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review -- reused "signed in front of a/the driver license
+    office employee or a notary public" near-verbatim; content unchanged.
+- affidavit-withdrawal (3 questions, status: approved)
+  - NOTE: 1 question reworded during review -- reused "may withdraw their signature and your
+    permit/license will be canceled" near-verbatim; content unchanged.
+- curfew-exceptions (3 questions, status: approved)
+- curfew-under-18 (3 questions, status: approved)
+- passenger-restriction-after-1-year (3 questions, status: approved)
+  - NOTE: 1 question reworded during review -- reused "as many passengers as there are seat belts
+    in the vehicle" near-verbatim; content unchanged.
+- passenger-restriction-after-6-months (3 questions, status: approved)
+  - NOTE: 1 question reworded during review -- reused "After 6 months, you may have one passenger
+    younger than 21" with only a pronoun swap; content unchanged.
+- passenger-restriction-exceptions (3 questions, status: approved)
+- passenger-restriction-first-6-months (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review -- reused "unless a parent or another licensed adult
+    driver is in the vehicle" near-verbatim; content unchanged.
+- permit-bts-substitute-12-hours (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review -- one reused the driving-school-substitution clause
+    ("offering at least 20 hours of behind-the-wheel training per week within 30 miles") with only
+    reordering, the other reused it in both stem and answer; content unchanged.
+- permit-bts-training-6-hours (3 questions, status: approved)
+  - NOTE: 1 question reworded during review -- stem reused "6 hours of behind-the-wheel training
+    with an approved driver education instructor" near-verbatim; content unchanged.
+- permit-driving-log-hours (3 questions, status: approved)
+- permit-duration-12-months (3 questions, status: approved)
+- permit-map-requirement (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review -- each reused "a printed map of the route from
+    your home to the driving school" (or "you live more than 30 miles from the nearest commercial
+    driving school") near-verbatim; content unchanged.
 
 ## motorcycle-awareness
 - collision-door-opening (3 questions, status: pending_review)
@@ -641,14 +656,10 @@ distances) were verified against the handbook and were correct. 27 questions app
 
 ## school-bus-stop-law
 - school-bus-20-foot-rule (3 questions, status: approved)
-- school-bus-caution-children (3 questions, status: flagged)
-  - ISSUE: question CPcnNCFCxfBOYWBODFF5 is a near-verbatim lift of the handbook's p.23 CAUTION
-    sentence ("Motorists should use extreme care when near a stopped school bus because children
-    are likely to dart from the bus's front or rear") with only minor word swaps — not a genuine
-    paraphrase, a legal/reuse concern per prd.md Section 8. Content is factually correct and the
-    concept is already adequately covered by question PZVepcsdjM5G4VZNOA9o (approved). Needs
-    rewriting with a genuinely different sentence structure before it can be approved. The other
-    2 questions in this concept were reviewed and approved.
+- school-bus-caution-children (3 questions, status: approved)
+  - NOTE: question CPcnNCFCxfBOYWBODFF5 was previously flagged as a near-verbatim lift of the
+    p.23 CAUTION sentence. Resolved by rewriting the stem and all choices with a different
+    sentence structure; content unchanged.
 - school-bus-divided-median-exception (3 questions, status: approved)
 - school-bus-five-lane-center-turn-exception (3 questions, status: approved)
 - school-bus-four-lane-no-median-both-stop (3 questions, status: approved)
@@ -683,15 +694,27 @@ distances) were verified against the handbook and were correct. 27 questions app
 - washboarding-gravel-roads (3 questions, status: pending_review)
 
 ## seat-belt-and-child-restraint-laws
-- child-restraint-2to4 (2 questions, status: pending_review)
-- child-restraint-4to9 (2 questions, status: pending_review)
-- child-restraint-9to18 (2 questions, status: pending_review)
-- child-restraint-responsibility (1 questions, status: pending_review)
-- child-restraint-under2-over40 (2 questions, status: pending_review)
-- child-restraint-under2-under40 (2 questions, status: pending_review)
-- seatbelt-exceptions (4 questions, status: pending_review)
-- seatbelt-mandatory-law (3 questions, status: pending_review)
-- teen-driver-passenger-limit (3 questions, status: pending_review)
+NOTE (chunk-wide): 5 of 21 questions reworded during review — correct answers reused 8+ word
+verbatim runs from the handbook's child-restraint and passenger-limit rules (p.6); facts were
+correct throughout, only wording changed while keeping the same meaning and answer position.
+16 questions approved as-is.
+- child-restraint-2to4 (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — verbatim reuse of "rear-facing or forward-facing
+    child restraint system in the rear seat"; content unchanged.
+- child-restraint-4to9 (2 questions, status: approved)
+  - NOTE: both questions reworded during review — verbatim reuse of "child restraint system or
+    booster seat in the rear seat"; content unchanged.
+- child-restraint-9to18 (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — verbatim reuse of "must be properly restrained in
+    a seat belt or child restraint system"; content unchanged.
+- child-restraint-responsibility (1 question, status: approved)
+- child-restraint-under2-over40 (2 questions, status: approved)
+- child-restraint-under2-under40 (2 questions, status: approved)
+- seatbelt-exceptions (4 questions, status: approved)
+- seatbelt-mandatory-law (3 questions, status: approved)
+- teen-driver-passenger-limit (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — verbatim reuse of "must not exceed the number of
+    seat belts"; content unchanged.
 
 ## sharing-the-road-trucks-and-buses
 - bus-frequent-stops-caution (3 questions, status: pending_review)
@@ -752,18 +775,46 @@ distances) were verified against the handbook and were correct. 27 questions app
 - zipper-merge-technique (3 questions, status: pending_review)
 
 ## traffic-signals
-- flashing-red-light (3 questions, status: pending_review)
-- flashing-yellow-arrow (3 questions, status: pending_review)
-- flashing-yellow-light (3 questions, status: pending_review)
-- green-arrow (3 questions, status: pending_review)
-- hawk-signal (3 questions, status: pending_review)
-- left-turn-red-oneway (3 questions, status: pending_review)
-- malfunctioning-signal (3 questions, status: pending_review)
-- red-arrow (3 questions, status: pending_review)
-- steady-green-light (3 questions, status: pending_review)
-- steady-red-light (3 questions, status: pending_review)
-- steady-yellow-light (3 questions, status: pending_review)
-- yellow-arrow (3 questions, status: pending_review)
+NOTE (chunk-wide): 21 of 36 questions reworded during review — most reused the handbook's traffic
+signal wording (p.10) near-verbatim or with only synonym swaps/reordering (e.g. "stop, then go
+only after yielding to pedestrians and other traffic", "treat the intersection as a four way
+stop", "must stop and may not turn in the direction shown"); facts were correct throughout. 15
+questions approved as-is. No questions flagged.
+- flashing-red-light (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answer reused the handbook's flashing-red
+    sentence near-verbatim; content unchanged.
+- flashing-yellow-arrow (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answer reused the handbook's flashing
+    yellow arrow instructions near-verbatim; content unchanged.
+- flashing-yellow-light (3 questions, status: approved)
+  - NOTE: 3 questions reworded during review — correct answer reused or synonym-swapped the
+    handbook's "slow down and proceed with caution"; content unchanged.
+- green-arrow (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer reused the green-arrow-off clause
+    near-verbatim; content unchanged.
+- hawk-signal (3 questions, status: approved)
+- left-turn-red-oneway (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied "turning from a one-way
+    street onto another one-way street" verbatim; content unchanged.
+- malfunctioning-signal (3 questions, status: approved)
+  - NOTE: 3 questions reworded during review — stem/answer reused "treat the intersection as a
+    four way stop" and "not operating or is malfunctioning" near-verbatim, and one stem's
+    "According to the handbook" framing was removed; content unchanged.
+- red-arrow (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answer reused "must stop and may not turn
+    in the direction shown" near-verbatim; content unchanged.
+- steady-green-light (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — stem/answer reused the steady-green-light clause
+    near-verbatim; content unchanged.
+- steady-red-light (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — stem/answer reused "stopping and yielding to
+    pedestrians and other traffic" near-verbatim; content unchanged.
+- steady-yellow-light (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer reused "red light is about to
+    appear" / "already in the intersection" with only reordering/synonym swaps; content unchanged.
+- yellow-arrow (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answer reused the handbook's yellow-arrow
+    sentence near-verbatim, in one case almost the entire sentence; content unchanged.
 
 ## traffic-signs-bicycle-and-disabled-parking
 - bicycle-full-lane-sign (3 questions, status: pending_review)
@@ -788,16 +839,40 @@ distances) were verified against the handbook and were correct. 27 questions app
 - work-zone-sign-appearance-purpose (3 questions, status: pending_review)
 
 ## traffic-signs-regulatory-and-warning
-- advisory-speed-signs (2 questions, status: pending_review)
-- do-not-enter-wrong-way-signs (3 questions, status: pending_review)
-- lane-control-signs (3 questions, status: pending_review)
-- one-way-signs (2 questions, status: pending_review)
-- prohibited-signs (2 questions, status: pending_review)
-- regulatory-signs-color-meaning (3 questions, status: pending_review)
-- speed-limit-signs-max-min (3 questions, status: pending_review)
-- stop-sign-where-to-stop (3 questions, status: pending_review)
-- warning-signs-color-content (3 questions, status: pending_review)
-- yield-sign-meaning (3 questions, status: pending_review)
+NOTE (chunk-wide): All 27 questions had an incorrect sourceRef during review — the export used the
+handbook's printed page number (p.7/p.8) instead of the PDF page number the ingestion spec
+requires (p.N = page-NN.txt); the printed pages 7 and 8 are actually PDF pages 10 and 11. All
+sourceRefs were corrected to p.10 or p.11 accordingly. Separately, 10 of 27 questions were
+reworded because their correct answer copied a handbook sentence verbatim or near-verbatim (e.g.
+"black or red on a white background", "before entering the crosswalk on the near side of the
+intersection"); facts were correct throughout and meaning/answer position were preserved. 17
+questions approved as-is (aside from the sourceRef fix).
+- advisory-speed-signs (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer echoed the handbook's advisory
+    speed sign sentence near-verbatim; content unchanged.
+- do-not-enter-wrong-way-signs (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied the handbook's Do Not
+    Enter/Wrong Way sentence near-verbatim; content unchanged.
+- lane-control-signs (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied the handbook's lane control
+    sentence near-verbatim; content unchanged.
+- one-way-signs (2 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was a near-verbatim paraphrase of
+    the handbook's One Way sentence; content unchanged.
+- prohibited-signs (2 questions, status: approved)
+- regulatory-signs-color-meaning (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers copied the handbook's regulatory
+    sign color/purpose sentences verbatim or near-verbatim; content unchanged.
+- speed-limit-signs-max-min (3 questions, status: approved)
+- stop-sign-where-to-stop (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers copied the handbook's stop-sign
+    stopping-location sentences verbatim or near-verbatim; content unchanged.
+- warning-signs-color-content (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied the handbook's warning sign
+    color phrase verbatim; content unchanged.
+- yield-sign-meaning (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer was the handbook's yield-sign
+    sentence with only articles removed; content unchanged.
 
 ## turning-signaling-and-lane-position
 - avoid-short-wide-late-turns-straddling (3 questions, status: pending_review)
