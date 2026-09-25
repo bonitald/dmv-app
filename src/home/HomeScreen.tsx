@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useBaselineProgress } from '../baseline/useBaselineProgress';
 import { Card } from '../components/Card';
 import { colors, radius, spacing, typography } from '../theme/tokens';
 import { TestDateCard } from './TestDateCard';
@@ -19,17 +20,42 @@ export function HomeScreen() {
   );
 }
 
-// Slice 1: always "Start your baseline". Slice 2 (ph-3-us-13) adds Resume from
-// users/{uid}/baseline/progress, and Slice 5 swaps in practice tests once the baseline is done.
+// ph-3-us-13: Start / Resume / Done from users/{uid}/baseline/progress. Slice 5 swaps in
+// practice tests once the baseline is done.
 function TestCard() {
   const navigation = useNavigation();
+  const progress = useBaselineProgress();
+  const open = () => navigation.navigate('Baseline');
+
+  if (progress.status === 'in-progress') {
+    return (
+      <RouteCard
+        icon="clipboard-outline"
+        eyebrow="FIND OUT WHERE YOU STAND"
+        title="Resume your baseline"
+        body={`Section ${progress.currentSection} of ${progress.totalSections}. Pick up where you left off.`}
+        onPress={open}
+      />
+    );
+  }
+  if (progress.status === 'complete') {
+    return (
+      <RouteCard
+        icon="checkmark-circle-outline"
+        eyebrow="BASELINE"
+        title="Baseline done"
+        body="See how you did on each part of the handbook."
+        onPress={open}
+      />
+    );
+  }
   return (
     <RouteCard
       icon="clipboard-outline"
       eyebrow="FIND OUT WHERE YOU STAND"
       title="Start your baseline"
       body="3 sections of about 15 minutes, based on the Colorado Driver Handbook. Pause any time."
-      onPress={() => navigation.navigate('Baseline')}
+      onPress={open}
     />
   );
 }
