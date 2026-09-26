@@ -1317,3 +1317,9 @@ was off (those pages cover snow/ice, mountain/rural driving and construction zon
   - NOTE: 2 questions reworded during review — one had "handbook" framing removed, the other was a
     near-verbatim synonym-swapped paraphrase of the handbook's "two most important actions" sentence
     (no explicit handbook mention, but caught by rule 6); content unchanged.
+
+## Post-review cleanup
+NOTE: 17 already-approved questions (drugged-and-impaired-driving, aggressive-driving,
+  railroad-crossing-and-light-rail, basic-driving-controls) still referenced "the handbook" in
+  the stem; reworded as normal driving questions, and two near-verbatim answers paraphrased.
+  Content unchanged. No approved question now mentions the handbook.
