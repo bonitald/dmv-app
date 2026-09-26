@@ -523,25 +523,70 @@ approved as-is.
     driving school") near-verbatim; content unchanged.
 
 ## motorcycle-awareness
-- collision-door-opening (3 questions, status: pending_review)
-- collision-driveway-pullout (3 questions, status: pending_review)
-- collision-left-turn-oncoming-motorcyclist (3 questions, status: pending_review)
-- collision-right-turn-in-front (3 questions, status: pending_review)
-- collision-stop-sign-signal (3 questions, status: pending_review)
-- full-lane-width-right (3 questions, status: pending_review)
-- increased-following-distance (3 questions, status: pending_review)
-- lane-position-shifting (3 questions, status: pending_review)
-- motorcycle-visibility-speed (3 questions, status: pending_review)
-- motorcyclist-vulnerability (3 questions, status: pending_review)
-- road-defects-danger (3 questions, status: pending_review)
-- wind-can-move-motorcycle (3 questions, status: pending_review)
+NOTE (chunk-wide): 22 of 36 questions reworded during review — correct choices (and a few stems)
+were near-verbatim or verbatim copies of the handbook's motorcycle-collision-avoidance table
+(p.25) and MOTORCYCLES section (p.26), or used "according to the handbook" / "the handbook
+advises" framing; facts were correct throughout except one small correction (see
+road-defects-danger below). 13 questions approved as-is, 1 corrected. All sourceRefs verified
+correct (p.25 for the collision-avoidance table rows, p.26 for the MOTORCYCLES section facts).
+- collision-door-opening (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim/framing; content unchanged.
+- collision-driveway-pullout (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim/verbatim/framing; content
+    unchanged.
+- collision-left-turn-oncoming-motorcyclist (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim to the handbook's left-turn
+    prevention text; content unchanged. The p.25 table row for this cause literally reads
+    "oncoming bicyclist" (an apparent handbook typo), but the row's own prevention text says
+    "oncoming motorcyclists" and the table is clearly the motorcycle-collision table, so
+    "motorcyclist" wording was kept.
+- collision-right-turn-in-front (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim to the handbook's right-turn
+    prevention text (which itself says "cyclist," treated as shorthand for motorcyclist given
+    context); content unchanged.
+- collision-stop-sign-signal (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim/framing; content unchanged.
+- full-lane-width-right (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — close paraphrase of the handbook's full-lane-width
+    sentence; content unchanged.
+- increased-following-distance (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim/framing; content unchanged.
+- lane-position-shifting (3 questions, status: approved)
+- motorcycle-visibility-speed (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — near-verbatim to the handbook's
+    visibility/speed sentence; content unchanged.
+- motorcyclist-vulnerability (3 questions, status: approved)
+- road-defects-danger (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — "according to the handbook" framing; content
+    unchanged. 1 question corrected: removed fabricated specifics ("potholes," "uneven pavement")
+    not stated in the handbook, which only says road defects and debris create dangers for
+    motorcyclists (p.26).
+- wind-can-move-motorcycle (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — verbatim/near-verbatim/framing; content
+    unchanged.
 
 ## motorist-bicyclist-collision-avoidance
-- dooring-collision (3 questions, status: pending_review)
-- driveway-pullout-collision (3 questions, status: pending_review)
-- left-turn-in-front-of-bicyclist (3 questions, status: pending_review)
-- right-hook-collision (3 questions, status: pending_review)
-- stop-sign-running-collision (3 questions, status: pending_review)
+NOTE (chunk-wide): 11 of 15 questions reworded during review — the correct answers (and one
+question stem) closely mirrored the wording of the handbook's motorist-bicyclist "Conviction /
+How to prevent" table on p.25, sometimes with only a synonym or word-order swap; facts were
+correct throughout and all sourceRefs (p.25) were verified against that table and the related
+p.26 bicyclist-safety practices.
+- dooring-collision (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers were near-verbatim of the p.25
+    dooring row / p.26 "Dutch Reach" description; content unchanged.
+- driveway-pullout-collision (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — correct answers (and one question stem)
+    were near-verbatim or contained an 8-word verbatim run from the p.25 driveway row; content
+    unchanged.
+- left-turn-in-front-of-bicyclist (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer echoed the p.25 left-turn row with
+    only reordering/synonym swaps; content unchanged.
+- right-hook-collision (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers closely mirrored the p.25/p.26
+    right-hook wording; content unchanged.
+- stop-sign-running-collision (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — correct answers reused "looking for and
+    yielding to others" from the p.25 stop-sign row near-verbatim; content unchanged.
 
 ## parking-rules-and-technique
 NOTE (chunk-wide): 6 of 36 questions reworded during review — either to drop
@@ -611,16 +656,39 @@ chunk appear under the "PAVEMENT MARKINGS" heading on PDF page 12.
     verbatim; content unchanged.
 
 ## pedestrian-safety
-- cautious-driving-pedestrian-zones (3 questions, status: pending_review)
-- look-for-pedestrians-turning (3 questions, status: pending_review)
-- lower-profile-pedestrians (3 questions, status: pending_review)
-- never-pass-vehicle-stopped-at-crosswalk (3 questions, status: pending_review)
-- no-stopping-in-crosswalk (3 questions, status: pending_review)
-- pedestrian-row-intersections-crosswalks (3 questions, status: pending_review)
-- pedestrian-speed-adjustment (3 questions, status: pending_review)
-- red-light-turn-pedestrian-check (3 questions, status: pending_review)
-- vulnerable-pedestrians-awareness (3 questions, status: pending_review)
-- watch-parked-vehicle-pedestrians (3 questions, status: pending_review)
+NOTE (chunk-wide): 17 of 30 questions reworded during review — most for near-verbatim/synonym-
+swapped copies of handbook p.27 sentences, a few for "the handbook says/advises" framing; facts
+were correct and sourceRef p.27 was accurate throughout. 13 questions approved as-is.
+- cautious-driving-pedestrian-zones (3 questions, status: approved)
+  - NOTE: 1 question reworded — correct answer copied the handbook's location list near-verbatim;
+    1 question reworded — stem referenced "the handbook" by name.
+- look-for-pedestrians-turning (3 questions, status: approved)
+  - NOTE: 1 question reworded — near-verbatim (synonym-swapped) copy of the intersection/turning
+    sentence; 1 question reworded — "the handbook advises" framing.
+- lower-profile-pedestrians (3 questions, status: approved)
+  - NOTE: 1 question reworded — stem referenced "the handbook" by name.
+- never-pass-vehicle-stopped-at-crosswalk (3 questions, status: approved)
+  - NOTE: 1 question reworded — correct answer was a near-verbatim copy of "the driver may be
+    stopping for ... you can't see".
+- no-stopping-in-crosswalk (3 questions, status: approved)
+  - NOTE: 1 question reworded — correct answer copied "any portion of your vehicle covering the
+    crosswalk area" with only a synonym swap.
+- pedestrian-row-intersections-crosswalks (3 questions, status: approved)
+  - NOTE: all 3 questions reworded — each correct answer was a near-verbatim copy of the
+    handbook's right-of-way sentence ("yield or come to a complete stop...", "have the
+    right-of-way at all intersections and crosswalks...", "even if the lines are not marked or
+    painted").
+- pedestrian-speed-adjustment (3 questions, status: approved)
+  - NOTE: 2 questions reworded — correct answers echoed "follow the speed limit...to see and
+    respond to pedestrians" too closely.
+- red-light-turn-pedestrian-check (3 questions, status: approved)
+  - NOTE: 2 questions reworded — correct answers were near-verbatim copies of the red-light-turn
+    checklist sentence; 1 of those also had its stem reworded (8-word run flagged by verbatim.py).
+- vulnerable-pedestrians-awareness (3 questions, status: approved)
+  - NOTE: all 3 questions reworded — correct answers copied "deaf, hard of hearing, deaf-blind, or
+    blind" almost word-for-word; reordered the list and reworded surrounding text, content
+    unchanged.
+- watch-parked-vehicle-pedestrians (3 questions, status: approved)
 
 ## railroad-crossing-and-light-rail
 NOTE (chunk-wide): 21 of 63 questions reworded during review — near-verbatim handbook wording or
@@ -789,28 +857,73 @@ found. 14 questions approved as-is.
 - school-bus-yellow-warning-lights (3 questions, status: approved)
 
 ## seasonal-mountain-and-rural-driving
-- bicyclist-fatalities-rural-alert (3 questions, status: pending_review)
-- bicyclist-passing-distance-rural (3 questions, status: pending_review)
-- brakes-condition-uniform (3 questions, status: pending_review)
-- clear-windows-defrost (3 questions, status: pending_review)
-- fwd-stopping-distance-myth (3 questions, status: pending_review)
-- hidden-intersections-animals-mountain (3 questions, status: pending_review)
-- mountain-driving-hazards-awareness (3 questions, status: pending_review)
-- no-passing-crest-curve (3 questions, status: pending_review)
-- potholes-traction-loss (3 questions, status: pending_review)
-- rural-blind-driveways-intersections (3 questions, status: pending_review)
-- rural-no-shoulders-guardrails (3 questions, status: pending_review)
-- rural-road-curves-hills-dips (3 questions, status: pending_review)
-- rural-road-obstacles (3 questions, status: pending_review)
-- rural-roads-fatality-rate (3 questions, status: pending_review)
-- rural-roads-narrow-passing (3 questions, status: pending_review)
-- rural-signs-hidden (3 questions, status: pending_review)
-- rural-unpaved-less-traction (3 questions, status: pending_review)
-- steep-hill-downshift (3 questions, status: pending_review)
-- steep-roadway-pullover (3 questions, status: pending_review)
-- tire-tread-chains-traction-devices (3 questions, status: pending_review)
-- uphill-right-of-way (3 questions, status: pending_review)
-- washboarding-gravel-roads (3 questions, status: pending_review)
+NOTE (chunk-wide): all sourceRefs (p.20) verified correct — the seasonal driving, mountain
+driving and rural driving bullet lists all appear on PDF page 20. 31 of 66 questions were
+reworded during review, mostly because the correct answer (or occasionally the question stem)
+copied an 8+ word run straight from the handbook's dense bulleted lists; facts were correct
+throughout and no content decisions were needed. 35 questions approved as-is.
+- bicyclist-fatalities-rural-alert (3 questions, status: approved)
+- bicyclist-passing-distance-rural (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied "more than the required
+    three feet of passing distance" verbatim; content unchanged.
+- brakes-condition-uniform (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each correct answer reused a near-verbatim
+    chunk of the single handbook brake-adjustment sentence; content unchanged.
+- clear-windows-defrost (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem used "According to the handbook" framing;
+    content unchanged.
+- fwd-stopping-distance-myth (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each correct answer copied "stop any sooner
+    than a conventional car" near-verbatim; content unchanged.
+- hidden-intersections-animals-mountain (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers copied 7-8 word runs of the
+    "intersections hidden by trees, brush or crops" clause verbatim; content unchanged.
+- mountain-driving-hazards-awareness (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer listed the handbook's hazards in
+    the exact same order/wording (11-word run); content unchanged.
+- no-passing-crest-curve (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — both stem and correct answer copied 8-9 word runs
+    from the handbook's passing-restriction sentence; content unchanged.
+- potholes-traction-loss (3 questions, status: approved)
+- rural-blind-driveways-intersections (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied an 8-word run ("...not
+    visible due to trees, crops and bushes"); content unchanged.
+- rural-no-shoulders-guardrails (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers strung together the handbook's
+    two shoulders/guard-rails sentences almost verbatim; content unchanged.
+- rural-road-curves-hills-dips (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — each correct answer copied the "sharp curves,
+    blind curves, steep hills and dips" list verbatim; content unchanged.
+- rural-road-obstacles (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one correct answer copied the handbook's entire
+    17-word obstacle list verbatim; content unchanged.
+- rural-roads-fatality-rate (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one stem used "Based on the handbook" framing,
+    and both correct answers copied 10+ word runs of the fatality-rate sentence verbatim;
+    content unchanged.
+- rural-roads-narrow-passing (3 questions, status: approved)
+- rural-signs-hidden (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one stem used "What does the handbook say"
+    framing, one correct answer copied an 8-word run of the guide-signage sentence verbatim;
+    content unchanged.
+- rural-unpaved-less-traction (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer strung together the handbook's
+    rough-pavement and unpaved-road sentences almost verbatim; content unchanged.
+- steep-hill-downshift (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer closely tracked the handbook's
+    downshift sentence with only minor insertions; content unchanged.
+- steep-roadway-pullover (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied two runs of the handbook's
+    steep-roadway sentence verbatim; content unchanged.
+- tire-tread-chains-traction-devices (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — correct answers copied 7-15 word runs of the
+    chains/snow-tire sentences verbatim; content unchanged.
+- uphill-right-of-way (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem used "According to the handbook" framing;
+    content unchanged.
+- washboarding-gravel-roads (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied the handbook's washboarding
+    definition verbatim (11-word run); content unchanged.
 
 ## seat-belt-and-child-restraint-laws
 NOTE (chunk-wide): 5 of 21 questions reworded during review — correct answers reused 8+ word
@@ -1146,13 +1259,33 @@ questions flagged.
 - turn-signal-urban-100ft (3 questions, status: approved)
 
 ## vehicle-breakdown-emergencies
-- brake-failure-first-step (3 questions, status: pending_review)
-- brake-failure-last-resort (3 questions, status: pending_review)
-- brake-failure-parking-brake (3 questions, status: pending_review)
-- headlight-failure-response (3 questions, status: pending_review)
-- jammed-gas-pedal-response (3 questions, status: pending_review)
-- power-steering-failure (3 questions, status: pending_review)
-- tire-blowout-response (3 questions, status: pending_review)
+NOTE (chunk-wide): 13 of 21 questions reworded during review — correct answers reused distinctive
+handbook clauses verbatim, near-verbatim, or with only synonym swaps/reordering from the "VEHICLE
+EMERGENCIES" bullets (brake failure, tire blowout, power failure, headlight failure, jammed gas
+pedal) on p.29; content unchanged. 8 questions approved as-is. All sourceRefs (p.29) verified
+correct — every fact in this chunk appears under the "VEHICLE EMERGENCIES" heading on PDF page 29.
+No flagged questions.
+- brake-failure-first-step (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — near-verbatim handbook phrasing; content unchanged.
+- brake-failure-last-resort (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — correct answer copied the entire handbook clause
+    "shift to lower gears and look for a safe place to slow to a stop" verbatim; content
+    unchanged.
+- brake-failure-parking-brake (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — 1 for an 8-word verbatim run with the handbook, 1
+    for a "According to the handbook" framing removed from the stem; content unchanged.
+- headlight-failure-response (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — verbatim or near-verbatim handbook phrasing;
+    content unchanged.
+- jammed-gas-pedal-response (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — near-verbatim join of three handbook sentences;
+    content unchanged.
+- power-steering-failure (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — handbook sentence with only synonym swaps; content
+    unchanged.
+- tire-blowout-response (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — verbatim, near-verbatim, or reordered handbook
+    phrasing; content unchanged.
 
 ## weather-and-hydroplaning
 NOTE (chunk-wide): 11 of 23 questions reworded during review — stems framed as "According to the
