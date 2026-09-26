@@ -53,7 +53,9 @@ describe('assembleTestForUser', () => {
   test('returns only the client-safe fields, not sourceRef/selfCheck/review metadata', async () => {
     await seedQuestion('q1');
 
-    const result = await assembleTestForUser(db, { uid: 'alice-uid' }, { count: 1 });
+    // A random source just under 1 makes Fisher–Yates swap each item with itself, so choices
+    // keep their stored order and can be compared exactly.
+    const result = await assembleTestForUser(db, { uid: 'alice-uid' }, { count: 1, random: () => 0.999999 });
 
     expect(result.questions[0]).toEqual({
       id: 'q1',
@@ -63,6 +65,15 @@ describe('assembleTestForUser', () => {
       chunkId: 'chunk-1',
       conceptId: 'concept-1',
     });
+  });
+
+  test('shuffles each question\'s answer choices so the correct answer is not always first', async () => {
+    await seedQuestion('q1', { choices: ['a', 'b', 'c', 'd'], correctAnswer: 'a' });
+
+    // With random always 0, Fisher–Yates turns [a, b, c, d] into [b, c, d, a].
+    const result = await assembleTestForUser(db, { uid: 'alice-uid' }, { count: 1, random: () => 0 });
+
+    expect(result.questions[0].choices).toEqual(['b', 'c', 'd', 'a']);
   });
 
   test('returns at most `count` questions', async () => {

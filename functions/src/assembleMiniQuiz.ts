@@ -37,7 +37,8 @@ interface AssembleMiniQuizOptions {
  *           input.count — optional, defaults to 10, capped at 10
  *           input.excludeIds — optional, previous set's question IDs; used to avoid an
  *             immediate repeat on "Review Again" when the topic's pool is large enough to do so
- * Returns:  { testId, questions[] } — no correctAnswer/sourceRef/selfCheck/review metadata
+ * Returns:  { testId, questions[] } — no correctAnswer/sourceRef/selfCheck/review metadata;
+ *           each question's choices are shuffled
  * Reads:    `questions` where chunkId == input.chunkId and status == 'approved'
  * Writes:   `users/{uid}/testAssignments/{testId}` — { type: 'mini-quiz', chunkId,
  *           questionIds, createdAt, scored: false } — graded later by scoreTest (ph-1-us-11)
@@ -99,7 +100,9 @@ export async function assembleMiniQuizForUser(
     return {
       id: doc.id,
       text: data.text,
-      choices: data.choices,
+      // Shuffled so the correct answer isn't always in the stored (usually first) slot. Safe for
+      // grading: scoreTest compares answer text to correctAnswer, not position.
+      choices: shuffle(data.choices, random),
       type: data.type,
       chunkId: data.chunkId,
       conceptId: data.conceptId,

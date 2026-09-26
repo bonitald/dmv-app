@@ -60,6 +60,20 @@ describe('assembleMiniQuizForUser', () => {
     ).rejects.toMatchObject({ code: 'not-found' });
   });
 
+  test('shuffles each question\'s answer choices so the correct answer is not always first', async () => {
+    await seedQuestion('q1', { choices: ['a', 'b', 'c', 'd'], correctAnswer: 'a' });
+
+    // With random always 0, Fisher–Yates turns [a, b, c, d] into [b, c, d, a].
+    const result = await assembleMiniQuizForUser(
+      db,
+      { uid: 'alice-uid' },
+      { chunkId: 'right-of-way' },
+      { random: () => 0 }
+    );
+
+    expect(result.questions[0].choices).toEqual(['b', 'c', 'd', 'a']);
+  });
+
   test('returns only approved questions from the requested topic', async () => {
     await seedQuestion('q1', { chunkId: 'right-of-way', status: 'approved' });
     await seedQuestion('q2', { chunkId: 'other-topic', status: 'approved' });

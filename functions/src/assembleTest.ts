@@ -17,7 +17,7 @@ const DEFAULT_QUESTION_COUNT = 25;
 export interface AssembledQuestion {
   id: string; // Firestore document ID of the question
   text: string; // The question prompt shown to the student
-  choices: string[]; // Answer options, in stored order
+  choices: string[]; // Answer options, shuffled so the correct one isn't always first
   type: string; // Question style (e.g. fact recall vs. situational scenario)
   chunkId: string; // Handbook topic/chunk this question was generated from
   conceptId: string; // Handbook concept this question tests; used to group/track weak areas
@@ -47,7 +47,7 @@ interface AssembleTestOptions {
  * Inputs:   db — Firestore instance
  *           auth — the caller's `request.auth` (undefined if not signed in)
  *           options.count — number of questions (default 25)
- *           options.random — random source (default Math.random)
+ *           options.random — random source for question and choice order (default Math.random)
  * Returns:  { testId, questions[] } — questions contain id/text/choices/type/chunkId/conceptId
  *           only
  * Reads:    `questions` collection, filtered to status == 'approved'
@@ -92,7 +92,10 @@ export async function assembleTestForUser(
     return {
       id: doc.id,
       text: data.text,
-      choices: data.choices,
+      // Most questions store the correct answer first, so serving stored order would let a
+      // student learn to "always pick A". Shuffling here is safe for grading: scoreTest compares
+      // the chosen answer's text to correctAnswer, not its position.
+      choices: shuffle(data.choices, random),
       type: data.type,
       chunkId: data.chunkId,
       conceptId: data.conceptId,

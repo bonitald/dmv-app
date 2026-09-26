@@ -2,6 +2,7 @@ import { FieldValue, type Firestore, type Timestamp } from 'firebase-admin/fires
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { getDb } from './adminApp';
 import type { AssembledQuestion } from './assembleTest';
+import { seededRandom, shuffle } from './shuffle';
 
 /**
  * The baseline definition every new user is started on (ph-1-us-8).
@@ -57,7 +58,9 @@ interface BaselineProgress {
  * Inputs:   db — Firestore instance; auth — request.auth. The client sends no request data:
  *           which section to serve comes only from server-side progress, so a client can't
  *           skip ahead or re-serve an earlier section.
- * Returns:  StartOrResumeBaselineResult — the current section's questions, without answers
+ * Returns:  StartOrResumeBaselineResult — the current section's questions, without answers.
+ *           Each question's choices are shuffled in a fixed order seeded by its ID, so every
+ *           call and every user sees the same order.
  * Reads:    `users/{uid}/baseline/progress`, `baselineTests/{version}`, `questions/{id}` by ID
  * Writes:   `users/{uid}/baseline/progress`, only on a user's first call. Calling again without
  *           submitting returns the same section; only `scoreTest` moves progress forward.
@@ -113,7 +116,8 @@ export async function startOrResumeBaselineForUser(
   }
 
   // Fetch by ID, not by query: order and membership are fixed by the published baseline, and
-  // every user must see the same questions in the same order. (No shuffling, unlike assembleTest.)
+  // every user must see the same questions in the same order. (Question order is never
+  // shuffled, unlike assembleTest; only each question's choices are, in a fixed order below.)
   const questionDocs = await Promise.all(
     section.questionIds.map((id) => db.collection('questions').doc(id).get())
   );
@@ -136,7 +140,11 @@ export async function startOrResumeBaselineForUser(
     return {
       id: doc.id,
       text: data.text,
-      choices: data.choices,
+      // Shuffle choices so the correct answer isn't always in the stored (usually first) slot,
+      // but seed the shuffle with the question ID so the order never changes: a resumed section
+      // must show exactly what was shown before, and every user gets the identical baseline.
+      // Grading is unaffected — scoreTest compares answer text, not position.
+      choices: shuffle(data.choices, seededRandom(`baseline:${doc.id}`)),
       type: data.type,
       chunkId: data.chunkId,
       conceptId: data.conceptId,

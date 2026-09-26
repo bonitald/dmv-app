@@ -96,7 +96,8 @@ async function checkAndConsumeRateLimit(db: Firestore, uid: string, now: number)
  * Auth:     requires a signed-in user (anonymous auth counts); otherwise throws
  * Inputs:   db; auth — request.auth; chunkId — required topic, from request.data.chunkId;
  *           options.random / options.now — injectable for deterministic tests
- * Returns:  { chunkId, cards[] } — every approved question in the topic, shuffled. Cards include
+ * Returns:  { chunkId, cards[] } — every approved question in the topic, shuffled, with each
+ *           card's choices shuffled too. Cards include
  *           `correctAnswer`: this is the one read path that sends answers to the client,
  *           which is why it is rate-limited (see RATE_LIMIT_MAX_CALLS)
  * Reads:    `questions` where chunkId == input and status == 'approved';
@@ -148,7 +149,9 @@ export async function getFlashcardsForUser(
     return {
       id: doc.id,
       text: data.text,
-      choices: data.choices,
+      // Shuffled like tests and mini-quizzes so no view of a card hints that the stored
+      // (usually first) choice is the answer. correctAnswer is text, so it's unaffected.
+      choices: shuffle(data.choices, random),
       correctAnswer: data.correctAnswer,
       type: data.type,
       chunkId: data.chunkId,

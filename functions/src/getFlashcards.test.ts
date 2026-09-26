@@ -60,7 +60,10 @@ describe('getFlashcardsForUser', () => {
   test('returns cards with answers, excluding sourceRef/selfCheck/review metadata', async () => {
     await seedQuestion('q1');
 
-    const result = await getFlashcardsForUser(db, { uid: 'alice-uid' }, 'right-of-way');
+    // A random source just under 1 keeps the stored choice order, so the card compares exactly.
+    const result = await getFlashcardsForUser(db, { uid: 'alice-uid' }, 'right-of-way', {
+      random: () => 0.999999,
+    });
 
     expect(result.chunkId).toBe('right-of-way');
     expect(result.cards).toEqual([
@@ -74,6 +77,18 @@ describe('getFlashcardsForUser', () => {
         conceptId: 'concept-1',
       },
     ]);
+  });
+
+  test('shuffles each card\'s choices while keeping the correct answer', async () => {
+    await seedQuestion('q1', { choices: ['a', 'b', 'c', 'd'], correctAnswer: 'a' });
+
+    // With random always 0, Fisher–Yates turns [a, b, c, d] into [b, c, d, a].
+    const result = await getFlashcardsForUser(db, { uid: 'alice-uid' }, 'right-of-way', {
+      random: () => 0,
+    });
+
+    expect(result.cards[0].choices).toEqual(['b', 'c', 'd', 'a']);
+    expect(result.cards[0].correctAnswer).toBe('a');
   });
 
   test('nothing is written to testAttempts or testAssignments', async () => {

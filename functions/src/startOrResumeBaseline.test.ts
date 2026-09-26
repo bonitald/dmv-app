@@ -118,6 +118,50 @@ describe('startOrResumeBaselineForUser', () => {
     });
   });
 
+  test('serves choices in a fixed shuffled order: stable across calls and users, not always stored order', async () => {
+    const ids = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'];
+    for (const id of ids) {
+      await db.collection('questions').doc(id).set({
+        conceptId: 'c1',
+        chunkId: 'row',
+        sourceRef: 'p.1',
+        type: 'fact',
+        text: `Question ${id}`,
+        choices: ['right', 'w1', 'w2', 'w3'],
+        correctAnswer: 'right',
+        status: 'approved',
+        selfCheck: { passed: true },
+        reviewedBy: null,
+        reviewedAt: null,
+        reviewNotes: null,
+      });
+    }
+    await db
+      .collection('baselineTests')
+      .doc(CURRENT_BASELINE_VERSION)
+      .set({
+        sections: [
+          { section: 1, questionIds: ids },
+          { section: 2, questionIds: [] },
+          { section: 3, questionIds: [] },
+        ],
+        createdAt: new Date(),
+      });
+
+    const first = await startOrResumeBaselineForUser(db, { uid: 'alice-uid' });
+    const resumed = await startOrResumeBaselineForUser(db, { uid: 'alice-uid' });
+    const otherUser = await startOrResumeBaselineForUser(db, { uid: 'bob-uid' });
+
+    // Resuming must show exactly what was shown before, and the baseline is identical for everyone.
+    expect(resumed.questions).toEqual(first.questions);
+    expect(otherUser.questions).toEqual(first.questions);
+    // Every choice is still there...
+    for (const q of first.questions) expect([...q.choices].sort()).toEqual(['right', 'w1', 'w2', 'w3']);
+    // ...but the correct answer is no longer always in the first slot.
+    const positions = first.questions.map((q) => q.choices.indexOf('right'));
+    expect(new Set(positions).size).toBeGreaterThan(1);
+  });
+
   test('two different users receive identical section-1 questions', async () => {
     await seedBaseline();
 
