@@ -623,27 +623,31 @@ chunk appear under the "PAVEMENT MARKINGS" heading on PDF page 12.
 - watch-parked-vehicle-pedestrians (3 questions, status: pending_review)
 
 ## railroad-crossing-and-light-rail
-- lr-basics-and-rights (3 questions, status: pending_review)
-- lr-check-all-directions (3 questions, status: pending_review)
-- lr-crossing-signals-mean-stop (3 questions, status: pending_review)
-- lr-never-bypass-gates (3 questions, status: pending_review)
-- lr-never-turn-in-front (3 questions, status: pending_review)
-- lr-overhead-wires (3 questions, status: pending_review)
-- lr-report-hazard (3 questions, status: pending_review)
-- lr-watch-for-boarding-riders (3 questions, status: pending_review)
-- lr-weight-and-stopping (3 questions, status: pending_review)
-- rr-advance-warning-sign (3 questions, status: pending_review)
-- rr-check-unmarked-crossing (3 questions, status: pending_review)
-- rr-clear-room-before-crossing (3 questions, status: pending_review)
-- rr-commercial-vehicles-stop (3 questions, status: pending_review)
-- rr-crossbuck-sign (3 questions, status: pending_review)
-- rr-ens-sign (3 questions, status: pending_review)
-- rr-flashing-lights-and-gates (3 questions, status: pending_review)
-- rr-never-stop-on-tracks (3 questions, status: pending_review)
-- rr-pavement-markings (3 questions, status: pending_review)
-- rr-quiet-zone-sign (3 questions, status: pending_review)
-- rr-stalled-vehicle (3 questions, status: pending_review)
-- rr-train-speed-judgment (3 questions, status: pending_review)
+NOTE (chunk-wide): 21 of 63 questions reworded during review — near-verbatim handbook wording or
+"according to the handbook" framing paraphrased; facts were correct throughout. 42 questions
+approved as-is. Concept list block generated from the review file (the review agent hit the session
+limit after writing its verdicts).
+- lr-basics-and-rights (3 questions, status: approved)
+- lr-check-all-directions (3 questions, status: approved)
+- lr-crossing-signals-mean-stop (3 questions, status: approved)
+- lr-never-bypass-gates (3 questions, status: approved)
+- lr-never-turn-in-front (3 questions, status: approved)
+- lr-overhead-wires (3 questions, status: approved)
+- lr-report-hazard (3 questions, status: approved)
+- lr-watch-for-boarding-riders (3 questions, status: approved)
+- lr-weight-and-stopping (3 questions, status: approved)
+- rr-advance-warning-sign (3 questions, status: approved)
+- rr-check-unmarked-crossing (3 questions, status: approved)
+- rr-clear-room-before-crossing (3 questions, status: approved)
+- rr-commercial-vehicles-stop (3 questions, status: approved)
+- rr-crossbuck-sign (3 questions, status: approved)
+- rr-ens-sign (3 questions, status: approved)
+- rr-flashing-lights-and-gates (3 questions, status: approved)
+- rr-never-stop-on-tracks (3 questions, status: approved)
+- rr-pavement-markings (3 questions, status: approved)
+- rr-quiet-zone-sign (3 questions, status: approved)
+- rr-stalled-vehicle (3 questions, status: approved)
+- rr-train-speed-judgment (3 questions, status: approved)
 
 ## right-of-way-emergency-and-work-vehicles
 NOTE (chunk-wide): 17 of 29 questions reworded during review — correct answers tracked
@@ -832,18 +836,22 @@ correct throughout, only wording changed while keeping the same meaning and answ
     seat belts"; content unchanged.
 
 ## sharing-the-road-trucks-and-buses
-- bus-frequent-stops-caution (3 questions, status: pending_review)
-- bus-right-of-way-merging-and-pedestrians (3 questions, status: pending_review)
-- motorcycle-lane-filtering-definition (3 questions, status: pending_review)
-- motorcycle-lane-filtering-speed-limit (3 questions, status: pending_review)
-- truck-bus-no-zone-definition (3 questions, status: pending_review)
-- truck-bus-passing-distance (3 questions, status: pending_review)
-- truck-bus-rear-blind-spot-tailgating (3 questions, status: pending_review)
-- truck-bus-reversing-caution (3 questions, status: pending_review)
-- truck-bus-runaway-ramps (3 questions, status: pending_review)
-- truck-bus-side-blind-spots (3 questions, status: pending_review)
-- truck-bus-stop-bar-space (3 questions, status: pending_review)
-- truck-bus-wide-turns (3 questions, status: pending_review)
+NOTE (chunk-wide): 7 of 36 questions reworded during review — near-verbatim handbook wording or
+"according to the handbook" framing paraphrased; facts were correct throughout. 29 questions
+approved as-is. Concept list block generated from the review file (the review agent hit the session
+limit after writing its verdicts).
+- bus-frequent-stops-caution (3 questions, status: approved)
+- bus-right-of-way-merging-and-pedestrians (3 questions, status: approved)
+- motorcycle-lane-filtering-definition (3 questions, status: approved)
+- motorcycle-lane-filtering-speed-limit (3 questions, status: approved)
+- truck-bus-no-zone-definition (3 questions, status: approved)
+- truck-bus-passing-distance (3 questions, status: approved)
+- truck-bus-rear-blind-spot-tailgating (3 questions, status: approved)
+- truck-bus-reversing-caution (3 questions, status: approved)
+- truck-bus-runaway-ramps (3 questions, status: approved)
+- truck-bus-side-blind-spots (3 questions, status: approved)
+- truck-bus-stop-bar-space (3 questions, status: approved)
+- truck-bus-wide-turns (3 questions, status: approved)
 
 ## snow-and-ice-driving
 NOTE (chunk-wide): all sourceRefs already correctly point to p.20 (PDF page 20 = printed page 17,
@@ -913,20 +921,64 @@ content and correct answers were unchanged. 36 questions approved as-is.
 - work-zone-double-fines (3 questions, status: approved)
 
 ## traffic-flow-and-being-pulled-over
-- pulled-over-disagree-procedure (4 questions, status: pending_review)
-- pulled-over-document-wait (3 questions, status: pending_review)
-- pulled-over-officer-approach (3 questions, status: pending_review)
-- pulled-over-officer-may-actions (3 questions, status: pending_review)
-- pulled-over-officer-typical-actions (3 questions, status: pending_review)
-- pulled-over-stopping-actions (3 questions, status: pending_review)
-- pulled-over-supervisor-complaint (3 questions, status: pending_review)
-- pulled-over-visibility-hands (3 questions, status: pending_review)
-- pulled-over-weapon-disclosure (3 questions, status: pending_review)
-- slow-zone-locations (3 questions, status: pending_review)
-- traffic-flow-follow-speed (3 questions, status: pending_review)
-- traffic-flow-too-slow (3 questions, status: pending_review)
-- zipper-merge-etiquette (3 questions, status: pending_review)
-- zipper-merge-technique (3 questions, status: pending_review)
+NOTE (chunk-wide): all facts verified against handbook p.22 (Adjusting to traffic, Zipper Merge,
+Slow Zones, and "What to Do and Expect When Pulled Over by Law Enforcement" sections); every
+sourceRef was already correct as p.22, no corrections needed. No fabrications found and no
+questions flagged. 22 of 43 questions were auto-reworded during review — most had "according to
+the handbook" / "what does the handbook say/recommend" stem framing, and several correct answers
+reused 8+ word verbatim or near-verbatim runs from the handbook (e.g. "Turn off the engine and any
+audio devices", "your driver's license, proof of insurance, and vehicle registration", "keep your
+hands visible, exit the vehicle, and stand"); content and meaning were unchanged in every case. 21
+questions approved as-is.
+- pulled-over-disagree-procedure (4 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem used "what does the handbook recommend"
+    framing; content unchanged.
+- pulled-over-document-wait (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem and correct answer each reused an 8-word
+    verbatim run ("before reaching for your driver's license or vehicle" / "Wait for the
+    officer's instructions before reaching for"); content unchanged.
+- pulled-over-officer-approach (3 questions, status: approved)
+- pulled-over-officer-may-actions (3 questions, status: approved)
+  - NOTE: all 3 questions reworded during review — two had "what does the handbook say" framing,
+    and the third's correct answer reused a 9-word verbatim run ("keep your hands visible, exit
+    the vehicle, and stand"); content unchanged.
+- pulled-over-officer-typical-actions (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem used "what does the handbook say" framing and
+    correct answer reused a 9-word verbatim run ("your driver's license, proof of insurance, and
+    vehicle registration"); content unchanged.
+- pulled-over-stopping-actions (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one's stem/answer reused "Turn off the engine and
+    any audio devices" verbatim, the other had "According to the handbook" framing plus an
+    8-word verbatim run ("pull off to the right side of the"); content unchanged.
+- pulled-over-supervisor-complaint (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — both had "what does the handbook suggest" /
+    "according to the handbook" framing, and one correct answer combined two separate handbook
+    clauses near-verbatim; content unchanged.
+- pulled-over-visibility-hands (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — "does the handbook recommend" framing removed;
+    one also reused an 8-word verbatim run ("keep your hands on the steering wheel or"); content
+    unchanged.
+- pulled-over-weapon-disclosure (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — correct answers reused 8- and 10-word verbatim
+    runs ("reach for it or attempt to hand it" / "upon first contact, but do not reach for it
+    or"); one stem also had "what does the handbook say" framing. Content unchanged.
+- slow-zone-locations (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — "listed in the handbook" / "According to the
+    handbook" framing removed from stems; content unchanged.
+- traffic-flow-follow-speed (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — one stem named the handbook explicitly and its
+    correct answer copied "Follow posted speed limits and keep pace with traffic in a reasonable
+    and cautious manner" near-verbatim; the other stem used "handbook associate" framing. Content
+    unchanged.
+- traffic-flow-too-slow (3 questions, status: approved)
+  - NOTE: 2 questions reworded during review — "According to the handbook" / "per the handbook"
+    framing removed from stems; content unchanged.
+- zipper-merge-etiquette (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem used "according to the handbook's guidance"
+    framing; content unchanged.
+- zipper-merge-technique (3 questions, status: approved)
+  - NOTE: 1 question reworded during review — stem used "what does the handbook recommend"
+    framing; content unchanged.
 
 ## traffic-signals
 NOTE (chunk-wide): 21 of 36 questions reworded during review — most reused the handbook's traffic
