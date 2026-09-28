@@ -1,6 +1,6 @@
 # Phase 3: Practice Test Generator & Test-Taking UI — Summary
 
-## Status: Not Started
+## Status: In Progress (Slice 2 baseline complete 2026-09-28)
 
 Depends on Phase 1 (question bank), which is Complete. Phase 1 already built every server
 function the test flows call (`assembleTest`, `startOrResumeBaseline`, `scoreTest`), so Phase 3
@@ -11,19 +11,19 @@ mix and repeat-avoidance in `assembleTest`, and recording `timing` in `scoreTest
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
-| ph-3-us-1 | Use the on-device test cache in the test-taking flow | Frontend | — | Not Started |
+| ph-3-us-1 | Use the on-device test cache in the test-taking flow | Frontend | — | In Progress (baseline use complete) |
 | ph-3-us-2 | Start a practice test that mixes fact and scenario questions | Parent | — | Not Started |
 | ph-3-us-3 | `assembleTest` guarantees a fact/scenario mix and topic spread | Backend | ph-3-us-2 | Not Started |
-| ph-3-us-4 | Test-taking screen (shared quiz runner) | Frontend | ph-3-us-2 | Not Started |
+| ph-3-us-4 | Test-taking screen (shared quiz runner) | Frontend | ph-3-us-2 | In Progress (baseline use complete) |
 | ph-3-us-5 | Unlimited, distinct practice tests | Parent | — | Not Started |
 | ph-3-us-6 | `assembleTest` avoids repeating a user's recent questions | Backend | ph-3-us-5 | Not Started |
 | ph-3-us-7 | Timed or untimed practice test mode | Parent | — | Not Started |
 | ph-3-us-8 | Record test mode and duration on the Test Attempt | Backend | ph-3-us-7 | Not Started |
 | ph-3-us-9 | Timed mode picker and countdown | Frontend | ph-3-us-7 | Not Started |
 | ph-3-us-10 | Every Test Attempt is recorded | Parent | — | Complete (delivered by ph-1-us-11) |
-| ph-3-us-11 | Colorado-only content, no state selector | Parent | — | In Progress (Slice 1 part complete) |
-| ph-3-us-12 | Take the baseline diagnostic, with pauses between sections | Parent | — | Not Started |
-| ph-3-us-13 | Baseline flow: intro, sections, "keep going?" and resume | Frontend | ph-3-us-12 | Not Started |
+| ph-3-us-11 | Colorado-only content, no state selector | Parent | — | In Progress (Slice 1 and baseline intro complete) |
+| ph-3-us-12 | Take the baseline diagnostic, with pauses between sections | Parent | — | Complete (2026-09-28) |
+| ph-3-us-13 | Baseline flow: intro, sections, "keep going?" and resume | Frontend | ph-3-us-12 | Complete (2026-09-28) |
 | ph-3-us-14 | Baseline recorded as its own attempt type, marks the free test used | Parent | — | Complete (delivered by ph-1-us-8/11) |
 
 `docs/phases.md` bullet → story: 1 → us-2; 2 → us-1; 3 → us-5; 4 → us-7; 5 → us-10; 6 → us-11;

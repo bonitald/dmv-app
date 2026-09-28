@@ -2,7 +2,7 @@
 
 **ID:** ph-3-us-11
 **Layer:** Parent
-**Status:** In Progress (Slice 1 part complete 2026-09-25; Colorado line goes on the real Practice tab and baseline intro in Slices 2 and 5)
+**Status:** In Progress (Slice 1 part complete 2026-09-25; baseline intro's Colorado line complete 2026-09-28 in Slice 2; the Practice tab line lands in Slice 5)
 
 ## Story
 As a teen user,

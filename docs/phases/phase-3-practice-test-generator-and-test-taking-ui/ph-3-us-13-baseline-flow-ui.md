@@ -3,7 +3,7 @@
 **ID:** ph-3-us-13
 **Layer:** Frontend
 **Parent:** ph-3-us-12
-**Status:** In Progress (code-complete 2026-09-25, Slice 2; device test pending the published baseline. Per the 2026-09-25 decision the baseline card lives on Home, not the Practice tab, which stays a placeholder until Slice 5)
+**Status:** Complete (2026-09-28, Slice 2; device-tested on the Android emulator against dev. Per the 2026-09-25 decision the baseline card lives on Home, not the Practice tab, which stays a placeholder until Slice 5)
 
 ## Story
 As a teen user,

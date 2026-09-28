@@ -60,12 +60,15 @@ Parents closed: ph-3-us-12. (ph-3-us-14 was already delivered by Phase 1.)
 The runner is built for the baseline first, but it has to fit practice tests (Slice 5) and
 mini-quizzes (Slice 4) too; ph-3-us-4 already describes all three.
 
-**Status: Code complete (2026-09-25), device test pending.** Plan:
+**Status: Complete (2026-09-28).** Device-tested on the Android emulator against dev: start,
+all 3 sections, check-in, take a break, resume, and the placeholder results. Plan:
 `docs/superpowers/plans/2026-09-25-slice-2-baseline.md`. The baseline starts from Home and from
-onboarding; the Practice tab stays a placeholder until Slice 5. Device testing is blocked on
-content: `baselineTests/v1` isn't published, and only 21 of 45 topics have an approved question
-on dev (the `topics` catalog isn't published either). Functions need deploying to dev
-(`functions/README.md`).
+onboarding; the Practice tab stays a placeholder until Slice 5. Device testing found and fixed:
+dev functions blocked by org IAM policy (`allUsers` invoker, runtime service account needed
+`roles/datastore.user`; both now in `docs/Prod-Launch-Plan.md`), `getDb()` not initializing
+the default Admin app on cold signed-in calls, non-network errors shown as "No connection",
+and the question strip not following the current question. The results wording change it
+prompted is in Slice 3 (ph-4-us-6).
 
 ---
 
