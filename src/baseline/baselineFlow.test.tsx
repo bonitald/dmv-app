@@ -253,6 +253,18 @@ test('offline with nothing cached shows No connection; Try again retries', async
   expect(await screen.findByText('Section 1 of 3')).toBeTruthy();
 });
 
+test('a server error with nothing cached is not reported as No connection; Try again retries', async () => {
+  mockStart
+    .mockRejectedValueOnce(new CallableError('unauthenticated', 'unauthenticated', 'denied'))
+    .mockResolvedValueOnce(sectionOf(1));
+  await renderFlow();
+  await fireEvent.press(await screen.findByText('Start section 1'));
+  expect(await screen.findByText('Something went wrong')).toBeTruthy();
+  expect(screen.queryByText('No connection')).toBeNull();
+  await fireEvent.press(screen.getByText('Try again'));
+  expect(await screen.findByText('Section 1 of 3')).toBeTruthy();
+});
+
 test('a failed submit shows the error and keeps the answers', async () => {
   mockStart.mockResolvedValueOnce(sectionOf(1));
   mockScore
@@ -325,6 +337,14 @@ describe('offline and leaving (ph-3-us-1)', () => {
     await renderFlow();
     expect(await screen.findByText('Section 2 of 3')).toBeTruthy();
     expect(screen.getByLabelText('Question 1, answered')).toBeTruthy();
+  });
+
+  test('server error on reopen with a cached section: keeps going from the cache', async () => {
+    mockProgress = { status: 'in-progress', currentSection: 2, totalSections: 3 };
+    await startSession('u1', 'baseline-v1-2', 'baseline', sectionOf(2).questions);
+    mockStart.mockRejectedValueOnce(new CallableError('unknown', 'internal', 'boom'));
+    await renderFlow();
+    expect(await screen.findByText('Section 2 of 3')).toBeTruthy();
   });
 
   test('leaving mid-section asks first, and leaving keeps the session', async () => {

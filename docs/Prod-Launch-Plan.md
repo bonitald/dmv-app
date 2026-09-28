@@ -29,6 +29,18 @@ Content before that would sit unreachable; functions without content would retur
 - [ ] **Cloud Build and Artifact Registry permissions on prod.** Dev needed a Cloud Build IAM fix
       before functions would deploy (see `docs/history/LOG.md`, 2026-09-25), and prod will
       likely need the same.
+- [ ] **Org policy override so the functions can be public on prod.** The slatestack.io org
+      blocks granting anything to `allUsers` ("Domain restricted sharing",
+      `iam.allowedPolicyMemberDomains`). Callable functions need `allUsers` as Cloud Run
+      invoker: the functions check the Firebase login in their own code, because Cloud Run IAM
+      can't read Firebase tokens. Without this, every call gets a 403 before reaching our code,
+      and the app sees `UNAUTHENTICATED` (hit on dev 2026-09-27). Override the policy for
+      `dmv-app-prod` only, not the whole org. Console: project `dmv-app-prod` → IAM & Admin →
+      Organization Policies → Domain restricted sharing → Manage policy → Override parent's
+      policy → Add rule → Allow all. (If that constraint isn't enforced, check "Allowed policy
+      members", `iam.managed.allowedPolicyMembers`.) Needs the Organization Policy Administrator
+      role on the org. Do this **before** step 2, so the functions deploy can set the invoker
+      itself.
 - [ ] **Anonymous Authentication enabled** in the prod console (Authentication → Sign-in method).
       The app signs every user in anonymously on first launch. If this is off, the app can't
       start.
@@ -77,6 +89,44 @@ Functions run in `us-central1`:
 - Before deploying, run the functions tests locally with `npm run test:functions`.
 - Deploy functions **before** the prod app build is used, so the callables exist when the app
   first calls them.
+
+### After deploying: service account and invoker permissions
+
+The slatestack.io org turns off Google's automatic Editor grant for default service accounts.
+So on a fresh project the functions deploy fine but can't read Firestore (`PERMISSION_DENIED`
+in the function logs, `INTERNAL` in the app). Both fixes were needed on dev on 2026-09-27.
+
+- [ ] **Give the functions' runtime service account Firestore access.** The functions run as the
+      default compute service account and only use Firestore, so grant just Cloud Datastore
+      User, not Editor. Use the prod project number from step 0:
+
+  ```bash
+  gcloud projects add-iam-policy-binding dmv-app-prod --member=serviceAccount:<PROD_PROJECT_NUMBER>-compute@developer.gserviceaccount.com --role=roles/datastore.user
+  ```
+
+  Confirm the account the functions actually run as:
+  `gcloud run services describe scoretest --region us-central1 --project dmv-app-prod --format="value(spec.template.spec.serviceAccountName)"`.
+
+- [ ] **Check the functions are publicly invokable.** The deploy sets this when the org policy
+      override (step 0) is in place. If it didn't, grant it per function (Cloud Run service
+      names are lowercase):
+
+  ```bash
+  gcloud run services add-iam-policy-binding startorresumebaseline --region=us-central1 --member=allUsers --role=roles/run.invoker --project=dmv-app-prod
+  gcloud run services add-iam-policy-binding scoretest --region=us-central1 --member=allUsers --role=roles/run.invoker --project=dmv-app-prod
+  gcloud run services add-iam-policy-binding assembletest --region=us-central1 --member=allUsers --role=roles/run.invoker --project=dmv-app-prod
+  gcloud run services add-iam-policy-binding assembleminiquiz --region=us-central1 --member=allUsers --role=roles/run.invoker --project=dmv-app-prod
+  gcloud run services add-iam-policy-binding getflashcards --region=us-central1 --member=allUsers --role=roles/run.invoker --project=dmv-app-prod
+  ```
+
+- [ ] **Smoke-check each function without logging in.** The expected result is HTTP 401 with the
+      function's own `"requires a signed-in caller"` message. That means the call reached our
+      code, and our login check turned it away. An HTML **403 Forbidden** page means the invoker
+      grant is still missing.
+
+  ```bash
+  curl -s -X POST -H "Content-Type: application/json" -d '{"data":{}}' https://us-central1-dmv-app-prod.cloudfunctions.net/startOrResumeBaseline
+  ```
 
 ## 3. Question content: dev → prod snapshot (managed export/import)
 
@@ -173,3 +223,4 @@ Always pass `--collection-ids` on both the export and the import. Without it, th
 | Date | What was done | By |
 |---|---|---|
 | 2026-09-27 | Plan written; nothing run against prod yet | Eldy / Claude |
+| 2026-09-27 | Added org policy override (step 0) and post-deploy service account / invoker permissions with a smoke check (step 2), learned from dev | Eldy / Claude |

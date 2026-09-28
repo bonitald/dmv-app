@@ -71,7 +71,7 @@ on dev (the `topics` catalog isn't published either). Functions need deploying t
 
 ## Slice 3 — Results
 
-**Test:** finish the baseline → results show N of 45 and all 45 topics as Got it / Missed it →
+**Test:** finish the baseline → results show the percentage, N of 45 and how that tracks against the 80% pass mark, plus all 45 topics as Got it / Missed it →
 "Review answers" shows every question with the right answer → tapping a topic or "Start with
 what you missed" goes to the concept-list stub.
 

@@ -1,7 +1,7 @@
-import { Alert } from 'react-native';
+import { Alert, ScrollView } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { QuizQuestion } from '../api/types';
-import { QuizRunner, type QuizRunnerProps } from './QuizRunner';
+import { QuizRunner, stripScrollX, type QuizRunnerProps } from './QuizRunner';
 
 const questions: QuizQuestion[] = [
   { id: 'q1', text: 'First question?', choices: ['Yes', 'No'], type: 'fact', chunkId: 'c1', conceptId: 'k1' },
@@ -142,4 +142,33 @@ test('question strip chips meet the 48pt touch-target minimum', async () => {
   const size = chip.props.style.width ?? chip.props.style.find?.((x: any) => x?.width)?.width;
   const slop = chip.props.hitSlop;
   expect(size + 2 * (typeof slop === 'number' ? slop : slop.left)).toBeGreaterThanOrEqual(48);
+});
+
+describe('question strip follows the current question', () => {
+  // Chips are 36 wide with an 8 gap, so chip i starts at 44 * i and its centre is at 44 * i + 18.
+  // 15 chips span 15 * 36 + 14 * 8 = 652.
+  test('centres the current chip in the visible strip', () => {
+    expect(stripScrollX(8, 15, 300)).toBe(44 * 8 + 18 - 150);
+  });
+
+  test('never scrolls before the first chip or past the last', () => {
+    expect(stripScrollX(0, 15, 300)).toBe(0);
+    expect(stripScrollX(14, 15, 300)).toBe(652 - 300);
+    expect(stripScrollX(1, 2, 300)).toBe(0);
+  });
+
+  test('scrolls the strip when the user moves to the next question', async () => {
+    const scrollTo = jest.spyOn(ScrollView.prototype, 'scrollTo').mockImplementation(() => {});
+    const many: QuizQuestion[] = Array.from({ length: 15 }, (_, i) => ({
+      ...questions[0],
+      id: `q${i + 1}`,
+    }));
+    await setup({ questions: many });
+    await fireEvent(screen.getByTestId('question-strip'), 'layout', {
+      nativeEvent: { layout: { width: 300, height: 44, x: 0, y: 0 } },
+    });
+    for (let i = 0; i < 8; i++) await fireEvent.press(screen.getByText('Next'));
+
+    expect(scrollTo).toHaveBeenLastCalledWith({ x: stripScrollX(8, 15, 300), animated: true });
+  });
 });

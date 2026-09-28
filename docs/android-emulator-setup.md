@@ -58,13 +58,13 @@ emulator -list-avds
 emulator -avd Android-Medium-Phone
 
 # Launch in the background so the terminal stays free
-Start-Process "$env:ANDROID_HOME\emulator\emulator.exe" -ArgumentList "-avd Medium_Phone_API_36"
+Start-Process "$env:ANDROID_HOME\emulator\emulator.exe" -ArgumentList "-avd Android-Medium-Phone"
 ```
 
 If `emulator` isn't on your PATH, use the full path:
 
 ```powershell
-& "$env:ANDROID_HOME\emulator\emulator.exe" -avd Medium_Phone_API_36
+& "$env:ANDROID_HOME\emulator\emulator.exe" -avd Android-Medium-Phone
 ```
 
 Keep the emulator running throughout your dev session.
@@ -195,6 +195,24 @@ If the bundler shows stale module errors after a native rebuild:
 ```powershell
 npx expo start --clear
 ```
+
+---
+
+### Emulator stuck booting / `adb devices` shows `offline`
+
+The emulator resumed from a stale or corrupt Quick Boot snapshot (common after an unclean shutdown) and hung. Close the emulator window, reset adb, and cold boot without loading the snapshot:
+
+```powershell
+Stop-Process -Name "qemu-system-x86_64","emulator" -Force -ErrorAction SilentlyContinue
+adb kill-server
+emulator -avd Android-Medium-Phone -no-snapshot-load -gpu host
+```
+
+Confirm it's up with `adb devices` (should show `device`, not `offline`) or `adb shell getprop sys.boot_completed` (returns `1`).
+
+If this keeps happening, disable Quick Boot: Android Studio → Device Manager → edit device → Show Advanced Settings → Boot option → **Cold boot**.
+
+Also check that the AVD renders with the GPU, not the CPU. In `%USERPROFILE%\.android\avd\<avd-name>.avd\config.ini`, set `hw.gpu.mode=host` (`software` is very slow, especially on API 36+ images).
 
 ---
 

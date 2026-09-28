@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { QuizQuestion } from '../api/types';
 import { Button } from '../components/Button';
@@ -124,6 +124,21 @@ export function QuizRunner({
   );
 }
 
+const CHIP_SIZE = 36;
+const CHIP_GAP = spacing.space2;
+
+/**
+ * How far to scroll the question strip so the current chip sits in the middle of the visible
+ * part, clamped to the strip's ends. Without this the current chip drifts off-screen once a
+ * test has more questions than fit across (from about question 9 on a phone).
+ */
+export function stripScrollX(current: number, count: number, viewportWidth: number): number {
+  const contentWidth = count * CHIP_SIZE + (count - 1) * CHIP_GAP;
+  const maxX = Math.max(0, contentWidth - viewportWidth);
+  const centred = current * (CHIP_SIZE + CHIP_GAP) + CHIP_SIZE / 2 - viewportWidth / 2;
+  return Math.min(maxX, Math.max(0, centred));
+}
+
 function QuestionStrip({
   questions,
   answers,
@@ -135,8 +150,23 @@ function QuestionStrip({
   current: number;
   onJump: (index: number) => void;
 }) {
+  const scrollRef = useRef<ScrollView>(null);
+  const [viewportWidth, setViewportWidth] = useState(0);
+
+  // Keep the current chip in view as the user moves through the questions.
+  useEffect(() => {
+    if (viewportWidth === 0) return;
+    scrollRef.current?.scrollTo({
+      x: stripScrollX(current, questions.length, viewportWidth),
+      animated: true,
+    });
+  }, [current, questions.length, viewportWidth]);
+
   return (
     <ScrollView
+      ref={scrollRef}
+      testID="question-strip"
+      onLayout={(e) => setViewportWidth(e.nativeEvent.layout.width)}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.strip}
@@ -175,10 +205,10 @@ function Banner({ text }: { text: string }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.space5, gap: spacing.space3 },
-  strip: { gap: spacing.space2, paddingVertical: spacing.space1 },
+  strip: { gap: CHIP_GAP, paddingVertical: spacing.space1 },
   chip: {
-    width: 36,
-    height: 36,
+    width: CHIP_SIZE,
+    height: CHIP_SIZE,
     borderRadius: radius.pill,
     borderWidth: 1,
     borderColor: colors.line,

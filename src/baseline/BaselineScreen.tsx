@@ -31,7 +31,8 @@ type Phase =
   | { kind: 'check-in'; section: number; totalSections: number }
   | { kind: 'complete'; correctCount: number | null; totalCount: number | null }
   | { kind: 'unavailable' }
-  | { kind: 'offline' };
+  | { kind: 'offline' }
+  | { kind: 'error' };
 
 const CACHE_WARNING =
   "This section can't be saved on your phone. Stay connected until you submit.";
@@ -111,7 +112,9 @@ export function BaselineScreen() {
           initialAnswers: active.answers,
         });
       } else {
-        setPhase({ kind: 'offline' });
+        // Only a network failure says "No connection"; anything else (e.g. the server refusing
+        // the call) would send the user off to check a connection that's fine.
+        setPhase({ kind: error.kind === 'offline' ? 'offline' : 'error' });
       }
     }
   }, [uid]);
@@ -254,6 +257,14 @@ export function BaselineScreen() {
       return (
         <NoConnection
           message="The baseline needs a connection to load. Check your connection and try again."
+          onRetry={() => void load()}
+        />
+      );
+    case 'error':
+      return (
+        <NoConnection
+          title="Something went wrong"
+          message="We couldn't load the baseline. Try again in a moment."
           onRetry={() => void load()}
         />
       );
