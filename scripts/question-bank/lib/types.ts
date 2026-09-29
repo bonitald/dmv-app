@@ -52,6 +52,11 @@ export interface QuestionInput {
   choices: string[];
   correctAnswer: string;
   selfCheck: QuestionSelfCheck;
+  /**
+   * Optional short, paraphrased "why" shown when reviewing a graded question (ph-4-us-3). Never
+   * sent before grading. prd.md Section 8's no-verbatim rule applies.
+   */
+  explanation?: string;
 }
 
 export interface QuestionRecord extends QuestionInput {

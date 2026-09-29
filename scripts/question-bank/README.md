@@ -90,6 +90,11 @@ Input JSON shape (array of questions — write all of one chunk's questions in a
 otherwise. Nothing written by this script is ever `approved` — that only happens via human
 review in the Firebase console.
 
+A question may also carry an optional `explanation`: a short, paraphrased "why" (no verbatim
+handbook text), shown only in the review after a test is graded (ph-4-us-3). It must be a
+non-empty string when present. None exist yet; writing them for the bank is an unscheduled
+content task.
+
 When reviewing, also reject (or flag) any question that depends on another state's rule, or on
 general or federal information that contradicts Colorado law. The app is Colorado-only and has
 no state selector (ph-3-us-11).

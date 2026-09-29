@@ -56,6 +56,30 @@ describe('writeQuestions', () => {
     expect(flagged?.createdAt).toBeDefined();
   });
 
+  it('stores an explanation only when the question has one', async () => {
+    const conceptId = uniqueConceptId();
+    const base = {
+      conceptId,
+      chunkId: 'c1',
+      sourceRef: 'p.5',
+      type: 'fact',
+      choices: ['Red', 'Yellow'],
+      correctAnswer: 'Red',
+      selfCheck: { passed: true, notes: '' },
+    };
+    const filePath = writeTempJson([
+      { ...base, text: 'With', explanation: 'Why' },
+      { ...base, text: 'Without' },
+    ]);
+
+    await writeQuestions(filePath);
+
+    const snap = await getDb().collection('questions').where('conceptId', '==', conceptId).get();
+    const byText = Object.fromEntries(snap.docs.map((d) => [d.data().text, d.data()]));
+    expect(byText.With.explanation).toBe('Why');
+    expect(byText.Without).not.toHaveProperty('explanation');
+  });
+
   it('rejects an invalid questions file without writing anything', async () => {
     const conceptId = uniqueConceptId();
     const filePath = writeTempJson([{ conceptId }]);
