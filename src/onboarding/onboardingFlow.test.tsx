@@ -115,7 +115,7 @@ describe('Home (ph-9-us-7 / ph-9-us-5)', () => {
 
   test('the test card shows Baseline done once it is complete', async () => {
     mockProfile = { onboarding: { choice: 'baseline' }, testDate: null };
-    mockBaselineProgress = { status: 'complete' };
+    mockBaselineProgress = { status: 'complete', version: 'v1' };
     await render(<RootNavigator initialRoute="Main" />);
     expect(await screen.findByText('Baseline done')).toBeTruthy();
   });

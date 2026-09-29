@@ -44,7 +44,7 @@ function TestCard() {
         icon="checkmark-circle-outline"
         eyebrow="BASELINE"
         title="Baseline done"
-        body="See how you did on each part of the handbook."
+        body="See your score and what to work on first."
         onPress={open}
       />
     );

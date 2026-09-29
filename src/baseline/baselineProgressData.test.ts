@@ -4,9 +4,16 @@ test('no doc means not started', () => {
   expect(toBaselineProgress(undefined)).toEqual({ status: 'not-started' });
 });
 
-test('a doc with completedAt is complete', () => {
+test('a doc with completedAt is complete, with its version', () => {
+  expect(
+    toBaselineProgress({ currentSection: 3, completedAt: { seconds: 1 }, version: 'v2' })
+  ).toEqual({ status: 'complete', version: 'v2' });
+});
+
+test('a complete doc with no version falls back to v1', () => {
   expect(toBaselineProgress({ currentSection: 3, completedAt: { seconds: 1 } })).toEqual({
     status: 'complete',
+    version: 'v1',
   });
 });
 
