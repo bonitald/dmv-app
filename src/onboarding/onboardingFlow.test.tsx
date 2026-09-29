@@ -30,6 +30,10 @@ jest.mock('../baseline/useBaselineProgress', () => ({
   useBaselineProgress: () => mockBaselineProgress,
 }));
 jest.mock('../network/useIsOnline', () => ({ useIsOnline: () => true }));
+jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ status: 'loading' }) }));
+jest.mock('../review/useTestAttempt', () => ({
+  useTestAttempt: () => ({ status: 'loading', retry: jest.fn() }),
+}));
 jest.mock('../api/callables', () => ({
   startOrResumeBaseline: jest.fn(() => new Promise(() => {})),
   scoreTest: jest.fn(),
