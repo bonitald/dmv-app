@@ -10,6 +10,7 @@ import { colors, typography } from '../theme/tokens';
 import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 import { BaselineScreen } from '../baseline/BaselineScreen';
 import { HomeScreen } from '../home/HomeScreen';
+import { ReviewScreen } from '../review/ReviewScreen';
 import { SettingsScreen } from '../settings/SettingsScreen';
 import { WelcomeScreen } from '../onboarding/WelcomeScreen';
 import { ChoiceScreen } from '../onboarding/ChoiceScreen';
@@ -21,7 +22,7 @@ import type { HomeStackParamList, RootStackParamList, RootTabParamList } from '.
 export type { RootTabParamList } from './types';
 
 // ph-0-us-8 / ph-9-us-3 / ph-9-us-7: a root stack holds onboarding, then `Main` (the tabs), plus
-// full-screen flows above the tabs (Baseline, the test date editor). Each tab is its own stack
+// full-screen flows above the tabs (Baseline, Review, the test date editor). Each tab is its own stack
 // so later slices can push nested screens without restructuring this file.
 
 const headerOptions: NativeStackNavigationOptions = {
@@ -152,6 +153,11 @@ export function RootNavigator({ initialRoute }: { initialRoute: InitialRoute }) 
           name="Baseline"
           component={BaselineScreen}
           options={{ title: 'Baseline' }}
+        />
+        <RootStack.Screen
+          name="Review"
+          component={ReviewScreen}
+          options={{ title: 'Review answers' }}
         />
         <RootStack.Screen
           name="TestDateEditor"
