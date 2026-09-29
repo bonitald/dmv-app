@@ -3,7 +3,7 @@
 **ID:** ph-4-us-4
 **Layer:** Frontend
 **Parent:** ph-4-us-2
-**Status:** Not Started
+**Status:** In Progress (baseline review code complete, Slice 3, 2026-09-29; dev deploy and device test pending. Entry points from practice results, mini-quiz results and missed questions come with Slices 4b/5)
 
 ## Story
 As a teen user,
@@ -23,27 +23,31 @@ So that I can see exactly where I went wrong and learn the right answer.
 - Uses the quiz question card from ph-3-us-4 in a read-only "review" state: the user's choice and
   the correct choice are marked; this is where the Scenario question card mockup's answer
   feedback states and explanation panel belong (`docs/design/mockups.md`).
+- **Built in Slice 3** as a generic root-stack route `Review: { testId }` (`src/review/ReviewScreen.tsx`)
+  that reads `users/{uid}/testAttempts/{testId}` itself, so practice tests and mini-quizzes reuse
+  it. "Study this concept" goes through `src/navigation/openConcept.ts`, which opens the Study
+  tab until Slice 4a gives it the topic's flashcards.
 - When there's no explanation, the fallback is the handbook topic (`chunkId` → `topics` title),
   with a link to study that concept's flashcards (ph-2-us-3).
 
 ## Acceptance Criteria
-- [ ] Given the user opens a review, when it loads, then the first question shows its text, all
+- [x] Given the user opens a review, when it loads, then the first question shows its text, all
   choices, the user's choice marked right or wrong, and the correct choice highlighted.
-- [ ] Given the user skipped a question, when it's reviewed, then it shows "Not answered" and the
+- [x] Given the user skipped a question, when it's reviewed, then it shows "Not answered" and the
   correct choice.
-- [ ] Given a question has an `explanation`, when it's reviewed, then the explanation panel shows
+- [x] Given a question has an `explanation`, when it's reviewed, then the explanation panel shows
   it.
-- [ ] Given a question has no explanation, when it's reviewed, then it shows "From the handbook:
+- [x] Given a question has no explanation, when it's reviewed, then it shows "From the handbook:
   <topic title>" with a "Study this concept" link to that topic's flashcards.
-- [ ] Given a review, when the user switches "Missed only" on, then only wrong and skipped
+- [x] Given a review, when the user switches "Missed only" on, then only wrong and skipped
   questions are shown, and it's the default when there's at least one miss.
-- [ ] Given a question is `unavailable`, when it's reviewed, then it shows "This question was
+- [x] Given a question is `unavailable`, when it's reviewed, then it shows "This question was
   removed" and isn't counted.
-- [ ] Given a baseline that's still in progress, when its attempts are opened, then no review is
+- [x] Given a baseline that's still in progress, when its attempts are opened, then no review is
   offered (answers are held back until the baseline is complete).
-- [ ] Given a scenario question, when it's reviewed, then it keeps the scenario treatment
+- [x] Given a scenario question, when it's reviewed, then it keeps the scenario treatment
   (ph-2-us-5).
-- [ ] Given the device is offline, when the user opens a past attempt's review, then it loads
+- [x] Given the device is offline, when the user opens a past attempt's review, then it loads
   from Firestore's local cache if it was loaded before, or shows the no-connection state.
 
 ## UI/UX Notes
@@ -64,10 +68,10 @@ So that I can see exactly where I went wrong and learn the right answer.
   unavailable"; offline with nothing cached.
 
 ## Tasks
-- [ ] Add a "review" state to the quiz question card (marked choices, explanation panel).
-- [ ] Build the review screen (navigation, question strip, missed-only filter).
-- [ ] Load from a `scoreTest` result or a `testAttempts` doc (including `baselineReview`).
-- [ ] Topic-title fallback and "Study this concept" navigation into the Study tab.
+- [x] Add a "review" state to the quiz question card (marked choices, explanation panel).
+- [x] Build the review screen (navigation, question strip, missed-only filter).
+- [x] Load from a `scoreTest` result or a `testAttempts` doc (including `baselineReview`).
+- [x] Topic-title fallback and "Study this concept" navigation into the Study tab.
 
 ## Questions
 None outstanding.

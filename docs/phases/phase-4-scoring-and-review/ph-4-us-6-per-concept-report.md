@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-6
 **Layer:** Parent
-**Status:** Not Started
+**Status:** In Progress (baseline results part code complete, Slice 3, 2026-09-29; dev deploy and device test pending. Concept report is Slice 4b; practice "Topics to work on" is Slice 5a)
 
 ## Story
 As a teen user,
@@ -37,10 +37,10 @@ For each topic, use the most specific evidence available:
 Every label is shown as indicative ("based on N answers").
 
 ## Acceptance Criteria
-- [ ] Given the user completes the baseline, when section 3 is graded, then the baseline results
+- [x] Given the user completes the baseline, when section 3 is graded, then the baseline results
   screen shows the overall score (N of 45) and all 45 topics in handbook order, each marked Got
   it or Missed it, with a note that one question per topic is only a rough guide.
-- [ ] Given the baseline results screen, when it shows the overall score, then it leads with the
+- [x] Given the baseline results screen, when it shows the overall score, then it leads with the
   percentage and the count ("82% — 37 of 45 right") and says how that tracks against the real
   test's 80% pass mark, without the words "pass" or "fail" (the baseline is one question per
   topic, not the real 25-question test). At or above `PASS_MARK`, e.g. "The real test needs 80%.
@@ -48,9 +48,10 @@ Every label is shown as indicative ("based on N answers").
   "The real test needs 80%. Here's where to focus first", leading into the topic list. Uses the
   same `PASS_MARK` as practice results (ph-4-us-1). (Added 2026-09-28 after device-testing
   Slice 2: "37 of 45" alone didn't tell the user how they were doing.)
-- [ ] Given the baseline results screen, when the user taps a topic, then that concept's
-  flashcards open (ph-2-us-3). A "Start with what you missed" button opens the first missed topic.
-- [ ] Given the baseline results screen, when the user taps "Review answers", then the 45-question
+- [x] Given the baseline results screen, when the user taps a topic, then that concept's
+  flashcards open (ph-2-us-3). *(Slice 3: opens the Study tab stub via `openConcept`; Slice 4a
+  points it at the flashcards.)* A "Start with what you missed" button opens the first missed topic.
+- [x] Given the baseline results screen, when the user taps "Review answers", then the 45-question
   review opens (ph-4-us-4).
 - [ ] Given the user has later mini-quiz or practice-test results, when they open the concept
   report (Progress tab), then each topic shows strong / shaky / likely gap per the rule above,
@@ -96,7 +97,7 @@ Every label is shown as indicative ("based on N answers").
   tested with `npm run test:app`.
 - [ ] Add an evidence loader combining the baseline attempt, Concept Progress and recent practice
   attempts.
-- [ ] Build the baseline results screen (replacing ph-3-us-13's placeholder), including the
+- [x] Build the baseline results screen (replacing ph-3-us-13's placeholder), including the
   "how you're tracking" line. If ph-4-us-1 hasn't landed yet, add the shared `PASS_MARK` here
   and let ph-4-us-1 reuse it.
 - [ ] Build the concept report on the Progress tab (replacing its `PlaceholderScreen`), with sort

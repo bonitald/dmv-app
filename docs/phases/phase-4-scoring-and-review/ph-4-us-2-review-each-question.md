@@ -3,7 +3,7 @@
 **ID:** ph-4-us-2
 **Layer:** Parent
 **Children:** ph-4-us-3 (Backend), ph-4-us-4 (Frontend)
-**Status:** Not Started
+**Status:** In Progress (baseline review code complete, Slice 3, 2026-09-29; dev deploy and device test pending. Practice-test and mini-quiz review entry points come with Slices 5/4b)
 
 ## Story
 As a teen user,
@@ -31,9 +31,9 @@ So that I understand why I got things wrong and do better next time.
 - [ ] Given a completed practice test or mini-quiz, when the user opens its review (right after
   or later from history), then every question shows its text, all choices, the user's answer,
   and the correct answer.
-- [ ] Given a question has an explanation, when it's reviewed, then the explanation shows. Given
+- [x] Given a question has an explanation, when it's reviewed, then the explanation shows. Given
   it has none, then the review points to the handbook topic it comes from instead.
-- [ ] Given a baseline in progress, when the user looks for a review, then none is offered until
+- [x] Given a baseline in progress, when the user looks for a review, then none is offered until
   the baseline is complete. After that, all 45 questions can be reviewed.
 
 ## Dependencies

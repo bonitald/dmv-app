@@ -94,6 +94,14 @@ with strong / shaky / likely gap needs mini-quiz data, so it's in Slice 4b. The 
 Baseline attempts made while testing Slice 2 don't carry question text. Test this slice with a
 fresh anonymous user (clear app data).
 
+**Status: Code complete (2026-09-29), on `feat/results`.** Plan:
+`docs/superpowers/plans/2026-09-28-slice-3-results.md`. Functions 66/66, question bank 47/47, app
+81/81, components 76/76. Still to do: deploy `scoreTest` to dev (Firebase CLI login had expired)
+and device-test the line above. Decided during implementation: attempts also save each
+question's `type` (scenario badge in review); the baseline review shows choices in the seeded
+order the user saw; topic links open the Study tab through one `openConcept` helper that Slice 4a
+repoints at flashcards.
+
 ---
 
 ## Slice 4 — Learning path

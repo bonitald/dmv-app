@@ -60,3 +60,6 @@
 
 ### 2026-09-28
 - **Slice 2 (baseline) complete**: device-tested on the Android emulator against dev (start, 3 sections, check-in, break, resume, placeholder results). ph-3-us-12/13 Complete; ph-3-us-1/4 baseline parts complete (practice-test and mini-quiz parts wait for Slices 5/4b); ph-3-us-11 baseline intro line done; build-order.md and the Phase 3 summary updated. Next: Slice 3 (results): ph-4-us-3 (`scoreTest` saves question text), ph-4-us-4 (review screen), ph-4-us-6 (baseline results with the pass-mark tracking line).
+
+### 2026-09-29
+- **Slice 3 (results) code complete** on `feat/results`: `scoreTest` saves each question's text, choices (baseline in the seeded order shown), type and optional `explanation` (new optional question-bank field); generic `Review` screen (missed-only default, explanation or "From the handbook" fallback, removed/old-attempt states); quiz card review state; baseline results screen (percentage, N of 45, 80% tracking line without pass/fail, Got it / Missed it per topic, reopen loads the final attempt). Functions 66/66, question bank 47/47, app 81/81, components 76/76. Next: `firebase login --reauth`, deploy functions to dev, device-test Slice 3 with cleared app data.
