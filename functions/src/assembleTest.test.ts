@@ -145,4 +145,11 @@ describe('assembleTestForUser', () => {
     expect(assignment.questionIds.sort()).toEqual(result.questions.map((q) => q.id).sort());
     expect(assignment.createdAt).toBeDefined();
   });
+
+  test('never returns explanation', async () => {
+    await seedQuestion('q1', { explanation: 'Because a.' });
+    const result = await assembleTestForUser(db, { uid: 'alice-uid' }, { count: 1 });
+    expect(result.questions[0]).not.toHaveProperty('explanation');
+    expect(JSON.stringify(result)).not.toContain('Because a.');
+  });
 });

@@ -146,4 +146,11 @@ describe('assembleMiniQuizForUser', () => {
 
     expect(result.questions.map((q) => q.id)).toEqual(['q1']);
   });
+
+  test('never returns explanation', async () => {
+    await seedQuestion('q1', { explanation: 'Because a.' });
+    const result = await assembleMiniQuizForUser(db, { uid: 'alice-uid' }, { chunkId: 'right-of-way', count: 1 });
+    expect(result.questions[0]).not.toHaveProperty('explanation');
+    expect(JSON.stringify(result)).not.toContain('Because a.');
+  });
 });

@@ -190,7 +190,7 @@ causing an error. Malformed answer entries are ignored.
   "correctCount": 12,
   "totalCount": 15,
   "perTopic": [{ "chunkId": "right-of-way", "correct": 3, "total": 4 }],
-  "perQuestion": [{ "questionId": "...", "chunkId": "...", "choice": "... | null if skipped", "correctAnswer": "...", "correct": false }],
+  "perQuestion": [{ "questionId": "...", "chunkId": "...", "choice": "... | null if skipped", "correctAnswer": "...", "correct": false, "text": "...", "choices": ["..."], "type": "fact | scenario", "explanation": "... (only when present)" }],
   "recommendation": "move-on | review-again | null"
 }
 ```
@@ -198,18 +198,29 @@ causing an error. Malformed answer entries are ignored.
 answer, so the app can show what the student missed. Answers are revealed only after grading,
 only for questions this user was assigned, and each session can be graded only once.
 
+Each entry also carries the question's `text`, `choices` and `type` (ph-4-us-3), so a past
+attempt can be reviewed from the attempt doc alone; clients can't read `questions`. Baseline
+choices are saved in the seeded order the user was shown (`baselineChoices` in `shuffle.ts`,
+shared with `startOrResumeBaseline`); practice-test and mini-quiz choices are in stored order,
+since their shuffle isn't recorded. `explanation` is included only when the question has a
+non-empty one. It is never sent on a baseline section before the last, and never by
+`assembleTest`, `assembleMiniQuiz`, `getFlashcards` or `startOrResumeBaseline` (it would give
+answers away before grading).
+
 If an assigned question was deleted from the bank before grading, it's listed in `perQuestion`
-with `unavailable: true` (and `chunkId`/`correctAnswer`/`correct` null) and left out of
+with `unavailable: true` (and `chunkId`/`correctAnswer`/`correct`/`text`/`choices`/`type` null) and left out of
 `totalCount` and the score, so the student isn't marked down for it. Retire questions with a
 non-`approved` status instead of deleting them where possible.
 
 **Baseline answers are held back until the whole baseline is complete.** Every user takes the
 same 45 questions, so revealing section 1's answers early would let them be shared. For each
-section before the last, `perQuestion` has `correctAnswer: null` and `correct: null` — in the
+section before the last, `perQuestion` has `correctAnswer: null` and `correct: null`, and no
+`explanation` — in the
 response and in the saved attempt (which the client can read). Per-topic totals and the score
 are still returned; because the baseline has one question per topic, those totals do show
 right/wrong per question, just not the correct answer. Scoring the last section adds `baselineReview`: every question from all sections, in
-baseline order, with the student's choice, the correct answer and whether it was right —
+baseline order, with the question's text, choices and explanation, the student's choice, the
+correct answer and whether it was right —
 rebuilt from the choices saved on each earlier section's attempt.
 
 **How each type is graded** — always against a server-side record, never question IDs the client
@@ -230,7 +241,8 @@ product decision.** `null` for practice tests and baseline sections.
 **Persistence**: writes `users/{uid}/testAttempts/{testId}` — `{ type, chunkId (topic for a
 mini-quiz, or for a practice test whose questions all share one; otherwise null), score,
 correctCount, totalCount, perTopic, perQuestion, recommendation, createdAt }`, plus
-`baselineReview` on the final baseline section's attempt. Clients can read attempts but
+`baselineReview` on the final baseline section's attempt. `perQuestion` and `baselineReview`
+entries include the question content described above. Clients can read attempts but
 never write them.
 
 **Errors**: `invalid-argument` (missing `testId`, non-array `answers`, malformed baseline

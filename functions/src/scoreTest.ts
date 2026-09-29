@@ -1,6 +1,7 @@
 import { FieldValue, type Firestore } from 'firebase-admin/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { getDb } from './adminApp';
+import { baselineChoices } from './shuffle';
 
 /**
  * Mini-quiz score (0-1) at or above which the student is told to move on to the next topic;
@@ -46,6 +47,24 @@ export interface PerQuestionResult {
    * still reveal right/wrong per question, since the baseline has one question per topic.
    */
   correct: boolean | null;
+  /**
+   * The question as the student saw it, saved so a past attempt can be reviewed without reading
+   * `questions` (which clients can't). Null only when unavailable (ph-4-us-3).
+   */
+  text: string | null;
+  /**
+   * The choices in the order the student saw them for the baseline (see baselineChoices); stored
+   * order for practice tests and mini-quizzes, whose shuffle isn't recorded. Null only when
+   * unavailable.
+   */
+  choices: string[] | null;
+  /** 'fact' or 'scenario', so the review can keep the scenario treatment. Null only when unavailable. */
+  type: 'fact' | 'scenario' | null;
+  /**
+   * The question's short "why", when it has one. Left out while answers are withheld (it would
+   * give the answer away) and when the stored value isn't a non-empty string.
+   */
+  explanation?: string;
   /**
    * Present (true) when the question was deleted from the bank after it was assigned. It isn't
    * graded and doesn't count toward totalCount or the score.
@@ -116,9 +135,12 @@ function validateInput(input: ScoreTestInput): { testId: string; answers: Answer
  * Only `questionIds` (always taken from a server-side record) are graded. Answers for any other
  * question ID are ignored, so a client can't pad its score by submitting extra questions.
  *
+ * Inputs:   questionIds — server-recorded IDs to grade; answers — the submission;
+ *           orderChoices — how to order each question's saved choices (the baseline passes
+ *           baselineChoices so review matches what was shown); defaults to stored order
  * Returns:  correctCount; gradedCount (excludes questions deleted since assignment, which are
  *           listed in perQuestion as `unavailable`); perTopic breakdown; perQuestion results in
- *           `questionIds` order;
+ *           `questionIds` order, each with the question's text, choices, type and explanation;
  *           attemptChunkId — the single topic every question belongs to, or null when they
  *           span several topics
  * Reads:    `questions/{id}` for each ID
@@ -127,7 +149,8 @@ function validateInput(input: ScoreTestInput): { testId: string; answers: Answer
 async function gradeQuestions(
   db: Firestore,
   questionIds: string[],
-  answers: AnswerInput[]
+  answers: AnswerInput[],
+  orderChoices: (questionId: string, choices: string[]) => string[] = (_id, choices) => choices
 ): Promise<{
   correctCount: number;
   gradedCount: number;
@@ -157,6 +180,9 @@ async function gradeQuestions(
         choice: submitted,
         correctAnswer: null,
         correct: null,
+        text: null,
+        choices: null,
+        type: null,
         unavailable: true,
       });
       continue;
@@ -178,6 +204,15 @@ async function gradeQuestions(
       choice: submitted,
       correctAnswer: data.correctAnswer,
       correct,
+      // Saved so a past attempt can be reviewed without reading `questions`, which clients
+      // can't. This exposes nothing new: the user was just shown this question.
+      text: data.text,
+      choices: orderChoices(doc.id, data.choices),
+      type: data.type,
+      // Only real text is sent; a malformed value is dropped rather than shown.
+      ...(typeof data.explanation === 'string' && data.explanation.trim() !== ''
+        ? { explanation: data.explanation }
+        : {}),
     });
 
     const topic = perTopicMap.get(chunkId) ?? { chunkId, correct: 0, total: 0 };
@@ -259,8 +294,9 @@ async function scoreAssignedTest(
  * Grades one baseline section and advances the user's baseline progress.
  *
  * Reads:    `users/{uid}/baseline/progress`, `baselineTests/{version}`, `questions/{id}`
- * Returns:  per-question results with answers withheld (null) until the last section; the
- *           last section also returns `baselineReview` with every section's answers
+ * Returns:  per-question results (question text, choices in the order shown, type) with answers
+ *           and explanations withheld until the last section; the last section also returns
+ *           `baselineReview` with every section's answers and explanations revealed
  * Writes:   `users/{uid}/testAttempts/{testId}`; `users/{uid}/baseline/progress` — moves
  *           `currentSection` forward, or on the last section sets `completedAt` and
  *           `freeTestUsedAt` (the baseline is the user's one free full test)
@@ -309,17 +345,19 @@ async function scoreBaselineSection(
 
     const sections: { section: number; questionIds: string[] }[] = baselineSnap.data()!.sections;
     const sectionDef = sections.find((s) => s.section === section)!;
-    const { correctCount, gradedCount, perTopic, perQuestion: graded } = await gradeQuestions(db, sectionDef.questionIds, answers);
+    const { correctCount, gradedCount, perTopic, perQuestion: graded } = await gradeQuestions(db, sectionDef.questionIds, answers, baselineChoices);
     const totalCount = gradedCount;
     const score = totalCount === 0 ? 0 : correctCount / totalCount;
     const isLastSection = section >= sections.length;
 
     // Every user takes the same baseline, so answers stay hidden until the user has finished it:
     // otherwise section 1's answers could be passed to someone who hasn't taken it yet. The
-    // attempt doc is client-readable, so it must not hold them either.
+    // attempt doc is client-readable, so it must not hold them either. The explanation is
+    // dropped too: it would give the answer away. Text and choices stay, since the user just
+    // saw them.
     const perQuestion = isLastSection
       ? graded
-      : graded.map((q) => ({ ...q, correctAnswer: null, correct: null }));
+      : graded.map(({ explanation: _withheld, ...q }) => ({ ...q, correctAnswer: null, correct: null }));
 
     // On the last section, reveal everything: re-grade all sections using the choices saved on
     // each earlier section's attempt (which hold choices but no answers) plus this submission.
@@ -341,7 +379,7 @@ async function scoreBaselineSection(
         }
       }
       baselineReview = (
-        await gradeQuestions(db, ordered.flatMap((s) => s.questionIds), allAnswers)
+        await gradeQuestions(db, ordered.flatMap((s) => s.questionIds), allAnswers, baselineChoices)
       ).perQuestion;
     }
 
@@ -393,8 +431,9 @@ async function scoreBaselineSection(
  * Inputs:   db; auth — request.auth; rawInput.testId — as returned by assembleTest,
  *           assembleMiniQuiz, or startOrResumeBaseline; rawInput.answers —
  *           [{ questionId, choice }]. Unanswered or unknown questions count as wrong.
- * Returns:  ScoreTestResult — score, per-topic and per-question results (with correct answers,
- *           except baseline sections before the last), and for mini-quizzes a
+ * Returns:  ScoreTestResult — score, per-topic and per-question results (question text, choices,
+ *           type, and correct answer + explanation except for baseline sections before the
+ *           last), and for mini-quizzes a
  *           move-on/review-again recommendation (see MINI_QUIZ_PASS_THRESHOLD)
  * Reads:    the session's server-side record (testAssignments, or baseline progress +
  *           baselineTests) and `questions/{id}` for each graded question

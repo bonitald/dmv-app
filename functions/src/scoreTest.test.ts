@@ -3,6 +3,7 @@ import { assembleTestForUser } from './assembleTest';
 import { assembleMiniQuizForUser } from './assembleMiniQuiz';
 import { startOrResumeBaselineForUser, CURRENT_BASELINE_VERSION } from './startOrResumeBaseline';
 import { scoreTestForUser } from './scoreTest';
+import { baselineChoices } from './shuffle';
 
 describe('scoreTestForUser', () => {
   const db = getDb();
@@ -20,7 +21,12 @@ describe('scoreTestForUser', () => {
     }
   });
 
-  async function seedQuestion(id: string, chunkId: string, correctAnswer: string) {
+  async function seedQuestion(
+    id: string,
+    chunkId: string,
+    correctAnswer: string,
+    extra: Record<string, unknown> = {}
+  ) {
     await db
       .collection('questions')
       .doc(id)
@@ -37,8 +43,14 @@ describe('scoreTestForUser', () => {
         reviewedBy: null,
         reviewedAt: null,
         reviewNotes: null,
+        ...extra,
       });
   }
+
+  // The question content scoreTest saves for review (ph-4-us-3), as seeded above.
+  const content = (id: string) => ({ text: `Question ${id}`, choices: ['a', 'b'], type: 'fact' });
+  // Baseline choices are saved in the seeded order the user was shown.
+  const baselineContent = (id: string) => ({ ...content(id), choices: baselineChoices(id, ['a', 'b']) });
 
   test('rejects a call with no authenticated user', async () => {
     await expect(
@@ -106,8 +118,8 @@ describe('scoreTestForUser', () => {
     });
 
     const expected = {
-      q1: { questionId: 'q1', chunkId: 'row', choice: 'a', correctAnswer: 'a', correct: true },
-      q2: { questionId: 'q2', chunkId: 'signs', choice: 'a', correctAnswer: 'b', correct: false },
+      q1: { questionId: 'q1', chunkId: 'row', choice: 'a', correctAnswer: 'a', correct: true, ...content('q1') },
+      q2: { questionId: 'q2', chunkId: 'signs', choice: 'a', correctAnswer: 'b', correct: false, ...content('q2') },
     };
     const assignedOrder = assembled.questions.map((q) => q.id as 'q1' | 'q2');
     expect(result.perQuestion).toEqual(assignedOrder.map((id) => expected[id]));
@@ -128,7 +140,7 @@ describe('scoreTestForUser', () => {
     const result = await scoreTestForUser(db, { uid }, { testId: assembled.testId, answers: [] });
 
     expect(result.perQuestion).toEqual([
-      { questionId: 'q1', chunkId: 'row', choice: null, correctAnswer: 'a', correct: false },
+      { questionId: 'q1', chunkId: 'row', choice: null, correctAnswer: 'a', correct: false, ...content('q1') },
     ]);
   });
 
@@ -156,6 +168,9 @@ describe('scoreTestForUser', () => {
       choice: 'b',
       correctAnswer: null,
       correct: null,
+      text: null,
+      choices: null,
+      type: null,
       unavailable: true,
     });
   });
@@ -232,7 +247,9 @@ describe('scoreTestForUser', () => {
     expect(result.type).toBe('baseline');
     // Answers are held back until the whole baseline is complete — in the response and in the
     // client-readable attempt doc.
-    const withheld = [{ questionId: 'q1', chunkId: 'row', choice: 'a', correctAnswer: null, correct: null }];
+    const withheld = [
+      { questionId: 'q1', chunkId: 'row', choice: 'a', correctAnswer: null, correct: null, ...baselineContent('q1') },
+    ];
     expect(result.perQuestion).toEqual(withheld);
     expect(result.baselineReview).toBeUndefined();
     const attemptSnap = await db.collection('users').doc(uid).collection('testAttempts').doc(started.testId).get();
@@ -289,8 +306,8 @@ describe('scoreTestForUser', () => {
     });
 
     const review = [
-      { questionId: 'q1', chunkId: 'row', choice: 'wrong', correctAnswer: 'a', correct: false },
-      { questionId: 'q2', chunkId: 'signs', choice: 'b', correctAnswer: 'b', correct: true },
+      { questionId: 'q1', chunkId: 'row', choice: 'wrong', correctAnswer: 'a', correct: false, ...baselineContent('q1') },
+      { questionId: 'q2', chunkId: 'signs', choice: 'b', correctAnswer: 'b', correct: true, ...baselineContent('q2') },
     ];
     expect(final.perQuestion).toEqual([review[1]]);
     expect(final.baselineReview).toEqual(review);
@@ -337,5 +354,109 @@ describe('scoreTestForUser', () => {
 
     const progressSnap = await db.collection('users').doc(uid).collection('baseline').doc('progress').get();
     expect(progressSnap.data()?.completedAt).toBeNull();
+  });
+
+  test('practice perQuestion carries text, choices, type and explanation, in response and attempt', async () => {
+    await seedQuestion('q1', 'row', 'a', { explanation: 'Because a.', type: 'scenario' });
+    await seedQuestion('q2', 'signs', 'b');
+    const assembled = await assembleTestForUser(db, { uid }, { count: 2 });
+
+    const result = await scoreTestForUser(db, { uid }, {
+      testId: assembled.testId,
+      answers: [{ questionId: 'q1', choice: 'a' }],
+    });
+
+    const byId = Object.fromEntries(result.perQuestion.map((q) => [q.questionId, q]));
+    expect(byId.q1).toMatchObject({
+      text: 'Question q1',
+      choices: ['a', 'b'],
+      type: 'scenario',
+      explanation: 'Because a.',
+    });
+    expect(byId.q2).toMatchObject({ text: 'Question q2', choices: ['a', 'b'], type: 'fact' });
+    expect(byId.q2).not.toHaveProperty('explanation');
+
+    const attempt = await db.collection('users').doc(uid).collection('testAttempts').doc(assembled.testId).get();
+    expect(attempt.data()?.perQuestion).toEqual(result.perQuestion);
+  });
+
+  test.each([[''], ['   '], [42], [null]])('leaves out a malformed explanation (%p)', async (explanation) => {
+    await seedQuestion('q1', 'row', 'a', { explanation });
+    const assembled = await assembleTestForUser(db, { uid }, { count: 1 });
+    const result = await scoreTestForUser(db, { uid }, { testId: assembled.testId, answers: [] });
+    expect(result.perQuestion[0]).not.toHaveProperty('explanation');
+  });
+
+  test('baseline sections before the last carry text and choices but no answer or explanation', async () => {
+    await seedQuestion('q1', 'row', 'a', { choices: ['a', 'b', 'c', 'd'], explanation: 'Because a.' });
+    await db.collection('baselineTests').doc(CURRENT_BASELINE_VERSION).set({
+      sections: [
+        { section: 1, questionIds: ['q1'] },
+        { section: 2, questionIds: [] },
+      ],
+      createdAt: new Date(),
+    });
+    const started = await startOrResumeBaselineForUser(db, { uid });
+
+    const result = await scoreTestForUser(db, { uid }, {
+      testId: started.testId,
+      answers: [{ questionId: 'q1', choice: 'a' }],
+    });
+
+    const expected = {
+      questionId: 'q1',
+      chunkId: 'row',
+      choice: 'a',
+      correctAnswer: null,
+      correct: null,
+      text: 'Question q1',
+      // The order startOrResumeBaseline showed, so review matches what the user saw.
+      choices: started.questions[0].choices,
+      type: 'fact',
+    };
+    expect(result.perQuestion).toEqual([expected]);
+    const attempt = await db.collection('users').doc(uid).collection('testAttempts').doc(started.testId).get();
+    expect(attempt.data()?.perQuestion).toEqual([expected]);
+    expect(JSON.stringify(attempt.data())).not.toContain('Because a.');
+  });
+
+  test('baselineReview reveals text, seeded choices, answers and explanations for every section', async () => {
+    await seedQuestion('q1', 'row', 'a', { choices: ['a', 'b', 'c', 'd'], explanation: 'Because a.' });
+    await seedQuestion('q2', 'signs', 'b');
+    await db.collection('baselineTests').doc(CURRENT_BASELINE_VERSION).set({
+      sections: [
+        { section: 1, questionIds: ['q1'] },
+        { section: 2, questionIds: ['q2'] },
+      ],
+      createdAt: new Date(),
+    });
+    const s1 = await startOrResumeBaselineForUser(db, { uid });
+    await scoreTestForUser(db, { uid }, { testId: s1.testId, answers: [{ questionId: 'q1', choice: 'b' }] });
+    const s2 = await startOrResumeBaselineForUser(db, { uid });
+    const final = await scoreTestForUser(db, { uid }, { testId: s2.testId, answers: [] });
+
+    expect(final.baselineReview).toEqual([
+      {
+        questionId: 'q1',
+        chunkId: 'row',
+        choice: 'b',
+        correctAnswer: 'a',
+        correct: false,
+        text: 'Question q1',
+        choices: baselineChoices('q1', ['a', 'b', 'c', 'd']),
+        type: 'fact',
+        explanation: 'Because a.',
+      },
+      {
+        questionId: 'q2',
+        chunkId: 'signs',
+        choice: null,
+        correctAnswer: 'b',
+        correct: false,
+        text: 'Question q2',
+        choices: baselineChoices('q2', ['a', 'b']),
+        type: 'fact',
+      },
+    ]);
   });
 });

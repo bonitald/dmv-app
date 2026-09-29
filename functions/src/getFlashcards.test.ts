@@ -129,4 +129,11 @@ describe('getFlashcardsForUser', () => {
       getFlashcardsForUser(db, { uid: 'alice-uid' }, 'right-of-way', { now: () => now })
     ).resolves.toBeDefined();
   });
+
+  test('never returns explanation', async () => {
+    await seedQuestion('q1', { explanation: 'Because a.' });
+    const result = await getFlashcardsForUser(db, { uid: 'alice-uid' }, 'right-of-way');
+    expect(result.cards[0]).not.toHaveProperty('explanation');
+    expect(JSON.stringify(result)).not.toContain('Because a.');
+  });
 });
