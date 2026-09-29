@@ -246,10 +246,11 @@ export function BaselineScreen() {
         />
       );
     case 'complete': {
-      const testId =
-        phase.testId ??
-        (progress.status === 'complete' ? finalBaselineTestId(progress.version) : null);
-      // already-exists before progress has caught up: wait a beat for the version.
+      // already-exists before progress has caught up: wait a beat for the version. If progress
+      // can't be read at all it never will, so fall back to v1, the only version so far.
+      const version =
+        progress.status === 'complete' ? progress.version : progress.status === 'error' ? 'v1' : null;
+      const testId = phase.testId ?? (version ? finalBaselineTestId(version) : null);
       if (!testId) return <View style={styles.blank} />;
       return <BaselineResults review={phase.review} testId={testId} onDone={goHome} />;
     }

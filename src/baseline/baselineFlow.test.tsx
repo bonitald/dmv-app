@@ -42,7 +42,11 @@ async function setProgress(progress: BaselineProgress) {
     mockProgressListeners.forEach((listener) => listener());
   });
 }
-jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ status: 'ready', topics: [] }) }));
+let mockTopics: { status: string; topics?: { chunkId: string; title: string; order: number }[] } = {
+  status: 'ready',
+  topics: [],
+};
+jest.mock('../topics/useTopics', () => ({ useTopics: () => mockTopics }));
 // The final attempt read: only asked for when results aren't already in memory (testId set).
 let mockAttempt: { status: string; data?: Record<string, unknown>; offline?: boolean } = {
   status: 'loading',
@@ -137,6 +141,7 @@ beforeEach(async () => {
   await AsyncStorage.clear();
   mockProgress = { status: 'not-started' };
   mockAttempt = { status: 'loading' };
+  mockTopics = { status: 'ready', topics: [] };
   mockOnline = true;
   mockOnlineListeners.clear();
 });
@@ -303,6 +308,32 @@ test('already-exists from startOrResumeBaseline shows results, not an error', as
   // Progress catches up with the server and reports the version the results live under.
   await setProgress({ status: 'complete', version: 'v1' });
   expect(await screen.findByText('89%')).toBeTruthy();
+});
+
+test('progress unreadable and already-exists: results still load (v1), not a blank screen', async () => {
+  mockProgress = { status: 'error' };
+  mockAttempt = {
+    status: 'ready',
+    data: { type: 'baseline', perQuestion: [], baselineReview: reviewOf(40) },
+  };
+  mockStart.mockRejectedValueOnce(new CallableError('already-exists', 'already-exists', 'done'));
+  await renderFlow();
+  expect(await screen.findByText('89%')).toBeTruthy();
+});
+
+test('results wait for topic titles instead of flashing raw topic ids', async () => {
+  mockTopics = { status: 'loading' };
+  await finishWith(reviewOf(37));
+  await waitFor(() => expect(mockScore).toHaveBeenCalled());
+  await act(async () => {});
+  expect(screen.queryByText('82%')).toBeNull();
+  expect(screen.queryByLabelText('c0, Got it')).toBeNull();
+});
+
+test('topics that fail to load fall back to topic ids rather than an empty list', async () => {
+  mockTopics = { status: 'error' };
+  await finishWith(reviewOf(37));
+  expect(await screen.findByLabelText('c0, Got it')).toBeTruthy();
 });
 
 test('already-exists from scoreTest moves on to the check-in', async () => {

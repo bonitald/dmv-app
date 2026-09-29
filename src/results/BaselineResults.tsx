@@ -46,7 +46,11 @@ export function BaselineResults({
     [review, attemptData]
   );
 
-  if (!review && attempt.status === 'loading') return <View style={styles.blank} />;
+  // Wait for topic titles too, so rows don't flash raw ids in the wrong order. A failed read
+  // still shows results, titled by id.
+  if ((!review && attempt.status === 'loading') || topics.status === 'loading') {
+    return <View style={styles.blank} />;
+  }
   if (!review && attempt.status === 'error' && attempt.offline) {
     return (
       <NoConnection
@@ -65,7 +69,7 @@ export function BaselineResults({
     );
   }
 
-  // Titles fill in when the catalog arrives; until then (or if it fails) rows use chunkIds.
+  // If the catalog read failed, rows fall back to chunkIds rather than an empty list.
   const summary = summarizeBaseline(items, topics.status === 'ready' ? topics.topics : []);
   const firstMissed = summary.firstMissedChunkId;
 
