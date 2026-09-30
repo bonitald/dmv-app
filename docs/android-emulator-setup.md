@@ -214,6 +214,25 @@ If this keeps happening, disable Quick Boot: Android Studio â†’ Device Manager â
 
 Also check that the AVD renders with the GPU, not the CPU. In `%USERPROFILE%\.android\avd\<avd-name>.avd\config.ini`, set `hw.gpu.mode=host` (`software` is very slow, especially on API 36+ images).
 
+### After the PC changes network: `Failed to connect to /<old-ip>:8081` or `auth/network-request-failed`
+
+Both come from the PC's network changing while the emulator was set up for the old one.
+
+- **Metro `ECONNREFUSED` to an old IP:** the dev client remembered the old address. Point it at the adb port forward instead, which doesn't depend on the IP:
+
+  ```bash
+  adb reverse tcp:8081 tcp:8081
+  adb shell am start -a android.intent.action.VIEW -d "exp+dmv-app://expo-development-client/?url=http%3A%2F%2Flocalhost%3A8081"
+  ```
+
+  (Or press `a` in the Metro terminal.)
+- **Firebase `auth/network-request-failed`:** the emulator takes its DNS servers at boot, so it keeps the old network's. Check with `adb shell ping -c 2 identitytoolkit.googleapis.com` (`unknown host` = DNS). Toggling airplane mode doesn't fix it; restart the emulator with explicit DNS, then redo the `adb reverse` above:
+
+  ```powershell
+  adb emu kill
+  emulator -avd Android-Medium-Phone -dns-server 8.8.8.8,1.1.1.1
+  ```
+
 ---
 
 ## Google OAuth on the Emulator
