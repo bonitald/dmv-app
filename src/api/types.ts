@@ -37,13 +37,21 @@ export interface PerTopicResult {
   total: number;
 }
 
-/** `correctAnswer` / `correct` are null for baseline sections before the last. */
+/**
+ * `correctAnswer` / `correct` / `explanation` are withheld for baseline sections before the
+ * last. `text` / `choices` / `type` are null when the question was deleted (`unavailable`), and
+ * missing on attempts saved before ph-4-us-3.
+ */
 export interface PerQuestionResult {
   questionId: string;
   chunkId: string | null;
   choice: string | null;
   correctAnswer: string | null;
   correct: boolean | null;
+  text?: string | null;
+  choices?: string[] | null;
+  type?: QuestionType | null;
+  explanation?: string;
   unavailable?: true;
 }
 

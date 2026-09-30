@@ -81,6 +81,17 @@ describe('validateQuestions', () => {
       validateQuestions([{ ...validQuestion, selfCheck: { passed: false, notes: '' } }])
     ).toThrow('no "selfCheck.notes"');
   });
+
+  it('accepts a question with a non-empty explanation', () => {
+    const q = { ...validQuestion, explanation: 'Red always means a full stop.' };
+    expect(validateQuestions([q])).toEqual([q]);
+  });
+
+  it.each([[''], ['   '], [42], [null], [['a']]])('rejects explanation %p', (explanation) => {
+    expect(() => validateQuestions([{ ...validQuestion, explanation }])).toThrow(
+      'invalid "explanation"'
+    );
+  });
 });
 
 describe('validateChunkStatusArg', () => {

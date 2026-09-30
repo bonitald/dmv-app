@@ -24,6 +24,8 @@ export type RootStackParamList = {
   Main: NavigatorScreenParams<RootTabParamList> | undefined;
   /** The baseline flow (ph-3-us-13). */
   Baseline: undefined;
+  /** Question-by-question review of a graded attempt (ph-4-us-4). */
+  Review: { testId: string };
   TestDateEditor: undefined;
 };
 

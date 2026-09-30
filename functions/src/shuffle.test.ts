@@ -1,4 +1,4 @@
-import { seededRandom, shuffle } from './shuffle';
+import { baselineChoices, seededRandom, shuffle } from './shuffle';
 
 describe('seededRandom', () => {
   test('the same seed always produces the same sequence', () => {
@@ -32,5 +32,18 @@ describe('seededRandom', () => {
     }
     // Roughly 100 each; a loose bound catches a broken generator without being flaky.
     for (const count of counts) expect(count).toBeGreaterThan(60);
+  });
+});
+
+describe('baselineChoices', () => {
+  test('is the seeded shuffle startOrResumeBaseline has always used', () => {
+    const choices = ['a', 'b', 'c', 'd'];
+    expect(baselineChoices('q1', choices)).toEqual(shuffle(choices, seededRandom('baseline:q1')));
+  });
+
+  test('does not mutate its input', () => {
+    const choices = ['a', 'b', 'c', 'd'];
+    baselineChoices('q1', choices);
+    expect(choices).toEqual(['a', 'b', 'c', 'd']);
   });
 });

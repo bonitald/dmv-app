@@ -41,3 +41,14 @@ export function seededRandom(seed: string): () => number {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+/**
+ * The baseline's fixed choice order for one question: a shuffle seeded by the question ID.
+ *
+ * The one definition of that order. startOrResumeBaseline uses it to serve choices, and
+ * scoreTest uses it to save them on the attempt, so the review shows the choices exactly as the
+ * user saw them (ph-4-us-3). Change it in one place or the review stops matching the test.
+ */
+export function baselineChoices(questionId: string, choices: string[]): string[] {
+  return shuffle(choices, seededRandom(`baseline:${questionId}`));
+}

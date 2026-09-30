@@ -3,7 +3,7 @@
 **ID:** ph-4-us-3
 **Layer:** Backend
 **Parent:** ph-4-us-2
-**Status:** Not Started
+**Status:** Complete (Slice 3; deployed to dev and device-tested on the Android emulator against dev 2026-09-29)
 
 ## Story
 As a developer,
@@ -28,22 +28,32 @@ collection.
   field valid and passes it through. Writing explanations for the existing 1,415 questions is a
   content task, not engineering (see Questions).
 - Follows the `cloud-function-documentation` skill.
+- **Decided during Slice 3 implementation** (`docs/superpowers/plans/2026-09-28-slice-3-results.md`):
+  - Each entry also carries `type` (`fact` / `scenario` / null), so the review keeps the scenario
+    badge (ph-4-us-4).
+  - Baseline choices are saved in the seeded order the user was shown (`baselineChoices` in
+    `functions/src/shuffle.ts`, shared with `startOrResumeBaseline`). Practice-test and mini-quiz
+    choices are in stored order, since their shuffle isn't recorded; Slice 5 can record it on the
+    assignment if it matters.
+  - `baselineReview` takes text and choices from re-reading the question docs (which grading
+    already does), not from the earlier sections' attempts. Same result for the user, and it
+    also works for attempts saved before this change.
 
 ## Acceptance Criteria
-- [ ] Given a practice test or mini-quiz is graded, when `scoreTest` returns and saves the
+- [x] Given a practice test or mini-quiz is graded, when `scoreTest` returns and saves the
   attempt, then each `perQuestion` entry also has `text` and `choices`, plus `explanation` when
   the question has one.
-- [ ] Given a baseline section before the last is graded, when `perQuestion` is built, then it
+- [x] Given a baseline section before the last is graded, when `perQuestion` is built, then it
   has `text` and `choices`, but `correctAnswer`, `correct` and `explanation` stay null/absent.
-- [ ] Given the final baseline section is graded, when `baselineReview` is built, then every one
+- [x] Given the final baseline section is graded, when `baselineReview` is built, then every one
   of the 45 entries has `text`, `choices`, `correctAnswer`, `correct`, and `explanation` where
   present. Earlier sections' text and choices are taken from their saved attempts; explanations
   and answers are re-read from the question docs.
-- [ ] Given a question is `unavailable` (deleted), when results are built, then `text`,
+- [x] Given a question is `unavailable` (deleted), when results are built, then `text`,
   `choices` and `explanation` are null, as its other fields already are.
-- [ ] Given a question doc has `explanation` that isn't a non-empty string, when it's graded,
+- [x] Given a question doc has `explanation` that isn't a non-empty string, when it's graded,
   then `explanation` is left out rather than sending bad data.
-- [ ] Given the ingestion pipeline writes a question with an `explanation`, when
+- [x] Given the ingestion pipeline writes a question with an `explanation`, when
   `validate.ts` runs, then an optional non-empty string is accepted and anything else is
   rejected. Questions without one stay valid.
 
@@ -73,13 +83,13 @@ collection.
   `explanation`.
 
 ## Tasks
-- [ ] Add optional `explanation` to `scripts/question-bank/lib/types.ts` and `validate.ts`, with
+- [x] Add optional `explanation` to `scripts/question-bank/lib/types.ts` and `validate.ts`, with
   tests (`npm run test:question-bank`).
-- [ ] Extend `PerQuestionResult` and `gradeQuestions` in `scoreTest`; handle baseline withholding
+- [x] Extend `PerQuestionResult` and `gradeQuestions` in `scoreTest`; handle baseline withholding
   and `baselineReview`.
-- [ ] Extend `functions/src/scoreTest.test.ts`, and add "no explanation" assertions to the
+- [x] Extend `functions/src/scoreTest.test.ts`, and add "no explanation" assertions to the
   assemble/flashcard function tests (`npm run test:functions`).
-- [ ] Update `functions/README.md` (`scoreTest` output and persistence) and the question-bank
+- [x] Update `functions/README.md` (`scoreTest` output and persistence) and the question-bank
   README (new field).
 
 ## Questions

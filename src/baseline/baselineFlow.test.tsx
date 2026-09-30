@@ -21,7 +21,40 @@ jest.mock('@react-native-firebase/analytics', () => ({
 jest.mock('../auth/AuthProvider', () => ({ useAuth: () => ({ status: 'ready', uid: 'u1' }) }));
 jest.mock('../api/callables', () => ({ startOrResumeBaseline: jest.fn(), scoreTest: jest.fn() }));
 let mockProgress: BaselineProgress = { status: 'not-started' };
-jest.mock('./useBaselineProgress', () => ({ useBaselineProgress: () => mockProgress }));
+// Subscribable like the real onSnapshot-backed hook, so a test can move progress on mid-flow.
+const mockProgressListeners = new Set<() => void>();
+jest.mock('./useBaselineProgress', () => {
+  const { useSyncExternalStore } = jest.requireActual('react');
+  return {
+    useBaselineProgress: () =>
+      useSyncExternalStore(
+        (listener: () => void) => {
+          mockProgressListeners.add(listener);
+          return () => mockProgressListeners.delete(listener);
+        },
+        () => mockProgress
+      ),
+  };
+});
+async function setProgress(progress: BaselineProgress) {
+  await act(() => {
+    mockProgress = progress;
+    mockProgressListeners.forEach((listener) => listener());
+  });
+}
+let mockTopics: { status: string; topics?: { chunkId: string; title: string; order: number }[] } = {
+  status: 'ready',
+  topics: [],
+};
+jest.mock('../topics/useTopics', () => ({ useTopics: () => mockTopics }));
+// The final attempt read: only asked for when results aren't already in memory (testId set).
+let mockAttempt: { status: string; data?: Record<string, unknown>; offline?: boolean } = {
+  status: 'loading',
+};
+jest.mock('../review/useTestAttempt', () => ({
+  useTestAttempt: (testId: string | null) =>
+    testId ? { ...mockAttempt, retry: jest.fn() } : { status: 'loading', retry: jest.fn() },
+}));
 // A subscribable stand-in for NetInfo, so tests can flip the connection mid-flow.
 let mockOnline = true;
 const mockOnlineListeners = new Set<() => void>();
@@ -85,6 +118,7 @@ function flowTree() {
       <Stack.Navigator initialRouteName="Main">
         <Stack.Screen name="Main">{() => <Text>Home screen</Text>}</Stack.Screen>
         <Stack.Screen name="Baseline" component={BaselineScreen} />
+        <Stack.Screen name="Review">{() => <Text>Review screen</Text>}</Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -106,6 +140,8 @@ beforeEach(async () => {
   jest.clearAllMocks();
   await AsyncStorage.clear();
   mockProgress = { status: 'not-started' };
+  mockAttempt = { status: 'loading' };
+  mockTopics = { status: 'ready', topics: [] };
   mockOnline = true;
   mockOnlineListeners.clear();
 });
@@ -178,23 +214,61 @@ test('a stale session for another section is discarded', async () => {
   expect((await getActiveSession('u1'))?.testId).toBe('baseline-v1-3');
 });
 
-test('section 3 submit goes to the complete screen with the total from baselineReview', async () => {
+const reviewOf = (right: number, total = 45) =>
+  Array.from({ length: total }, (_, i) => ({
+    questionId: `r${i}`,
+    chunkId: `c${i}`,
+    choice: i < right ? 'x' : 'y',
+    correctAnswer: 'x',
+    correct: i < right,
+    text: `T${i}`,
+    choices: ['x', 'y'],
+    type: 'fact' as const,
+  }));
+
+async function finishWith(review: ReturnType<typeof reviewOf>) {
   mockProgress = { status: 'in-progress', currentSection: 3, totalSections: 3 };
   mockStart.mockResolvedValueOnce(sectionOf(3));
-  const review = Array.from({ length: 45 }, (_, i) => ({
-    questionId: `r${i}`,
-    chunkId: 'c',
-    choice: 'x',
-    correctAnswer: 'x',
-    correct: i < 30,
-  }));
   mockScore.mockResolvedValueOnce(graded(3, { baselineReview: review }));
-
   await renderFlow();
   await screen.findByText('Section 3 of 3');
   await answerAllAndSubmit(3);
-  expect(await screen.findByText('Baseline done')).toBeTruthy();
-  expect(screen.getByText('You got 30 of 45 right.')).toBeTruthy();
+}
+
+test('section 3 submit shows results from baselineReview: 82%, 37 of 45, tracking line, topics', async () => {
+  await finishWith(reviewOf(37));
+
+  expect(await screen.findByText('82%')).toBeTruthy();
+  expect(screen.getByText('37 of 45 right')).toBeTruthy();
+  expect(screen.getByText(/The real test needs 80%\. You're off to a strong start/)).toBeTruthy();
+  expect(screen.queryByText(/\bpass\b|\bfail/i)).toBeNull();
+  expect(screen.getByLabelText('c0, Got it')).toBeTruthy();
+  expect(screen.getByLabelText('c37, Missed it')).toBeTruthy();
+  expect(screen.getByText('One question per topic, so this is only a rough guide.')).toBeTruthy();
+});
+
+test('below the mark says where to focus; Start with what you missed opens the Study tab', async () => {
+  await finishWith(reviewOf(30));
+  expect(await screen.findByText("The real test needs 80%. Here's where to focus first.")).toBeTruthy();
+  await fireEvent.press(screen.getByText('Start with what you missed'));
+  expect(navRef.getCurrentRoute()?.name).toBe('Main');
+});
+
+test('tapping a topic opens the Study tab', async () => {
+  await finishWith(reviewOf(30));
+  await fireEvent.press(await screen.findByLabelText('c2, Got it'));
+  expect(navRef.getCurrentRoute()?.name).toBe('Main');
+});
+
+test('all right: no "Start with what you missed"; Review answers opens the final attempt', async () => {
+  await finishWith(reviewOf(45));
+  expect(await screen.findByText('100%')).toBeTruthy();
+  expect(screen.queryByText('Start with what you missed')).toBeNull();
+  await fireEvent.press(screen.getByText('Review answers'));
+  expect(navRef.getCurrentRoute()).toMatchObject({
+    name: 'Review',
+    params: { testId: 'baseline-v1-3' },
+  });
 });
 
 test('if progress cannot be read, the server decides: the section loads instead of a blank screen', async () => {
@@ -204,18 +278,62 @@ test('if progress cannot be read, the server decides: the section loads instead 
   expect(await screen.findByText('Section 2 of 3')).toBeTruthy();
 });
 
-test('complete progress opens straight to the complete screen', async () => {
-  mockProgress = { status: 'complete' };
+test('reopening a completed baseline loads results from the final attempt', async () => {
+  mockProgress = { status: 'complete', version: 'v1' };
+  mockAttempt = {
+    status: 'ready',
+    data: { type: 'baseline', perQuestion: [], baselineReview: reviewOf(30) },
+  };
   await renderFlow();
-  expect(await screen.findByText('Baseline done')).toBeTruthy();
+  expect(await screen.findByText('67%')).toBeTruthy();
+  expect(screen.getByText('30 of 45 right')).toBeTruthy();
   expect(mockStart).not.toHaveBeenCalled();
 });
 
-test('already-exists from startOrResumeBaseline shows complete, not an error', async () => {
+test('reopening while offline with nothing cached shows no connection', async () => {
+  mockProgress = { status: 'complete', version: 'v1' };
+  mockAttempt = { status: 'error', offline: true };
+  await renderFlow();
+  expect(await screen.findByText('No connection')).toBeTruthy();
+});
+
+test('already-exists from startOrResumeBaseline shows results, not an error', async () => {
   mockProgress = { status: 'in-progress', currentSection: 3, totalSections: 3 };
+  mockAttempt = {
+    status: 'ready',
+    data: { type: 'baseline', perQuestion: [], baselineReview: reviewOf(40) },
+  };
   mockStart.mockRejectedValueOnce(new CallableError('already-exists', 'already-exists', 'done'));
   await renderFlow();
-  expect(await screen.findByText('Baseline done')).toBeTruthy();
+  // Progress catches up with the server and reports the version the results live under.
+  await setProgress({ status: 'complete', version: 'v1' });
+  expect(await screen.findByText('89%')).toBeTruthy();
+});
+
+test('progress unreadable and already-exists: results still load (v1), not a blank screen', async () => {
+  mockProgress = { status: 'error' };
+  mockAttempt = {
+    status: 'ready',
+    data: { type: 'baseline', perQuestion: [], baselineReview: reviewOf(40) },
+  };
+  mockStart.mockRejectedValueOnce(new CallableError('already-exists', 'already-exists', 'done'));
+  await renderFlow();
+  expect(await screen.findByText('89%')).toBeTruthy();
+});
+
+test('results wait for topic titles instead of flashing raw topic ids', async () => {
+  mockTopics = { status: 'loading' };
+  await finishWith(reviewOf(37));
+  await waitFor(() => expect(mockScore).toHaveBeenCalled());
+  await act(async () => {});
+  expect(screen.queryByText('82%')).toBeNull();
+  expect(screen.queryByLabelText('c0, Got it')).toBeNull();
+});
+
+test('topics that fail to load fall back to topic ids rather than an empty list', async () => {
+  mockTopics = { status: 'error' };
+  await finishWith(reviewOf(37));
+  expect(await screen.findByLabelText('c0, Got it')).toBeTruthy();
 });
 
 test('already-exists from scoreTest moves on to the check-in', async () => {

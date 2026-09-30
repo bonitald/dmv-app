@@ -30,6 +30,10 @@ jest.mock('../baseline/useBaselineProgress', () => ({
   useBaselineProgress: () => mockBaselineProgress,
 }));
 jest.mock('../network/useIsOnline', () => ({ useIsOnline: () => true }));
+jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ status: 'loading' }) }));
+jest.mock('../review/useTestAttempt', () => ({
+  useTestAttempt: () => ({ status: 'loading', retry: jest.fn() }),
+}));
 jest.mock('../api/callables', () => ({
   startOrResumeBaseline: jest.fn(() => new Promise(() => {})),
   scoreTest: jest.fn(),
@@ -111,7 +115,7 @@ describe('Home (ph-9-us-7 / ph-9-us-5)', () => {
 
   test('the test card shows Baseline done once it is complete', async () => {
     mockProfile = { onboarding: { choice: 'baseline' }, testDate: null };
-    mockBaselineProgress = { status: 'complete' };
+    mockBaselineProgress = { status: 'complete', version: 'v1' };
     await render(<RootNavigator initialRoute="Main" />);
     expect(await screen.findByText('Baseline done')).toBeTruthy();
   });

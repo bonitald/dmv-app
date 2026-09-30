@@ -2,7 +2,7 @@ import { FieldValue, type Firestore, type Timestamp } from 'firebase-admin/fires
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { getDb } from './adminApp';
 import type { AssembledQuestion } from './assembleTest';
-import { seededRandom, shuffle } from './shuffle';
+import { baselineChoices } from './shuffle';
 
 /**
  * The baseline definition every new user is started on (ph-1-us-8).
@@ -144,7 +144,7 @@ export async function startOrResumeBaselineForUser(
       // but seed the shuffle with the question ID so the order never changes: a resumed section
       // must show exactly what was shown before, and every user gets the identical baseline.
       // Grading is unaffected — scoreTest compares answer text, not position.
-      choices: shuffle(data.choices, seededRandom(`baseline:${doc.id}`)),
+      choices: baselineChoices(doc.id, data.choices),
       type: data.type,
       chunkId: data.chunkId,
       conceptId: data.conceptId,

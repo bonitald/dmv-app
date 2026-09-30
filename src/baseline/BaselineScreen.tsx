@@ -5,16 +5,17 @@ import { getApp } from '@react-native-firebase/app';
 import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import { scoreTest, startOrResumeBaseline } from '../api/callables';
 import { toCallableError } from '../api/callableErrors';
-import type { BaselineSection } from '../api/types';
+import type { BaselineSection, PerQuestionResult } from '../api/types';
 import { useAuth } from '../auth/AuthProvider';
 import { NoConnection } from '../components/NoConnection';
 import { useIsOnline } from '../network/useIsOnline';
 import { toAnswerList, type Answers } from '../quiz/answers';
 import { QuizRunner, type SubmitState } from '../quiz/QuizRunner';
 import { endSession, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
+import { finalBaselineTestId } from '../results/baselineResultsData';
+import { BaselineResults } from '../results/BaselineResults';
 import { colors } from '../theme/tokens';
 import { BaselineCheckIn } from './BaselineCheckIn';
-import { BaselineComplete } from './BaselineComplete';
 import { BaselineIntro } from './BaselineIntro';
 import { BASELINE_TOTAL_SECTIONS } from './baselineProgressData';
 import { BaselineUnavailable } from './BaselineUnavailable';
@@ -29,7 +30,11 @@ type Phase =
   | { kind: 'intro' }
   | { kind: 'running'; section: BaselineSection; initialAnswers: Answers; notice?: string }
   | { kind: 'check-in'; section: number; totalSections: number }
-  | { kind: 'complete'; correctCount: number | null; totalCount: number | null }
+  /**
+   * `review` is the final section's baselineReview when it was just graded; otherwise the
+   * results load from the final attempt, `testId` (null until progress reports the version).
+   */
+  | { kind: 'complete'; review: PerQuestionResult[] | null; testId: string | null }
   | { kind: 'unavailable' }
   | { kind: 'offline' }
   | { kind: 'error' };
@@ -91,7 +96,8 @@ export function BaselineScreen() {
     } catch (raw) {
       const error = toCallableError(raw);
       if (error.kind === 'already-exists') {
-        setPhase({ kind: 'complete', correctCount: null, totalCount: null });
+        // Finished elsewhere (or progress was stale): progress will report the version shortly.
+        setPhase({ kind: 'complete', review: null, testId: null });
         return;
       }
       if (error.kind === 'failed-precondition') {
@@ -125,7 +131,7 @@ export function BaselineScreen() {
     if (decidedRef.current || progress.status === 'loading') return;
     decidedRef.current = true;
     if (progress.status === 'complete') {
-      setPhase({ kind: 'complete', correctCount: null, totalCount: null });
+      setPhase({ kind: 'complete', review: null, testId: finalBaselineTestId(progress.version) });
     } else if (progress.status === 'not-started') {
       setPhase({ kind: 'intro' });
     } else {
@@ -146,17 +152,13 @@ export function BaselineScreen() {
       submittingRef.current = true;
       const { section } = phase;
       setSubmitState('submitting');
-      let correctCount: number | null = null;
-      let totalCount: number | null = null;
+      let baselineReview: PerQuestionResult[] | null = null;
       try {
         const result = await scoreTest({
           testId: section.testId,
           answers: toAnswerList(section.questions, answers),
         });
-        if (result.baselineReview) {
-          correctCount = result.baselineReview.filter((q) => q.correct === true).length;
-          totalCount = result.baselineReview.length;
-        }
+        baselineReview = result.baselineReview ?? null;
       } catch (raw) {
         const error = toCallableError(raw);
         // Includes 'offline' while NetInfo says online (e.g. the server can't be reached):
@@ -181,7 +183,7 @@ export function BaselineScreen() {
           totalSections: section.totalSections,
         });
       } else {
-        setPhase({ kind: 'complete', correctCount, totalCount });
+        setPhase({ kind: 'complete', review: baselineReview, testId: section.testId });
       }
     },
     [phase, uid, isOnline]
@@ -243,14 +245,15 @@ export function BaselineScreen() {
           onTakeBreak={goHome}
         />
       );
-    case 'complete':
-      return (
-        <BaselineComplete
-          correctCount={phase.correctCount}
-          totalCount={phase.totalCount}
-          onDone={goHome}
-        />
-      );
+    case 'complete': {
+      // already-exists before progress has caught up: wait a beat for the version. If progress
+      // can't be read at all it never will, so fall back to v1, the only version so far.
+      const version =
+        progress.status === 'complete' ? progress.version : progress.status === 'error' ? 'v1' : null;
+      const testId = phase.testId ?? (version ? finalBaselineTestId(version) : null);
+      if (!testId) return <View style={styles.blank} />;
+      return <BaselineResults review={phase.review} testId={testId} onDone={goHome} />;
+    }
     case 'unavailable':
       return <BaselineUnavailable onDone={goHome} />;
     case 'offline':

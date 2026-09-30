@@ -23,6 +23,8 @@ export async function writeQuestions(jsonPath: string): Promise<{ written: numbe
       choices: question.choices,
       correctAnswer: question.correctAnswer,
       selfCheck: question.selfCheck,
+      // Only written when present, so questions without one don't carry an empty field.
+      ...(question.explanation ? { explanation: question.explanation } : {}),
       status: question.selfCheck.passed ? 'pending_review' : 'flagged',
       reviewedBy: null,
       reviewedAt: null,

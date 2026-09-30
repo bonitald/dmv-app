@@ -92,6 +92,16 @@ export function validateQuestions(data: unknown): QuestionInput[] {
     ) {
       throw new Error(`Question at index ${index} failed selfCheck but has no "selfCheck.notes"`);
     }
+
+    // Optional, but when present it's shown to users as-is, so it must be real text.
+    if (
+      q.explanation !== undefined &&
+      (typeof q.explanation !== 'string' || q.explanation.trim() === '')
+    ) {
+      throw new Error(
+        `Question at index ${index} has an invalid "explanation" (must be a non-empty string when present)`
+      );
+    }
   });
 
   return data as QuestionInput[];

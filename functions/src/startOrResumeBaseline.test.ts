@@ -170,4 +170,12 @@ describe('startOrResumeBaselineForUser', () => {
 
     expect(alice.questions).toEqual(bob.questions);
   });
+
+  test('never returns explanation', async () => {
+    await seedBaseline();
+    await db.collection('questions').doc('q1').update({ explanation: 'Because a.' });
+    const result = await startOrResumeBaselineForUser(db, { uid: 'alice-uid' });
+    expect(result.questions[0]).not.toHaveProperty('explanation');
+    expect(JSON.stringify(result)).not.toContain('Because a.');
+  });
 });

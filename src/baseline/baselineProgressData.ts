@@ -10,11 +10,15 @@ export type BaselineProgress =
   | { status: 'error' }
   | { status: 'not-started' }
   | { status: 'in-progress'; currentSection: number; totalSections: number }
-  | { status: 'complete' };
+  /** `version` names the final attempt doc that holds the results (ph-4-us-6). */
+  | { status: 'complete'; version: string };
 
 export function toBaselineProgress(data: Record<string, unknown> | undefined): BaselineProgress {
   if (!data) return { status: 'not-started' };
-  if (data.completedAt) return { status: 'complete' };
+  if (data.completedAt) {
+    // v1 is the only version so far, and the one progress docs from before versioning used.
+    return { status: 'complete', version: typeof data.version === 'string' ? data.version : 'v1' };
+  }
   const section = data.currentSection;
   return {
     status: 'in-progress',
