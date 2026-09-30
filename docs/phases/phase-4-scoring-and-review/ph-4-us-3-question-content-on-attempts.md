@@ -3,7 +3,7 @@
 **ID:** ph-4-us-3
 **Layer:** Backend
 **Parent:** ph-4-us-2
-**Status:** Code complete (Slice 3, 2026-09-29; dev deploy and device test pending)
+**Status:** Complete (Slice 3; deployed to dev and device-tested on the Android emulator against dev 2026-09-29)
 
 ## Story
 As a developer,

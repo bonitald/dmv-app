@@ -3,7 +3,7 @@
 **ID:** ph-4-us-4
 **Layer:** Frontend
 **Parent:** ph-4-us-2
-**Status:** In Progress (baseline review code complete, Slice 3, 2026-09-29; dev deploy and device test pending. Entry points from practice results, mini-quiz results and missed questions come with Slices 4b/5)
+**Status:** Complete (Slice 3; device-tested on the Android emulator against dev 2026-09-29. The screen is generic; the links into it from practice results, mini-quiz results and missed questions belong to ph-4-us-1, ph-2-us-9 and ph-4-us-5)
 
 ## Story
 As a teen user,

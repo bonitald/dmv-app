@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-6
 **Layer:** Parent
-**Status:** In Progress (baseline results part code complete, Slice 3, 2026-09-29; dev deploy and device test pending. Concept report is Slice 4b; practice "Topics to work on" is Slice 5a)
+**Status:** In Progress (baseline results part complete, Slice 3, device-tested on the Android emulator against dev 2026-09-29. Concept report is Slice 4b; practice "Topics to work on" is Slice 5a)
 
 ## Story
 As a teen user,

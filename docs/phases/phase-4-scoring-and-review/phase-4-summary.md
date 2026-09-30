@@ -1,6 +1,6 @@
 # Phase 4: Scoring & Review — Summary
 
-## Status: In Progress (Slice 3 code complete 2026-09-29; dev deploy and device test pending)
+## Status: In Progress (Slice 3 complete 2026-09-29: ph-4-us-2/3/4 done, ph-4-us-6 baseline results part done)
 
 Depends on Phase 3 (test attempts exist to score and review). Grading and saved attempts already
 exist from Phase 1 (`scoreTest`, ph-1-us-11), so this phase is mostly results and review screens.
@@ -12,9 +12,9 @@ attempts, so past tests can be reviewed without reading the deny-all `questions`
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
 | ph-4-us-1 | See my score and pass/fail right after a practice test | Parent | — | Not Started |
-| ph-4-us-2 | Review every question from a completed test | Parent | — | In Progress (baseline) |
-| ph-4-us-3 | Save question text, choices and explanation on graded attempts | Backend | ph-4-us-2 | Code complete |
-| ph-4-us-4 | Question review screen | Frontend | ph-4-us-2 | In Progress (baseline) |
+| ph-4-us-2 | Review every question from a completed test | Parent | — | Complete |
+| ph-4-us-3 | Save question text, choices and explanation on graded attempts | Backend | ph-4-us-2 | Complete |
+| ph-4-us-4 | Question review screen | Frontend | ph-4-us-2 | Complete |
 | ph-4-us-5 | Missed questions I can come back to | Parent | — | Not Started |
 | ph-4-us-6 | Per-concept report: baseline results and strong / shaky / likely gap | Parent | — | In Progress (baseline results) |
 | ph-4-us-7 | Latest score compared to my baseline | Parent | — | Not Started |
