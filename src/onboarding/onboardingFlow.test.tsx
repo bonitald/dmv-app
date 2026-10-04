@@ -30,7 +30,8 @@ jest.mock('../baseline/useBaselineProgress', () => ({
   useBaselineProgress: () => mockBaselineProgress,
 }));
 jest.mock('../network/useIsOnline', () => ({ useIsOnline: () => true }));
-jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ status: 'loading', retry: jest.fn() }) }));
+let mockTopics: { status: string; topics?: unknown[] } = { status: 'loading' };
+jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ ...mockTopics, retry: jest.fn() }) }));
 jest.mock('../review/useTestAttempt', () => ({
   useTestAttempt: () => ({ status: 'loading', retry: jest.fn() }),
 }));
@@ -49,6 +50,7 @@ beforeEach(async () => {
   await AsyncStorage.clear();
   mockProfile = { onboarding: null, testDate: null };
   mockBaselineProgress = { status: 'not-started' };
+  mockTopics = { status: 'loading' };
 });
 
 const today = toDateString(new Date());
@@ -101,6 +103,39 @@ describe('first launch (ph-9-us-3)', () => {
 });
 
 describe('Home (ph-9-us-7 / ph-9-us-5)', () => {
+  const ROW = { chunkId: 'row', title: 'Right of way', description: '', order: 1, approvedQuestionCount: 3 };
+
+  test('the study card continues the last topic opened, and opens its flashcards', async () => {
+    mockProfile = { onboarding: { choice: 'learn' }, testDate: null };
+    mockTopics = { status: 'ready', topics: [ROW] };
+    await AsyncStorage.setItem('dmv-app:study:last-opened:u1', 'row');
+    await render(<RootNavigator initialRoute="Main" />);
+
+    expect(await screen.findByText('Continue learning')).toBeTruthy();
+    expect(screen.getByText('Right of way')).toBeTruthy();
+    expect(screen.queryByText('Learn concept by concept')).toBeNull();
+    await fireEvent.press(screen.getByText('Continue learning'));
+    expect(await screen.findByLabelText('Loading cards')).toBeTruthy();
+  });
+
+  test('a remembered topic that is no longer in the catalog falls back to the list card', async () => {
+    mockProfile = { onboarding: { choice: 'learn' }, testDate: null };
+    mockTopics = { status: 'ready', topics: [ROW] };
+    await AsyncStorage.setItem('dmv-app:study:last-opened:u1', 'gone');
+    await render(<RootNavigator initialRoute="Main" />);
+
+    expect(await screen.findByText('Learn concept by concept')).toBeTruthy();
+    expect(screen.queryByText('Continue learning')).toBeNull();
+  });
+
+  test('before topics load, the study card is the list card', async () => {
+    mockProfile = { onboarding: { choice: 'learn' }, testDate: null };
+    await AsyncStorage.setItem('dmv-app:study:last-opened:u1', 'row');
+    await render(<RootNavigator initialRoute="Main" />);
+
+    expect(await screen.findByText('Learn concept by concept')).toBeTruthy();
+  });
+
   test('a returning user lands on Home with both routes and the add-date card', async () => {
     mockProfile = { onboarding: { choice: 'learn' }, testDate: null };
     await render(<RootNavigator initialRoute="Main" />);

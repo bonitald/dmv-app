@@ -1,9 +1,13 @@
+import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../auth/AuthProvider';
 import { useBaselineProgress } from '../baseline/useBaselineProgress';
 import { Card } from '../components/Card';
+import { getLastOpenedTopic } from '../profile/localFlags';
 import { colors, radius, spacing, typography } from '../theme/tokens';
+import { useTopics } from '../topics/useTopics';
 import { TestDateCard } from './TestDateCard';
 
 // ph-9-us-7: Home only shows and links. Each card reads its own data and renders only once its
@@ -60,10 +64,44 @@ function TestCard() {
   );
 }
 
-// Slice 1: links to the Study tab. Slice 4 (ph-2-us-7/12) makes it "Continue learning" with the
-// next concept to study.
+// ph-9-us-7 (Slice 4a): "Continue learning" opens the last topic whose flashcards loaded on this
+// device, read again each time Home comes back into view. Before any topic has been opened, or
+// if that topic is no longer in the catalog, it's "Learn concept by concept" and opens the list.
 function StudyCard() {
   const navigation = useNavigation();
+  const { uid } = useAuth();
+  const topics = useTopics();
+  const [lastOpened, setLastOpened] = useState<string | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!uid) return;
+      let cancelled = false;
+      getLastOpenedTopic(uid).then((chunkId) => {
+        if (!cancelled) setLastOpened(chunkId);
+      });
+      return () => {
+        cancelled = true;
+      };
+    }, [uid])
+  );
+
+  const topic =
+    lastOpened && topics.status === 'ready'
+      ? topics.topics.find((t) => t.chunkId === lastOpened)
+      : undefined;
+
+  if (topic) {
+    return (
+      <RouteCard
+        icon="book-outline"
+        eyebrow="STUDY"
+        title="Continue learning"
+        body={topic.title}
+        onPress={() => navigation.navigate('Flashcards', { chunkId: topic.chunkId })}
+      />
+    );
+  }
   return (
     <RouteCard
       icon="book-outline"
