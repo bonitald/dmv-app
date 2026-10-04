@@ -1,12 +1,13 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { QuizQuestion } from '../api/types';
 import { Card } from '../components/Card';
+import { ScenarioBadge } from '../components/ScenarioBadge';
 import { colors, radius, spacing, typography } from '../theme/tokens';
 
 // ph-3-us-4: one question and its choices, with no answer reveal while taking a test. Shared by
-// the baseline, practice tests and mini-quizzes. Scenario questions get the badge from the
-// Scenario question card mockup (ph-2-us-5). ph-4-us-4 adds a read-only review state that marks
-// the user's choice and the correct one, always with a text tag as well as color.
+// the baseline, practice tests and mini-quizzes. Scenario questions get the shared ScenarioBadge
+// (ph-2-us-5). ph-4-us-4 adds a read-only review state that marks the user's choice and the
+// correct one, always with a text tag as well as color.
 export function QuizCard({
   question,
   selected,
@@ -21,11 +22,7 @@ export function QuizCard({
 }) {
   return (
     <Card>
-      {question.type === 'scenario' && (
-        <View style={styles.badge}>
-          <Text style={[typography.caption, styles.badgeText]}>SCENARIO</Text>
-        </View>
-      )}
+      <ScenarioBadge type={question.type} />
       <Text style={[typography.h2, styles.question]}>{question.text}</Text>
       {review ? (
         <View style={styles.choices}>
@@ -93,14 +90,6 @@ export function QuizCard({
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    alignSelf: 'flex-start',
-    backgroundColor: colors.secondarySoft,
-    borderRadius: radius.chip,
-    paddingHorizontal: spacing.space2,
-    paddingVertical: 2,
-  },
-  badgeText: { color: colors.secondary },
   question: { lineHeight: 22 },
   choices: { gap: spacing.space2, marginTop: spacing.space2 },
   choice: {
