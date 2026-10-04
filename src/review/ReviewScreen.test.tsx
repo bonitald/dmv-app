@@ -46,7 +46,7 @@ async function renderReview() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Review" component={ReviewScreen} initialParams={{ testId: 't1' }} />
-        <Stack.Screen name="Main">{() => <Text>Study tab</Text>}</Stack.Screen>
+        <Stack.Screen name="Flashcards">{() => <Text>Flashcards screen</Text>}</Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -91,7 +91,7 @@ test('explanation panel when present; handbook topic and Study link otherwise', 
   await fireEvent.press(screen.getByText('Next'));
   expect(screen.getByText('From the handbook: Right of way')).toBeTruthy();
   await fireEvent.press(screen.getByText('Study this concept'));
-  expect(await screen.findByText('Study tab')).toBeTruthy();
+  expect(await screen.findByText('Flashcards screen')).toBeTruthy();
 });
 
 test('removed and pre-ph-4-us-3 questions', async () => {

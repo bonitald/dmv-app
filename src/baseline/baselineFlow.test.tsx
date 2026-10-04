@@ -119,6 +119,7 @@ function flowTree() {
         <Stack.Screen name="Main">{() => <Text>Home screen</Text>}</Stack.Screen>
         <Stack.Screen name="Baseline" component={BaselineScreen} />
         <Stack.Screen name="Review">{() => <Text>Review screen</Text>}</Stack.Screen>
+        <Stack.Screen name="Flashcards">{() => <Text>Flashcards screen</Text>}</Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -247,17 +248,17 @@ test('section 3 submit shows results from baselineReview: 82%, 37 of 45, trackin
   expect(screen.getByText('One question per topic, so this is only a rough guide.')).toBeTruthy();
 });
 
-test('below the mark says where to focus; Start with what you missed opens the Study tab', async () => {
+test('below the mark says where to focus; Start with what you missed opens flashcards', async () => {
   await finishWith(reviewOf(30));
   expect(await screen.findByText("The real test needs 80%. Here's where to focus first.")).toBeTruthy();
   await fireEvent.press(screen.getByText('Start with what you missed'));
-  expect(navRef.getCurrentRoute()?.name).toBe('Main');
+  expect(navRef.getCurrentRoute()?.name).toBe('Flashcards');
 });
 
-test('tapping a topic opens the Study tab', async () => {
+test("tapping a topic opens that topic's flashcards", async () => {
   await finishWith(reviewOf(30));
   await fireEvent.press(await screen.findByLabelText('c2, Got it'));
-  expect(navRef.getCurrentRoute()?.name).toBe('Main');
+  expect(navRef.getCurrentRoute()).toMatchObject({ name: 'Flashcards', params: { chunkId: 'c2' } });
 });
 
 test('all right: no "Start with what you missed"; Review answers opens the final attempt', async () => {

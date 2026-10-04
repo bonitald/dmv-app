@@ -26,6 +26,11 @@ export type RootStackParamList = {
   Baseline: undefined;
   /** Question-by-question review of a graded attempt (ph-4-us-4). */
   Review: { testId: string };
+  /** One topic's flip-card flashcards (ph-2-us-3). Above the tabs so Back returns to the list,
+   * results or review, wherever it was opened from. */
+  Flashcards: { chunkId: string };
+  /** The topic's mini-quiz. A placeholder until Slice 4b (ph-2-us-8). */
+  MiniQuiz: { chunkId: string };
   TestDateEditor: undefined;
 };
 

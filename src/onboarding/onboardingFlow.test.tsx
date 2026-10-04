@@ -34,9 +34,14 @@ jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ status: 'loading' 
 jest.mock('../review/useTestAttempt', () => ({
   useTestAttempt: () => ({ status: 'loading', retry: jest.fn() }),
 }));
+jest.mock('../study/conceptProgress', () => ({ markOpened: jest.fn() }));
+jest.mock('../study/useConceptProgress', () => ({
+  useConceptProgress: () => ({ status: 'ready', byChunk: {} }),
+}));
 jest.mock('../api/callables', () => ({
   startOrResumeBaseline: jest.fn(() => new Promise(() => {})),
   scoreTest: jest.fn(),
+  getFlashcards: jest.fn(() => new Promise(() => {})),
 }));
 
 beforeEach(async () => {
