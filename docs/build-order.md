@@ -39,7 +39,7 @@ slices).
 **Moved into this slice:** the `jest-expo` component-test config (a task on ph-2-us-3) lands
 with the first screen, which is now onboarding.
 
-**Status: Complete (2026-09-25).** Tested on the Android emulator (onboarding → baseline stub → Home countdown; relaunch skips onboarding). Rules deploy still pending. ph-9-us-6/us-7 and ph-3-us-11 stay open for their later-slice parts.
+**Status: Complete (2026-09-25).** Tested on the Android emulator (onboarding → baseline stub → Home countdown; relaunch skips onboarding). Rules since deployed to dev. ph-9-us-6/us-7 and ph-3-us-11 stay open for their later-slice parts.
 
 ---
 
@@ -116,6 +116,8 @@ Built as two testable halves.
 open a topic → flip through every card (scenario cards badged) → end of deck offers "Start
 this concept over" (mini-quiz button is a stub). The topic shows "in progress" on the list.
 Topics with no approved questions show "coming soon".
+
+Design: `docs/superpowers/specs/2026-10-03-slice-4a-concept-list-flashcards-design.md`.
 
 | Order | Story | What it adds |
 |-------|-------|--------------|
