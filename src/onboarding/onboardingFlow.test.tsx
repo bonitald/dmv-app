@@ -30,7 +30,7 @@ jest.mock('../baseline/useBaselineProgress', () => ({
   useBaselineProgress: () => mockBaselineProgress,
 }));
 jest.mock('../network/useIsOnline', () => ({ useIsOnline: () => true }));
-jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ status: 'loading' }) }));
+jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ status: 'loading', retry: jest.fn() }) }));
 jest.mock('../review/useTestAttempt', () => ({
   useTestAttempt: () => ({ status: 'loading', retry: jest.fn() }),
 }));
@@ -80,7 +80,7 @@ describe('first launch (ph-9-us-3)', () => {
     expect(await screen.findByText(longDateLabel(fourWeeksOut))).toBeTruthy();
     await fireEvent.press(screen.getByText('Continue'));
 
-    expect(await screen.findByText('Concepts')).toBeTruthy();
+    expect(await screen.findByLabelText('Loading concepts')).toBeTruthy();
     expect(saveOnboarding).toHaveBeenCalledWith('u1', 'learn', fourWeeksOut);
   });
 

@@ -12,13 +12,19 @@ import { BaselineScreen } from '../baseline/BaselineScreen';
 import { HomeScreen } from '../home/HomeScreen';
 import { ReviewScreen } from '../review/ReviewScreen';
 import { FlashcardScreen } from '../study/FlashcardScreen';
+import { ConceptListScreen } from '../study/ConceptListScreen';
 import { SettingsScreen } from '../settings/SettingsScreen';
 import { WelcomeScreen } from '../onboarding/WelcomeScreen';
 import { ChoiceScreen } from '../onboarding/ChoiceScreen';
 import { OnboardingTestDateScreen } from '../onboarding/OnboardingTestDateScreen';
 import type { InitialRoute } from '../onboarding/onboardingGate';
 import { TestDateEditorScreen } from '../profile/TestDateEditorScreen';
-import type { HomeStackParamList, RootStackParamList, RootTabParamList } from './types';
+import type {
+  HomeStackParamList,
+  RootStackParamList,
+  RootTabParamList,
+  StudyStackParamList,
+} from './types';
 
 export type { RootTabParamList } from './types';
 
@@ -81,8 +87,15 @@ function makeStack(routeName: string, title: string, placeholderLabel: string, n
   return StackNavigator;
 }
 
-// The Study tab's first screen becomes the concept list (ph-2-us-7, Slice 4).
-const StudyStack = makeStack('StudyHome', 'Study', 'Concepts');
+// ph-2-us-7: the Study tab is the concept list.
+const StudyStackNav = createNativeStackNavigator<StudyStackParamList>();
+function StudyStack() {
+  return (
+    <StudyStackNav.Navigator screenOptions={headerOptions}>
+      <StudyStackNav.Screen name="StudyHome" component={ConceptListScreen} options={{ title: 'Study' }} />
+    </StudyStackNav.Navigator>
+  );
+}
 const PracticeTestsStack = makeStack(
   'PracticeTestsHome',
   'Practice Tests',

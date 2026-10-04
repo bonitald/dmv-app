@@ -39,6 +39,11 @@ export type HomeStackParamList = {
   Settings: undefined;
 };
 
+export type StudyStackParamList = {
+  /** The concept list (ph-2-us-7). Flashcards open above the tabs, on the root stack. */
+  StudyHome: undefined;
+};
+
 export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<
   RootStackParamList,
   T
