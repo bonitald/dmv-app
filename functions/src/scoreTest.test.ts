@@ -15,7 +15,7 @@ describe('scoreTestForUser', () => {
       await Promise.all(snap.docs.map((d) => d.ref.delete()));
     }
     const userRef = db.collection('users').doc(uid);
-    for (const sub of ['testAssignments', 'testAttempts', 'baseline']) {
+    for (const sub of ['testAssignments', 'testAttempts', 'baseline', 'conceptProgress']) {
       const snap = await userRef.collection(sub).get();
       await Promise.all(snap.docs.map((d) => d.ref.delete()));
     }
@@ -222,6 +222,91 @@ describe('scoreTestForUser', () => {
     });
 
     expect(result.recommendation).toBe('review-again');
+  });
+
+  describe('Concept Progress (ph-2-us-11)', () => {
+    const progressRef = () => db.collection('users').doc(uid).collection('conceptProgress').doc('row');
+
+    async function takeMiniQuiz(choices: string[]) {
+      const assembled = await assembleMiniQuizForUser(db, { uid }, { chunkId: 'row', count: choices.length });
+      await scoreTestForUser(db, { uid }, {
+        testId: assembled.testId,
+        answers: assembled.questions.map((q, i) => ({ questionId: q.id, choice: choices[i] })),
+      });
+      return assembled.testId;
+    }
+
+    test('a mini-quiz merges its score and leaves an existing status alone', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      await seedQuestion('q2', 'row', 'a');
+      await progressRef().set({ status: 'reviewed', statusUpdatedAt: new Date() });
+
+      const testId = await takeMiniQuiz(['a', 'b']);
+
+      const progress = (await progressRef().get()).data()!;
+      expect(progress.status).toBe('reviewed');
+      expect(progress.latestMiniQuizScore).toBe(0.5);
+      expect(progress.latestTestId).toBe(testId);
+      expect(progress.latestMiniQuizAt).toBeDefined();
+    });
+
+    test('with no doc yet, it creates one with score fields only (no status)', async () => {
+      await seedQuestion('q1', 'row', 'a');
+
+      await takeMiniQuiz(['a']);
+
+      const progress = (await progressRef().get()).data()!;
+      expect(Object.keys(progress).sort()).toEqual(['latestMiniQuizAt', 'latestMiniQuizScore', 'latestTestId']);
+      expect(progress.latestMiniQuizScore).toBe(1);
+    });
+
+    test('retaking the quiz overwrites the latest score', async () => {
+      await seedQuestion('q1', 'row', 'a');
+
+      await takeMiniQuiz(['b']);
+      const secondTestId = await takeMiniQuiz(['a']);
+
+      const progress = (await progressRef().get()).data()!;
+      expect(progress.latestMiniQuizScore).toBe(1);
+      expect(progress.latestTestId).toBe(secondTestId);
+    });
+
+    test('a practice test does not touch Concept Progress', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      const assembled = await assembleTestForUser(db, { uid }, { count: 1 });
+
+      await scoreTestForUser(db, { uid }, {
+        testId: assembled.testId,
+        answers: [{ questionId: 'q1', choice: 'a' }],
+      });
+
+      const all = await db.collection('users').doc(uid).collection('conceptProgress').get();
+      expect(all.empty).toBe(true);
+    });
+
+    test('a baseline section does not touch Concept Progress', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      await db
+        .collection('baselineTests')
+        .doc(CURRENT_BASELINE_VERSION)
+        .set({
+          sections: [
+            { section: 1, questionIds: ['q1'] },
+            { section: 2, questionIds: [] },
+            { section: 3, questionIds: [] },
+          ],
+          createdAt: new Date(),
+        });
+      const started = await startOrResumeBaselineForUser(db, { uid });
+
+      await scoreTestForUser(db, { uid }, {
+        testId: started.testId,
+        answers: [{ questionId: 'q1', choice: 'a' }],
+      });
+
+      const all = await db.collection('users').doc(uid).collection('conceptProgress').get();
+      expect(all.empty).toBe(true);
+    });
   });
 
   test('scores a baseline section, advances currentSection, and does not mark freeTestUsedAt yet', async () => {

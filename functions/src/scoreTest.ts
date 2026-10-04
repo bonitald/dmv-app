@@ -235,7 +235,9 @@ async function gradeQuestions(
  *
  * Reads:    `users/{uid}/testAssignments/{testId}` (written by assembleTest/assembleMiniQuiz),
  *           `questions/{id}`
- * Writes:   `users/{uid}/testAttempts/{testId}`; sets the assignment's `scored: true`
+ * Writes:   `users/{uid}/testAttempts/{testId}`; sets the assignment's `scored: true`; for a
+ *           mini-quiz, merges the latest score into `users/{uid}/conceptProgress/{chunkId}`
+ *           (ph-2-us-11) without touching the client-owned `status`
  * Errors:   HttpsError('not-found') — no such assignment for this user
  *           HttpsError('already-exists') — the assignment was already scored
  */
@@ -285,6 +287,29 @@ async function scoreAssignedTest(
       createdAt: FieldValue.serverTimestamp(),
     });
     tx.update(assignmentRef, { scored: true });
+
+    // ph-2-us-11: a mini-quiz's score goes on the topic's Concept Progress record, written here
+    // (not by the client) so it can't be forged. `merge` keeps the client-owned `status`, and
+    // creates the doc with score fields only if this topic was never opened. It's in the same
+    // transaction as the attempt, so the two can't disagree. An assignment without a topic
+    // can't happen for mini-quizzes (assembleMiniQuiz always records it); skip rather than
+    // write to a bad path if one ever does.
+    if (type === 'mini-quiz' && typeof assignment.chunkId === 'string' && assignment.chunkId) {
+      const progressRef = db
+        .collection('users')
+        .doc(uid)
+        .collection('conceptProgress')
+        .doc(assignment.chunkId);
+      tx.set(
+        progressRef,
+        {
+          latestMiniQuizScore: score,
+          latestMiniQuizAt: FieldValue.serverTimestamp(),
+          latestTestId: testId,
+        },
+        { merge: true }
+      );
+    }
 
     return { testId, type, score, correctCount, totalCount, perTopic, perQuestion, recommendation };
   });

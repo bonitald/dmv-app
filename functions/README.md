@@ -245,6 +245,12 @@ correctCount, totalCount, perTopic, perQuestion, recommendation, createdAt }`, p
 entries include the question content described above. Clients can read attempts but
 never write them.
 
+For a **mini-quiz**, the same transaction also merges `{ latestMiniQuizScore (0–1),
+latestMiniQuizAt (server timestamp), latestTestId }` into `users/{uid}/conceptProgress/{chunkId}`
+(ph-2-us-11), creating the doc if needed. It never writes `status`: that field is the client's
+(rules allow the owner to set only `status` and `statusUpdatedAt`). Practice tests and baseline
+sections don't touch Concept Progress.
+
 **Errors**: `invalid-argument` (missing `testId`, non-array `answers`, malformed baseline
 `testId`), `not-found` (no matching assignment or baseline for this user), `already-exists`
 (already scored, or not the user's current baseline section).
