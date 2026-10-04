@@ -97,3 +97,11 @@ test('while topics load, a labelled spinner shows', async () => {
   await renderList();
   expect(screen.getByLabelText('Loading concepts')).toBeTruthy();
 });
+
+test('an empty list says so and offers Try again', async () => {
+  mockTopics = { status: 'ready', topics: [] };
+  await renderList();
+  expect(screen.getByText('No concepts yet. Check back soon.')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Try again'));
+  expect(mockRetry).toHaveBeenCalled();
+});

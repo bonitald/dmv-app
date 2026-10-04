@@ -8,7 +8,9 @@ import { colors, radius, spacing, typography } from '../theme/tokens';
 // the choices. Back: only the correct answer, labelled "Answer", with no right/wrong marking.
 // Tap anywhere to turn it. The turn is interruptible, so a tap mid-turn just turns it back from
 // where it is. Both faces stay mounted so the turn shows real content on each side; the card is
-// one accessible button whose label says which side is up. Long text scrolls inside the card.
+// one accessible button whose label says which side is up. The hidden face takes no touches
+// (pointerEvents, scrollEnabled), so on Android the face that is up is the one that scrolls.
+// Long text scrolls inside the card.
 // The parent gives each card a `key`, so moving to another card always starts on its front.
 const FLIP_MS = 300;
 
@@ -56,15 +58,23 @@ export function FlipCard({ card }: { card: Pick<Flashcard, 'text' | 'correctAnsw
       accessibilityHint={flipped ? 'Shows the question again' : 'Shows the answer'}
       style={styles.container}
     >
-      <Animated.View style={[styles.face, frontStyle]}>
-        <ScrollView contentContainerStyle={styles.faceContent}>
+      <Animated.View
+        testID="flipcard-front"
+        pointerEvents={flipped ? 'none' : 'auto'}
+        style={[styles.face, frontStyle]}
+      >
+        <ScrollView scrollEnabled={!flipped} contentContainerStyle={styles.faceContent}>
           <ScenarioBadge type={card.type} />
           <Text style={[typography.h1, styles.text]}>{card.text}</Text>
           <Text style={typography.small}>Tap to see the answer</Text>
         </ScrollView>
       </Animated.View>
-      <Animated.View style={[styles.face, styles.back, backStyle]}>
-        <ScrollView contentContainerStyle={styles.faceContent}>
+      <Animated.View
+        testID="flipcard-back"
+        pointerEvents={flipped ? 'auto' : 'none'}
+        style={[styles.face, styles.back, backStyle]}
+      >
+        <ScrollView scrollEnabled={flipped} contentContainerStyle={styles.faceContent}>
           <Text style={[typography.caption, styles.answerLabel]}>ANSWER</Text>
           <Text style={[typography.h1, styles.text]}>{card.correctAnswer}</Text>
         </ScrollView>

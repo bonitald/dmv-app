@@ -1,5 +1,6 @@
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { NoConnection } from '../components/NoConnection';
 import { colors, radius, spacing, typography } from '../theme/tokens';
@@ -53,7 +54,12 @@ export function ConceptListScreen() {
         </Text>
       }
       ListEmptyComponent={
-        <Text style={[typography.body, styles.muted]}>No concepts yet. Check back soon.</Text>
+        // Offline with nothing cached, Firestore can answer with an empty list instead of an
+        // error, so an empty list also offers a retry.
+        <View style={styles.empty}>
+          <Text style={[typography.body, styles.muted]}>No concepts yet. Check back soon.</Text>
+          <Button label="Try again" variant="secondary" onPress={topics.retry} />
+        </View>
       }
       renderItem={({ item }) => (
         <ConceptRowView
@@ -71,7 +77,7 @@ function ConceptRowView({ row, onPress }: { row: ConceptRow; onPress: () => void
     .filter(Boolean)
     .join(', ');
   const chip = row.comingSoon
-    ? { backgroundColor: colors.background, color: colors.inkFaint }
+    ? { backgroundColor: colors.background, color: colors.inkSoft }
     : CHIP[row.status];
 
   const content = (
@@ -114,6 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  empty: { gap: spacing.space3 },
   muted: { color: colors.inkSoft },
   rowHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.space2 },
   rowTitle: { flex: 1 },

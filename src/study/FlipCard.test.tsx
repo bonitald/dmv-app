@@ -42,3 +42,12 @@ test('an unknown type gets the plain fact styling', async () => {
   expect(screen.queryByText('SCENARIO')).toBeNull();
   expect(screen.getByLabelText('Question: Who goes first at a 4-way stop?')).toBeTruthy();
 });
+
+test('only the face that is up takes touches, and they swap on a tap', async () => {
+  await render(<FlipCard card={card} />);
+  expect(screen.getByTestId('flipcard-front').props.pointerEvents).toBe('auto');
+  expect(screen.getByTestId('flipcard-back').props.pointerEvents).toBe('none');
+  await fireEvent.press(screen.getByRole('button'));
+  expect(screen.getByTestId('flipcard-front').props.pointerEvents).toBe('none');
+  expect(screen.getByTestId('flipcard-back').props.pointerEvents).toBe('auto');
+});

@@ -7,7 +7,8 @@ import type { ProgressMap } from './conceptProgressData';
 // local cache at once, even offline) or when scoreTest saves a new score. 'error' is kept apart
 // from an empty map: lists show everything as not started, but nothing writes a status from an
 // unknown one, so a failed read can never downgrade a reviewed topic. Signed out: empty, and
-// nothing can write without a uid.
+// nothing can write without a uid. When the uid changes the state resets to loading at once, so
+// a previous user's map is never shown or used for a write.
 export type ConceptProgressState =
   | { status: 'loading' }
   | { status: 'ready'; byChunk: ProgressMap }
@@ -18,6 +19,7 @@ export function useConceptProgress(): ConceptProgressState {
   const [state, setState] = useState<ConceptProgressState>({ status: 'loading' });
 
   useEffect(() => {
+    setState({ status: 'loading' });
     if (!uid) {
       setState({ status: 'ready', byChunk: {} });
       return;
