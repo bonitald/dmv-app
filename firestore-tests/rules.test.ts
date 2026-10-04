@@ -275,3 +275,113 @@ test('an unauthenticated device cannot read topics', async () => {
   const anon = testEnv.unauthenticatedContext().firestore();
   await assertFails(getDoc(doc(anon, 'topics/right-of-way')));
 });
+
+// ph-2-us-11: Concept Progress. The client may set only `status` (one of three values) and a
+// server `statusUpdatedAt`; the score fields belong to scoreTest. Owner-only, never deleted.
+describe('users/{uid}/conceptProgress (ph-2-us-11)', () => {
+  const path = 'users/alice-uid/conceptProgress/row';
+  const alice = () => testEnv.authenticatedContext('alice-uid').firestore();
+  const seed = (docPath: string, data: Record<string, unknown>) =>
+    testEnv.withSecurityRulesDisabled(async (context) => {
+      await setDoc(doc(context.firestore(), docPath), data);
+    });
+  const scored = { latestMiniQuizScore: 0.6, latestMiniQuizAt: new Date(), latestTestId: 't1' };
+
+  test('the owner can read their own doc', async () => {
+    await seed(path, { status: 'reviewed' });
+    await assertSucceeds(getDoc(doc(alice(), path)));
+  });
+
+  test("reading another user's doc is denied", async () => {
+    await seed('users/bob-uid/conceptProgress/row', { status: 'reviewed' });
+    await assertFails(getDoc(doc(alice(), 'users/bob-uid/conceptProgress/row')));
+  });
+
+  test.each(['in-progress', 'reviewed', 'needs-revisit'])(
+    'creating with status %s and a server statusUpdatedAt succeeds',
+    async (status) => {
+      await assertSucceeds(
+        setDoc(doc(alice(), path), { status, statusUpdatedAt: serverTimestamp() })
+      );
+    }
+  );
+
+  test.each(['not-started', 'done', ''])('status "%s" is denied', async (status) => {
+    await assertFails(setDoc(doc(alice(), path), { status, statusUpdatedAt: serverTimestamp() }));
+  });
+
+  test('a client-chosen statusUpdatedAt is denied', async () => {
+    await assertFails(setDoc(doc(alice(), path), { status: 'reviewed', statusUpdatedAt: new Date() }));
+  });
+
+  test('creating without statusUpdatedAt is denied', async () => {
+    await assertFails(setDoc(doc(alice(), path), { status: 'reviewed' }));
+  });
+
+  test('creating with a score is denied', async () => {
+    await assertFails(
+      setDoc(doc(alice(), path), {
+        status: 'reviewed',
+        statusUpdatedAt: serverTimestamp(),
+        latestMiniQuizScore: 1,
+      })
+    );
+  });
+
+  test('creating with an unknown key is denied', async () => {
+    await assertFails(
+      setDoc(doc(alice(), path), { status: 'reviewed', statusUpdatedAt: serverTimestamp(), note: 'x' })
+    );
+  });
+
+  test('the owner can set status on a doc scoreTest already wrote', async () => {
+    await seed(path, scored);
+    await assertSucceeds(
+      setDoc(doc(alice(), path), { status: 'reviewed', statusUpdatedAt: serverTimestamp() }, { merge: true })
+    );
+  });
+
+  test('changing a score field on update is denied', async () => {
+    await seed(path, { ...scored, status: 'in-progress', statusUpdatedAt: new Date() });
+    await assertFails(
+      updateDoc(doc(alice(), path), {
+        status: 'reviewed',
+        statusUpdatedAt: serverTimestamp(),
+        latestMiniQuizScore: 1,
+      })
+    );
+  });
+
+  test('removing a score field is denied', async () => {
+    await seed(path, { ...scored, status: 'in-progress', statusUpdatedAt: new Date() });
+    await assertFails(updateDoc(doc(alice(), path), { latestTestId: deleteField() }));
+  });
+
+  test('changing status to not-started on update is denied', async () => {
+    await seed(path, { status: 'reviewed', statusUpdatedAt: new Date() });
+    await assertFails(
+      updateDoc(doc(alice(), path), { status: 'not-started', statusUpdatedAt: serverTimestamp() })
+    );
+  });
+
+  test('deleting is denied', async () => {
+    await seed(path, { status: 'reviewed', statusUpdatedAt: new Date() });
+    await assertFails(deleteDoc(doc(alice(), path)));
+  });
+
+  test("writing another user's doc is denied", async () => {
+    await assertFails(
+      setDoc(doc(alice(), 'users/bob-uid/conceptProgress/row'), {
+        status: 'reviewed',
+        statusUpdatedAt: serverTimestamp(),
+      })
+    );
+  });
+
+  test('an unauthenticated device can neither read nor write', async () => {
+    await seed(path, { status: 'reviewed' });
+    const anon = testEnv.unauthenticatedContext().firestore();
+    await assertFails(getDoc(doc(anon, path)));
+    await assertFails(setDoc(doc(anon, path), { status: 'reviewed', statusUpdatedAt: serverTimestamp() }));
+  });
+});

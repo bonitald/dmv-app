@@ -56,6 +56,31 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // ph-2-us-11: Concept Progress, one doc per handbook topic — the first client-writable
+    // collection under users/{uid}. The client sets only `status` (the user's own choice,
+    // ph-2-us-10) and `statusUpdatedAt`, which must be the server's time. The score fields
+    // (latestMiniQuizScore, latestMiniQuizAt, latestTestId) are written only by scoreTest via
+    // the Admin SDK, so a client can't forge a quiz score. `not-started` is never stored: it's
+    // the absence of a doc. Delete is denied; account deletion goes through ph-9-us-9.
+    match /users/{uid}/conceptProgress/{chunkId} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+      function validStatus() {
+        return request.resource.data.status in ['in-progress', 'reviewed', 'needs-revisit']
+          && request.resource.data.statusUpdatedAt == request.time;
+      }
+
+      allow read: if isOwner();
+      allow create: if isOwner()
+        && request.resource.data.keys().hasOnly(['status', 'statusUpdatedAt'])
+        && validStatus();
+      allow update: if isOwner()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'statusUpdatedAt'])
+        && validStatus();
+      allow delete: if false;
+    }
+
     // ph-1-us-9: topic catalog — holds no question content, so it's safe to expose to any
     // signed-in client. Populated only by the publish-topics script (Admin SDK).
     match /topics/{chunkId} {
@@ -65,6 +90,7 @@ service cloud.firestore {
 
     // Everything else stays deny-all (ph-0-us-3's locked-by-default baseline). Later phases
     // that need a client-writable sub-collection under users/{uid} (driving sessions, test
-    // outcomes, settings) add an explicit `match` block here rather than reopening the wildcard.
+    // outcomes, settings) add an explicit `match` block here, as `conceptProgress` does above,
+    // rather than reopening the wildcard.
   }
 }
