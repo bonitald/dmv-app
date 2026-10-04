@@ -19,6 +19,17 @@ export interface AssembledTest {
   questions: QuizQuestion[];
 }
 
+/** One `getFlashcards` card: a question with its answer, for flip-card study (ph-2-us-3). */
+export interface Flashcard extends QuizQuestion {
+  correctAnswer: string;
+}
+
+/** `getFlashcards` response: the whole topic, already shuffled. */
+export interface FlashcardDeck {
+  chunkId: string;
+  cards: Flashcard[];
+}
+
 /** `startOrResumeBaseline` response. `testId` is `baseline-{version}-{section}`. */
 export interface BaselineSection extends AssembledTest {
   version: string;

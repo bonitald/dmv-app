@@ -49,10 +49,10 @@ test('topics in handbook order with got it / missed it / not tested; first miss 
   const s = summarizeBaseline(
     [item('b', 'wrong'), item('a', 'right'), item('c', 'skipped'), item(null, 'removed')],
     [
-      { chunkId: 'a', title: 'A', order: 1 },
-      { chunkId: 'b', title: 'B', order: 2 },
-      { chunkId: 'c', title: 'C', order: 3 },
-      { chunkId: 'd', title: 'D', order: 4 },
+      { chunkId: 'a', title: 'A', description: '', order: 1, approvedQuestionCount: 1 },
+      { chunkId: 'b', title: 'B', description: '', order: 2, approvedQuestionCount: 1 },
+      { chunkId: 'c', title: 'C', description: '', order: 3, approvedQuestionCount: 1 },
+      { chunkId: 'd', title: 'D', description: '', order: 4, approvedQuestionCount: 1 },
     ]
   );
   expect(s.topics).toEqual([
@@ -68,7 +68,7 @@ test('topics in handbook order with got it / missed it / not tested; first miss 
 
 test('topics missing from the catalog (or no catalog) still show, titled by chunkId', () => {
   const s = summarizeBaseline([item('x', 'wrong'), item('a', 'right')], [
-    { chunkId: 'a', title: 'A', order: 1 },
+    { chunkId: 'a', title: 'A', description: '', order: 1, approvedQuestionCount: 1 },
   ]);
   expect(s.topics).toEqual([
     { chunkId: 'a', title: 'A', result: 'got-it' },
