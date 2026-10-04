@@ -117,8 +117,9 @@ loads with cards. A topic that errors or is empty never becomes "in progress".
   Swiping back from the first card does nothing.
 - End of deck is the screen's final state: "Take the mini-quiz" (→ `MiniQuiz` placeholder) and
   "Start this concept over" (reshuffle from cache, back to card 1, no call, status unchanged).
-- **`FlipCard`** (`src/study/FlipCard.tsx`): `Animated` `rotateY` with hidden back faces; taps
-  ignored while turning; front = question text only, back = correct answer labelled "Answer";
+- **`FlipCard`** (`src/study/FlipCard.tsx`): `Animated` `rotateY` with hidden back faces; a tap
+  mid-turn turns the card back smoothly from where it is (the animation is interruptible, so no
+  input lock that could stick); front = question text only, back = correct answer labelled "Answer";
   screen readers hear which side is showing; long text scrolls inside the card. Moving to
   another card always shows its front.
 - **`ScenarioBadge`** (`src/components/ScenarioBadge.tsx`): extracted from `QuizCard`, used by
