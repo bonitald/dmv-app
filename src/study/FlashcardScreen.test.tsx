@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text } from 'react-native';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getFlashcards } from '../api/callables';
 import { CallableError } from '../api/callableErrors';
@@ -46,17 +46,6 @@ function tree() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Flashcards" component={FlashcardScreen as never} initialParams={{ chunkId: 'row' }} />
-        <Stack.Screen name="MiniQuiz">{() => <Text>Mini-quiz screen</Text>}</Stack.Screen>
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-
-function treeWith(params: object) {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Flashcards" component={FlashcardScreen as never} initialParams={params} />
         <Stack.Screen name="MiniQuiz">{() => <Text>Mini-quiz screen</Text>}</Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
@@ -323,9 +312,10 @@ test('a not-passed topic with no history opens the full deck without a banner', 
 });
 
 test('the end of a missed-only pass offers the quiz and all cards', async () => {
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'in-progress', latestMiniQuizScore: 0.5 } }, cachedEmpty: false } as ConceptProgressState;
   await seedHistory(['q2']);
   mockGet.mockResolvedValue(deckOf(card(1), card(2)));
-  await render(treeWith({ chunkId: 'row', pass: { mode: 'missed-only', nonce: 1 } }));
+  await render(tree());
   await screen.findByLabelText('Question: Question 2');
   await fireEvent.press(screen.getByText('Next'));
   expect(screen.getByText("You've been through the 1 you missed.", { exact: false })).toBeTruthy();
@@ -334,32 +324,14 @@ test('the end of a missed-only pass offers the quiz and all cards', async () => 
   expect(screen.getByText('1 of 2')).toBeTruthy();
 });
 
-test('a missed-only pass param after a perfect score opens the full deck', async () => {
+test('a not-passed topic whose history has no matching misses opens the full deck', async () => {
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'in-progress', latestMiniQuizScore: 0.5 } }, cachedEmpty: false } as ConceptProgressState;
   await seedHistory([]);
   mockGet.mockResolvedValue(deckOf(card(1), card(2)));
-  await render(treeWith({ chunkId: 'row', pass: { mode: 'missed-only', nonce: 1 } }));
+  await render(tree());
   await screen.findByLabelText('Question: Question 1');
   expect(screen.queryByText(/you missed/)).toBeNull();
   expect(screen.getByText('1 of 2')).toBeTruthy();
-});
-
-test('a new pass param restarts the open viewer', async () => {
-  mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
-  const ref = createNavigationContainerRef();
-  await render(
-    <NavigationContainer ref={ref}>
-      <Stack.Navigator>
-        <Stack.Screen name="Flashcards" component={FlashcardScreen as never} initialParams={{ chunkId: 'row' }} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-  await screen.findByLabelText('Question: Question 1');
-  await fireEvent.press(screen.getByText('Next'));
-  await seedHistory(['q3']);
-  await act(() => ref.setParams({ chunkId: 'row', pass: { mode: 'missed-only', nonce: 2 } } as never));
-  expect(await screen.findByText('Reviewing the 1 you missed')).toBeTruthy();
-  expect(screen.getByLabelText('Question: Question 3')).toBeTruthy();
-  expect(mockGet).toHaveBeenCalledTimes(1);
 });
 
 test('Skip to quiz shows on every card, not at the end, and opens the quiz', async () => {
@@ -391,9 +363,10 @@ test('resuming restores the saved pass order and card', async () => {
 });
 
 test('Show all cards saves the new full pass, so reopening does not resume the old missed-only one', async () => {
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'in-progress', latestMiniQuizScore: 0.5 } }, cachedEmpty: false } as ConceptProgressState;
   await seedHistory(['q2', 'q3']);
   mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
-  const first = await render(treeWith({ chunkId: 'row', pass: { mode: 'missed-only', nonce: 1 } }));
+  const first = await render(tree());
   await screen.findByText('Reviewing the 2 you missed');
   await fireEvent.press(screen.getByText('Next'));
   await fireEvent.press(screen.getByText('Show all cards'));

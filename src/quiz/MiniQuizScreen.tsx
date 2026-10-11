@@ -145,10 +145,8 @@ export function MiniQuizScreen({ navigation, route }: RootStackScreenProps<'Mini
       if (choseRef.current || !uid) return;
       choseRef.current = true;
       setStatusFromChoice(uid, chunkId, choice); // queued by Firestore offline; never awaited
-      if (choice === 'review-again') {
-        navigation.popTo('Flashcards', { chunkId, pass: { mode: 'missed-only', nonce: Date.now() } });
-        return;
-      }
+      // Both choices return to the concept list. Review Again loses nothing: a topic whose latest
+      // quiz wasn't passed reopens on only its missed cards (lastQuizNotPassed).
       navigation.popTo('Main', { screen: 'Study', params: { screen: 'StudyHome' } });
     },
     [uid, chunkId, navigation]

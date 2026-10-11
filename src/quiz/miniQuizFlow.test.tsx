@@ -122,14 +122,14 @@ test('a retake passes the previous quiz as excludeIds', async () => {
   await waitFor(() => expect(assembleMiniQuiz).toHaveBeenLastCalledWith({ chunkId: 'row', excludeIds: ['q1', 'q2'] }));
 });
 
-test('Review Again pops back to the flashcards with a missed-only pass', async () => {
+test('Review Again returns to the concept list', async () => {
   (scoreTest as jest.Mock).mockResolvedValue(graded('review-again'));
   await renderFlow();
   await answerAllAndSubmit(2);
   await fireEvent.press(await screen.findByText('Review Again'));
   expect(setStatusFromChoice).toHaveBeenCalledWith('u1', 'row', 'review-again');
-  expect(await screen.findByText(/^Flashcards .*"chunkId":"row".*"mode":"missed-only"/)).toBeTruthy();
-  expect(ref.getRootState().routes.map((r) => r.name)).toEqual(['Main', 'Flashcards']);
+  expect(await screen.findByText(/^Main .*"screen":"Study"/)).toBeTruthy();
+  expect(ref.getRootState().routes.map((r) => r.name)).toEqual(['Main']);
 });
 
 test('Mark Reviewed after a failed quiz returns to the concept list', async () => {

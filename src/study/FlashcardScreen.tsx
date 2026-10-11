@@ -26,9 +26,9 @@ import { useFlashcardDeck } from './useFlashcardDeck';
 
 // ph-2-us-3 / ph-2-us-4: one topic's flashcards, one at a time, as a "pass": a full pass
 // (weak cards first) or a missed-only pass (the cards missed in the last mini-quiz). A saved
-// pass resumes where it was left; a topic whose last quiz wasn't passed opens missed-only; a new `pass` route
-// param (Review Again) restarts the open viewer. The end of a pass offers the mini-quiz or all
-// cards. The card the pass was left on is kept on the device (the end of the pass clears it).
+// pass resumes where it was left; a topic whose last quiz wasn't passed opens missed-only
+// (so Review Again, which returns to the concept list, loses nothing). The end of a pass offers
+// the mini-quiz or all cards. The card the pass was left on is kept on the device (the end of the pass clears it).
 // Opening counts only once the deck has cards, so an empty or failed topic never turns
 // "in progress" or becomes Home's "Continue learning".
 interface Pass {
@@ -40,14 +40,13 @@ interface Pass {
 }
 
 export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Flashcards'>) {
-  const { chunkId, pass: passParam } = route.params;
+  const { chunkId } = route.params;
   const { uid } = useAuth();
   const deck = useFlashcardDeck(chunkId);
   const progress = useConceptProgress();
   const topics = useTopics();
   const [pass, setPass] = useState<Pass | null>(null);
   const passCount = useRef(0);
-  const handledNonce = useRef<number | undefined>(undefined);
   const mounted = useRef(true);
   const latestRequest = useRef(0);
   useEffect(() => {
@@ -101,7 +100,6 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
   const progressKnown = progress.status !== 'loading';
   useEffect(() => {
     if (pass || deck.status !== 'ready' || !uid || !progressKnown) return;
-    if (passParam) return; // the param effect below starts it
     let cancelled = false;
     (async () => {
       const saved = await getDeckPass(uid, chunkId);
@@ -123,15 +121,7 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
     return () => {
       cancelled = true;
     };
-  }, [pass, deck, uid, chunkId, progressKnown, progress, passParam]);
-
-  // Review Again (Slice 4b): a new `pass` param restarts the open viewer with that pass,
-  // reading fresh history (the quiz just recorded it). No new getFlashcards call.
-  useEffect(() => {
-    if (!passParam || passParam.nonce === handledNonce.current || deck.status !== 'ready' || !uid) return;
-    handledNonce.current = passParam.nonce;
-    void startPass(passParam.mode);
-  }, [passParam, deck.status, uid, startPass]);
+  }, [pass, deck, uid, chunkId, progressKnown, progress]);
 
   const savePosition = useCallback(
     (p: Pass, cardId: string | null) => {
