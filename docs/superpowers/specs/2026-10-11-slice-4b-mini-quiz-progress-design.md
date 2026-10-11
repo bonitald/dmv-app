@@ -198,3 +198,26 @@ who has taken the baseline, plus a fresh one for the empty Progress state.
 Practice-test evidence in the report and "Topics to work on" (Slice 5a); practice and baseline
 results feeding card performance (ph-4-us-5, Slice 5b); syncing card performance to Firestore;
 strength markers on the concept list; clearing local study data on sign-out (Slice 6).
+
+## Amendment (2026-10-11, from device testing)
+
+Device testing found the three next-step choices confusing, especially after a pass: Mark
+Reviewed went back to the list, and the only "move on" button (Come Back Later) marked a topic
+just aced as *needs revisit*. Young users also benefit from short sessions that save their work.
+This amendment supersedes the earlier decisions it names.
+
+| # | Decision | Supersedes |
+|---|----------|------------|
+| A1 | The results screen has **two** choices on every result: **Mark Reviewed** (status `reviewed`) and **Review Again** (status `in-progress`). Highlighted: Mark Reviewed on a pass (`move-on`), Review Again on a fail (`review-again`); both always enabled. | Decision 3's three choices; ph-2-us-9's three-choice criteria |
+| A2 | **Mark Reviewed always returns to the concept list.** The user picks what to tackle next. | — |
+| A3 | **Come Back Later is removed**, with its next-topic navigation (`nextTopicId`, `routesForNextTopic`). Nothing sets `needs-revisit` any more; the value stays valid in rules and still displays for existing records. | Decision 2; ph-2-us-10 table row "Come Back Later" |
+| A4 | **Reopening a topic whose latest quiz was not passed** (latest score below the 80% pass mark) opens on only the cards missed in that quiz, with "Show all cards". This applies whatever its status, including *reviewed*. A saved pass still resumes first. | Decision 9 (was: *needs revisit* status) |
+| A5 | `scoreTest` also counts **`miniQuizPassCount`** and **`miniQuizFailCount`** per topic on Concept Progress (`FieldValue.increment`, same merge, pass = score ≥ `MINI_QUIZ_PASS_THRESHOLD`). Server-only; clients can't write them (existing `hasOnly` rule; new rules test). Records from before this have no counts. | Extends decision 10 |
+| A6 | **Concept list row:** keeps the status chip, adds a coral **"Last quiz not passed"** marker when the latest quiz score is below the pass mark, and a line **"Quizzes: {p} passed · {f} not passed · latest {c} of {t}"**. Older records without counts or correct/total fall back to "Latest quiz: {n}%". | ph-2-us-7 row ("Latest quiz: N%") |
+
+Copy (exact): "Mark Reviewed", "Review Again", "Last quiz not passed", "Quizzes: {p} passed · {f}
+not passed · latest {c} of {t}" (parts with no data are left out, e.g. "Quizzes: 1 passed ·
+latest 9 of 10").
+
+Story updates: ph-2-us-9 (two choices, always to the list), ph-2-us-10 (status table: Come Back
+Later removed), ph-2-us-11 (counts), ph-2-us-7 (row marker and quiz line), ph-2-us-4 (A4).
