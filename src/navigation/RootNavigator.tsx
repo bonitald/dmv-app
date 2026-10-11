@@ -9,6 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography } from '../theme/tokens';
 import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 import { BaselineScreen } from '../baseline/BaselineScreen';
+import { MiniQuizScreen } from '../quiz/MiniQuizScreen';
 import { HomeScreen } from '../home/HomeScreen';
 import { ReviewScreen } from '../review/ReviewScreen';
 import { FlashcardScreen } from '../study/FlashcardScreen';
@@ -29,7 +30,7 @@ import type {
 export type { RootTabParamList } from './types';
 
 // ph-0-us-8 / ph-9-us-3 / ph-9-us-7: a root stack holds onboarding, then `Main` (the tabs), plus
-// full-screen flows above the tabs (Baseline, Review, Flashcards, the mini-quiz placeholder, the
+// full-screen flows above the tabs (Baseline, Review, Flashcards, the mini-quiz, the
 // test date editor). Each tab is its own stack so later slices can push nested screens without restructuring this file.
 
 const headerOptions: NativeStackNavigationOptions = {
@@ -178,14 +179,7 @@ export function RootNavigator({ initialRoute }: { initialRoute: InitialRoute }) 
           component={FlashcardScreen}
           options={{ title: 'Flashcards' }}
         />
-        <RootStack.Screen name="MiniQuiz" options={{ title: 'Mini-quiz' }}>
-          {() => (
-            <PlaceholderScreen
-              label="Mini-quiz"
-              note="A quick quiz on this concept is coming in the next update."
-            />
-          )}
-        </RootStack.Screen>
+        <RootStack.Screen name="MiniQuiz" component={MiniQuizScreen} options={{ title: 'Mini-quiz' }} />
         <RootStack.Screen
           name="TestDateEditor"
           component={TestDateEditorScreen}

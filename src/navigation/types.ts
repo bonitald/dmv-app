@@ -8,7 +8,7 @@ import type { PassMode } from '../study/deckOrder';
 
 export type RootTabParamList = {
   Home: undefined;
-  Study: undefined;
+  Study: NavigatorScreenParams<StudyStackParamList> | undefined;
   PracticeTests: undefined;
   DrivingLog: undefined;
   Progress: undefined;
