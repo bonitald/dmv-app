@@ -31,7 +31,7 @@ export function quizLine(p: ConceptProgress): string | null {
   if (typeof p.latestMiniQuizCorrect === 'number' && typeof p.latestMiniQuizTotal === 'number') {
     parts.push(`latest ${p.latestMiniQuizCorrect} of ${p.latestMiniQuizTotal}`);
   }
-  if (parts.length > 0) return `Quizzes: ${parts.join(' · ')}`;
+  if (parts.length > 0) return `Quizzes: ${parts.join(' \u00b7 ')}`;
   if (typeof p.latestMiniQuizScore === 'number') return `Latest quiz: ${Math.round(p.latestMiniQuizScore * 100)}%`;
   return null;
 }
