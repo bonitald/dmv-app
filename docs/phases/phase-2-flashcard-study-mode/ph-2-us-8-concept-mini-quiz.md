@@ -89,4 +89,4 @@ So that I can check I actually learned it before moving on.
 
 ## Questions
 - Should starting a quiz without doing the flashcards be offered on the concept list itself, or
-  only inside the topic? Assumed: a "Skip to quiz" option at the start of the flashcard viewer.
+  only inside the topic? Decided (Slice 4b): a "Skip to quiz" link beside the card counter on every card of the flashcard viewer.

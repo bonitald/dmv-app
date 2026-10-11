@@ -235,9 +235,13 @@ function Deck({ pass, onMove, onQuiz, onAllCards }: DeckProps) {
           <Button label="Show all cards" variant="text" onPress={onAllCards} />
         </View>
       )}
-      <Text style={[typography.small, styles.progress]}>
-        {state.index + 1} of {total}
-      </Text>
+      {/* Skip to quiz on every card: a user can quiz out partway through the deck. */}
+      <View style={styles.progressRow}>
+        <Text style={typography.small}>
+          {state.index + 1} of {total}
+        </Text>
+        <Button label="Skip to quiz" variant="text" onPress={onQuiz} />
+      </View>
       <FlipCard key={`${state.index}-${card.id}`} card={card} />
       <View style={styles.nav}>
         <Button
@@ -249,7 +253,6 @@ function Deck({ pass, onMove, onQuiz, onAllCards }: DeckProps) {
         />
         <Button label="Next" onPress={() => dispatch({ type: 'next' })} style={styles.navButton} />
       </View>
-      {state.index === 0 && <Button label="Skip to quiz" variant="text" onPress={onQuiz} />}
     </View>
   );
 }
@@ -324,7 +327,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.space3,
   },
   centerText: { textAlign: 'center' },
-  progress: { textAlign: 'center' },
+  progressRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   nav: { flexDirection: 'row', gap: spacing.space3 },
   navButton: { flex: 1 },
   end: { justifyContent: 'center' },

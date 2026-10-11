@@ -352,13 +352,17 @@ test('a new pass param restarts the open viewer', async () => {
   expect(mockGet).toHaveBeenCalledTimes(1);
 });
 
-test('Skip to quiz shows on the first card only and opens the quiz', async () => {
+test('Skip to quiz shows on every card, not at the end, and opens the quiz', async () => {
   mockGet.mockResolvedValue(deckOf(card(1), card(2)));
   await render(tree());
   await screen.findByLabelText('Question: Question 1');
+  expect(screen.getByText('Skip to quiz')).toBeTruthy();
   await fireEvent.press(screen.getByText('Next'));
+  expect(screen.getByText('Skip to quiz')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Next'));
+  expect(screen.getByText('End of this concept')).toBeTruthy();
   expect(screen.queryByText('Skip to quiz')).toBeNull();
-  await fireEvent.press(screen.getByText('Previous'));
+  await fireEvent.press(screen.getByText('Back to the last card'));
   await fireEvent.press(screen.getByText('Skip to quiz'));
   expect(await screen.findByText('Mini-quiz screen')).toBeTruthy();
 });

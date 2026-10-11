@@ -17,14 +17,14 @@ shaky / likely gap.
 → "Show all cards" opens the full deck → retake → Come Back Later opens the next topic and the
 first one shows "needs revisit" → reopen it: only its missed cards → Mark Reviewed → the list
 shows "reviewed" → Progress tab shows the topic as strong / shaky / likely gap with "N of M
-right in your latest quiz". Also: "Skip to quiz" on the first card; a big topic gets more than
+right in your latest quiz". Also: "Skip to quiz" on any card; a big topic gets more than
 10 questions.
 
 ## Decisions (2026-10-11)
 
 | # | Question | Decision | Changes a story? |
 |---|----------|----------|------------------|
-| 1 | Starting the quiz without the flashcards | A "Skip to quiz" link on the first card of any pass. Nothing new on the concept list. | Resolves ph-2-us-8's open question |
+| 1 | Starting the quiz without the flashcards | A "Skip to quiz" link beside the card counter on every card (changed from first card only after device testing, 2026-10-11). Nothing new on the concept list. | Resolves ph-2-us-8's open question |
 | 2 | "Come Back Later" status | Always `needs-revisit`, whatever the score. | Confirms ph-2-us-9's assumption |
 | 3 | Mini-quiz results layout | One screen: score, recommendation, missed questions with the right answer, "Review answers" (existing `Review` screen), three choices. | No |
 | 4 | Practice-test evidence in the strength rule | `conceptStrength` handles it now; the loader passes none until Slice 5a. | No |
@@ -151,7 +151,7 @@ running → results*, like `BaselineScreen`.
   table; waits for both the saved pass and Concept Progress (decides `missed-only` for *needs
   revisit*).
 - Missed-only banner: "Reviewing the {n} you missed · Show all cards".
-- First card: "Skip to quiz" link → `MiniQuiz`.
+- Every card: "Skip to quiz" beside the "N of M" counter → `MiniQuiz` (hidden at the end of the deck, where "Take the mini-quiz" is the main action).
 - End of a `full` pass: "Take the mini-quiz", "Start this concept over" (as now). End of a
   `missed-only` pass: "Take the mini-quiz", "See all cards".
 
