@@ -1,4 +1,4 @@
-import { nextStatus, progressFor, statusForChoice, toProgress } from './conceptProgressData';
+import { lastQuizNotPassed, MINI_QUIZ_PASS_THRESHOLD, nextStatus, progressFor, statusForChoice, toProgress } from './conceptProgressData';
 
 describe('toProgress', () => {
   test('no doc is not started', () => {
@@ -83,5 +83,20 @@ describe('nextStatus (ph-2-us-10 transitions)', () => {
     expect(statusForChoice(choice)).toBe(expected);
     expect(nextStatus('reviewed', choice)).toBe(expected);
     expect(nextStatus('not-started', choice)).toBe(expected);
+  });
+});
+
+describe('lastQuizNotPassed', () => {
+  test('the pass mark is 80%', () => {
+    expect(MINI_QUIZ_PASS_THRESHOLD).toBe(0.8);
+  });
+  test('no score is not a fail', () => {
+    expect(lastQuizNotPassed({ status: 'in-progress' })).toBe(false);
+  });
+  test('below the pass mark is not passed', () => {
+    expect(lastQuizNotPassed({ status: 'reviewed', latestMiniQuizScore: 0.79 })).toBe(true);
+  });
+  test('at the pass mark is passed', () => {
+    expect(lastQuizNotPassed({ status: 'reviewed', latestMiniQuizScore: 0.8 })).toBe(false);
   });
 });

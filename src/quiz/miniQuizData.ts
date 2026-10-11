@@ -1,6 +1,6 @@
 import type { PerQuestionResult, ScoreTestResult } from '../api/types';
 import { isMissed, toReviewItems, type ReviewItem } from '../review/reviewData';
-import type { NextStepChoice } from '../study/conceptProgressData';
+import { MINI_QUIZ_PASS_THRESHOLD, type NextStepChoice } from '../study/conceptProgressData';
 
 // ph-2-us-8 / ph-2-us-9: the mini-quiz's logic outside the screen: its graded outcome (from
 // scoreTest, or from the saved attempt when it was already graded), the results copy, the
@@ -20,9 +20,6 @@ export interface MiniQuizOutcome {
   /** Raw results, for recording card performance (ph-2-us-6). */
   perQuestion: PerQuestionResult[];
 }
-
-/** Client copy of scoreTest's MINI_QUIZ_PASS_THRESHOLD, used only if a result lacks one. */
-export const MINI_QUIZ_PASS_THRESHOLD = 0.8;
 
 function outcome(
   testId: string,

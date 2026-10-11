@@ -56,7 +56,7 @@ test('every topic in order with its description, status and latest score', async
   await renderList();
 
   expect(screen.getByText('Start any concept, in any order, and start one over any time.')).toBeTruthy();
-  expect(screen.getByLabelText('Alpha, Reviewed, latest quiz 80%')).toBeTruthy();
+  expect(screen.getByLabelText('Alpha, Reviewed, Latest quiz: 80%')).toBeTruthy();
   expect(screen.getByLabelText('Bravo, Coming soon')).toBeTruthy();
   expect(screen.getByLabelText('Charlie, In progress')).toBeTruthy();
   expect(screen.getByLabelText('Delta, Not started')).toBeTruthy();
@@ -105,4 +105,20 @@ test('an empty list says so and offers Try again', async () => {
   expect(screen.getByText('No concepts yet. Check back soon.')).toBeTruthy();
   await fireEvent.press(screen.getByText('Try again'));
   expect(mockRetry).toHaveBeenCalled();
+});
+
+test('a topic whose latest quiz was not passed shows the marker and the quizzes line', async () => {
+  mockProgress = {
+    status: 'ready',
+    byChunk: {
+      a: { status: 'reviewed', latestMiniQuizScore: 0.4, latestMiniQuizCorrect: 4, latestMiniQuizTotal: 10, miniQuizPassCount: 2, miniQuizFailCount: 1 },
+      c: { status: 'in-progress', latestMiniQuizScore: 0.9, latestMiniQuizCorrect: 9, latestMiniQuizTotal: 10, miniQuizPassCount: 1 },
+    },
+    cachedEmpty: false,
+  };
+  await renderList();
+  expect(screen.getAllByText('Last quiz not passed')).toHaveLength(1);
+  expect(screen.getByText('Quizzes: 2 passed · 1 not passed · latest 4 of 10')).toBeTruthy();
+  expect(screen.getByText('Quizzes: 1 passed · latest 9 of 10')).toBeTruthy();
+  expect(screen.getByLabelText('Alpha, Reviewed, Last quiz not passed, Quizzes: 2 passed · 1 not passed · latest 4 of 10')).toBeTruthy();
 });

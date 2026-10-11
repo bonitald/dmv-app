@@ -289,8 +289,8 @@ test('a full pass puts weak cards first', async () => {
   expect(screen.getByText('1 of 3')).toBeTruthy();
 });
 
-test('a needs-revisit topic opens on only the cards missed in its last quiz', async () => {
-  mockProgress = { status: 'ready', byChunk: { row: { status: 'needs-revisit' } }, cachedEmpty: false } as ConceptProgressState;
+test('a topic whose latest quiz was not passed opens on only the cards missed, whatever its status', async () => {
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'reviewed', latestMiniQuizScore: 0.5 } }, cachedEmpty: false } as ConceptProgressState;
   await seedHistory(['q2', 'q3'], { q2: weak, q3: weak });
   mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
   await render(tree());
@@ -303,8 +303,18 @@ test('a needs-revisit topic opens on only the cards missed in its last quiz', as
   expect(screen.getByText('1 of 3')).toBeTruthy();
 });
 
-test('a needs-revisit topic with no history opens the full deck without a banner', async () => {
-  mockProgress = { status: 'ready', byChunk: { row: { status: 'needs-revisit' } }, cachedEmpty: false } as ConceptProgressState;
+test('a topic whose latest quiz was passed opens the full deck even with missed cards in history', async () => {
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'needs-revisit', latestMiniQuizScore: 0.9 } }, cachedEmpty: false } as ConceptProgressState;
+  await seedHistory(['q2', 'q3']);
+  mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
+  await render(tree());
+  await screen.findByLabelText('Question: Question 1');
+  expect(screen.queryByText(/you missed/)).toBeNull();
+  expect(screen.getByText('1 of 3')).toBeTruthy();
+});
+
+test('a not-passed topic with no history opens the full deck without a banner', async () => {
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'in-progress', latestMiniQuizScore: 0.5 } }, cachedEmpty: false } as ConceptProgressState;
   mockGet.mockResolvedValue(deckOf(card(1), card(2)));
   await render(tree());
   await screen.findByLabelText('Question: Question 1');

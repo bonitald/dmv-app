@@ -9,7 +9,7 @@ import { getDeckPass, setDeckPass, setLastOpenedTopic } from '../profile/localFl
 import { colors, radius, spacing, typography } from '../theme/tokens';
 import { useTopics } from '../topics/useTopics';
 import { markOpened } from './conceptProgress';
-import { progressFor } from './conceptProgressData';
+import { lastQuizNotPassed, progressFor } from './conceptProgressData';
 import {
   deckReducer,
   isHorizontalDrag,
@@ -26,7 +26,7 @@ import { useFlashcardDeck } from './useFlashcardDeck';
 
 // ph-2-us-3 / ph-2-us-4: one topic's flashcards, one at a time, as a "pass": a full pass
 // (weak cards first) or a missed-only pass (the cards missed in the last mini-quiz). A saved
-// pass resumes where it was left; a needs-revisit topic opens missed-only; a new `pass` route
+// pass resumes where it was left; a topic whose last quiz wasn't passed opens missed-only; a new `pass` route
 // param (Review Again) restarts the open viewer. The end of a pass offers the mini-quiz or all
 // cards. The card the pass was left on is kept on the device (the end of the pass clears it).
 // Opening counts only once the deck has cards, so an empty or failed topic never turns
@@ -95,8 +95,9 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
   );
 
   // First pass, once the deck and status are known: a saved pass resumes; otherwise a
-  // needs-revisit topic gets its missed cards and anything else a full pass. A status read
-  // that failed counts as "not needs-revisit" (full deck), which is always safe.
+  // topic whose latest quiz wasn't passed (whatever its status) gets its missed cards and
+  // anything else a full pass. A progress read that failed counts as "passed" (full deck),
+  // which is always safe.
   const progressKnown = progress.status !== 'loading';
   useEffect(() => {
     if (pass || deck.status !== 'ready' || !uid || !progressKnown) return;
@@ -111,11 +112,11 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
         setPass({ id: passCount.current, ...restored });
         return;
       }
-      // A cache-only empty snapshot (cachedEmpty) reads as not-started here, so a needs-revisit topic opens a full pass: safe, and only after a cleared cache, when card history is gone too.
-      const status = progress.status === 'ready' ? progressFor(progress.byChunk, chunkId).status : 'not-started';
+      // A cache-only empty snapshot (cachedEmpty) has no score here, so a not-passed topic opens a full pass: safe, and only after a cleared cache, when card history is gone too.
+      const notPassed = progress.status === 'ready' && lastQuizNotPassed(progressFor(progress.byChunk, chunkId));
       const history = await readTopicHistory(uid, chunkId);
       if (cancelled) return;
-      const built = buildPass(deck.cards, history, status === 'needs-revisit' ? 'missed-only' : 'full');
+      const built = buildPass(deck.cards, history, notPassed ? 'missed-only' : 'full');
       passCount.current += 1;
       setPass({ id: passCount.current, mode: built.mode, cards: built.cards, index: 0 });
     })();

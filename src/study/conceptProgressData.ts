@@ -21,7 +21,15 @@ export interface ConceptProgress {
 
 export type ProgressMap = Record<string, ConceptProgress>;
 
-/** The three choices on the post-quiz recommendation screen (ph-2-us-9). */
+/** Client copy of scoreTest's MINI_QUIZ_PASS_THRESHOLD: the mini-quiz pass mark. */
+export const MINI_QUIZ_PASS_THRESHOLD = 0.8;
+
+/** True only when the latest mini-quiz has a score and it is below the pass mark. */
+export function lastQuizNotPassed(p: ConceptProgress): boolean {
+  return typeof p.latestMiniQuizScore === 'number' && p.latestMiniQuizScore < MINI_QUIZ_PASS_THRESHOLD;
+}
+
+/** The two choices on the post-quiz recommendation screen (ph-2-us-9). */
 export type NextStepChoice = 'review-again' | 'mark-reviewed';
 
 const STORED: readonly string[] = ['in-progress', 'reviewed', 'needs-revisit'];

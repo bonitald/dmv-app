@@ -13,6 +13,7 @@ import { useConceptProgress } from './useConceptProgress';
 // any of them can be opened: no locked topics. Topics with no approved questions yet show as
 // "coming soon". Statuses update live (Concept Progress is a subscription). If they can't be
 // read, everything shows as not started rather than blocking the list.
+const NOT_PASSED = 'Last quiz not passed';
 const CHIP: Record<ConceptStatus, { backgroundColor: string; color: string }> = {
   'not-started': { backgroundColor: colors.background, color: colors.inkSoft },
   'in-progress': { backgroundColor: colors.primarySoft, color: colors.primary },
@@ -73,7 +74,8 @@ export function ConceptListScreen() {
 
 function ConceptRowView({ row, onPress }: { row: ConceptRow; onPress: () => void }) {
   const statusText = row.comingSoon ? 'Coming soon' : STATUS_LABEL[row.status];
-  const label = [row.title, statusText, row.scorePercent === null ? null : `latest quiz ${row.scorePercent}%`]
+  const notPassed = !row.comingSoon && row.lastQuizNotPassed;
+  const label = [row.title, statusText, notPassed ? NOT_PASSED : null, row.quizLine]
     .filter(Boolean)
     .join(', ');
   const chip = row.comingSoon
@@ -87,11 +89,14 @@ function ConceptRowView({ row, onPress }: { row: ConceptRow; onPress: () => void
         <View style={[styles.chip, { backgroundColor: chip.backgroundColor }]}>
           <Text style={[typography.small, { color: chip.color }]}>{statusText}</Text>
         </View>
+        {notPassed && (
+          <View style={[styles.chip, { backgroundColor: colors.secondarySoft }]}>
+            <Text style={[typography.small, { color: colors.secondary }]}>{NOT_PASSED}</Text>
+          </View>
+        )}
       </View>
       {row.description !== '' && <Text style={typography.small}>{row.description}</Text>}
-      {row.scorePercent !== null && (
-        <Text style={typography.small}>{`Latest quiz: ${row.scorePercent}%`}</Text>
-      )}
+      {row.quizLine !== null && <Text style={typography.small}>{row.quizLine}</Text>}
     </>
   );
 
