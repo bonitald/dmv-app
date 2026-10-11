@@ -157,11 +157,16 @@ test('a double tap on a choice writes and navigates once', async () => {
   await answerAllAndSubmit(2);
   const button = await screen.findByText('Mark Reviewed');
   // Both taps land before navigation re-renders (one act), like a real double tap.
-  await act(() => {
-    fireEvent.press(button);
-    fireEvent.press(button);
+  // fireEvent.press is async and wraps itself in act, so two of them can't share one act;
+  // call the button's host click handler twice inside a single act instead.
+  const onClick = button.parent!.props.onClick as (event: unknown) => void;
+  const event = { nativeEvent: {}, stopPropagation: () => {}, preventDefault: () => {} };
+  await act(async () => {
+    onClick(event);
+    onClick(event);
   });
   expect(setStatusFromChoice).toHaveBeenCalledTimes(1);
+  expect(ref.getRootState().routes.map((r) => r.name)).toEqual(['Main']);
 });
 
 test('Review answers opens the review for this quiz', async () => {
@@ -237,4 +242,12 @@ test('leaving mid-quiz asks first', async () => {
   await screen.findByText('Question 1');
   await act(() => ref.goBack());
   expect(alert).toHaveBeenCalledWith('Leave the quiz?', expect.any(String), expect.any(Array));
+});
+
+test('a topic with no questions is never marked opened', async () => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  (assembleMiniQuiz as jest.Mock).mockRejectedValue(new CallableError('not-found', 'not-found', 'none'));
+  await renderFlow();
+  expect(await screen.findByText('Nothing here yet')).toBeTruthy();
+  expect(markOpened).not.toHaveBeenCalled();
 });

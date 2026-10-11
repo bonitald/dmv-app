@@ -61,13 +61,13 @@ export function MiniQuizScreen({ navigation, route }: RootStackScreenProps<'Mini
     if (title) navigation.setOptions({ title: `Mini-quiz · ${title}` });
   }, [navigation, title]);
 
-  // Opening the quiz counts as opening the topic, from a known status only (ph-2-us-10).
+  // Opening the quiz counts as opening the topic once it has loaded, from a known status only (ph-2-us-10).
   const marked = useRef(false);
   useEffect(() => {
-    if (marked.current || !uid || progress.status !== 'ready' || progress.cachedEmpty) return;
+    if (marked.current || !uid || phase.kind !== 'running' || progress.status !== 'ready' || progress.cachedEmpty) return;
     marked.current = true;
     markOpened(uid, chunkId, progressFor(progress.byChunk, chunkId).status);
-  }, [uid, chunkId, progress]);
+  }, [uid, chunkId, progress, phase.kind]);
 
   const load = useCallback(async () => {
     if (!uid) return;
