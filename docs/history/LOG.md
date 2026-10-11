@@ -71,3 +71,4 @@
 
 ### 2026-10-11
 - **Slice 4b (mini-quiz, recommendation, progress) code complete** on `feat/mini-quiz-progress` via subagent-driven development (spec + plan in docs/superpowers): server-sized mini-quizzes (a third of the topic, 5–15), quiz correct/total on Concept Progress, local per-card history, weighted and missed-only flashcard passes with a saved pass, MiniQuizScreen with Review Again / Come Back Later / Mark Reviewed, Progress-tab concept report. Functions deployed to dev (smoke check 401). Rules 56, functions 83, question bank 47, app 182, components 159, tsc clean. Next: device test on the emulator, then story/build-order status updates and merge.
+- **Flashcards hide "NOT"/"EXCEPT" questions** — `getFlashcards` drops approved questions whose text has an uppercase NOT or EXCEPT, since a card with no choices can't be answered; they stay in tests and mini-quizzes. Functions 85 passing. Not yet deployed.

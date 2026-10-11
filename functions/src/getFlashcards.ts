@@ -29,6 +29,21 @@ export interface Flashcard {
   conceptId: string;
 }
 
+/**
+ * Matches negated stems like "Which of the following is NOT…" or "…all of these EXCEPT:".
+ * Case-sensitive on purpose: question writers capitalize the negation, while a lowercase
+ * "not" ("if you are not sure…") is an ordinary question that still works as a flashcard.
+ */
+const NEGATED_STEM = /\b(NOT|EXCEPT)\b/;
+
+/**
+ * True when a question only makes sense next to its answer choices. A flashcard's front shows
+ * just the question text, and the answer it reveals would be the odd one out, not a fact to learn.
+ */
+export function needsChoicesToMakeSense(text: string): boolean {
+  return NEGATED_STEM.test(text);
+}
+
 /** Response shape: the requested topic and its cards, in shuffled order. */
 export interface GetFlashcardsResult {
   chunkId: string;
@@ -96,7 +111,8 @@ async function checkAndConsumeRateLimit(db: Firestore, uid: string, now: number)
  * Auth:     requires a signed-in user (anonymous auth counts); otherwise throws
  * Inputs:   db; auth — request.auth; chunkId — required topic, from request.data.chunkId;
  *           options.random / options.now — injectable for deterministic tests
- * Returns:  { chunkId, cards[] } — every approved question in the topic, shuffled, with each
+ * Returns:  { chunkId, cards[] } — every approved question in the topic except negated
+ *           "NOT"/"EXCEPT" ones (see needsChoicesToMakeSense), shuffled, with each
  *           card's choices shuffled too. Cards include
  *           `correctAnswer`: this is the one read path that sends answers to the client,
  *           which is why it is rate-limited (see RATE_LIMIT_MAX_CALLS)
@@ -107,7 +123,7 @@ async function checkAndConsumeRateLimit(db: Firestore, uid: string, now: number)
  * Errors:   HttpsError('unauthenticated') — no signed-in caller
  *           HttpsError('invalid-argument') — chunkId missing or not a non-empty string
  *           HttpsError('resource-exhausted') — over the per-user rate limit
- *           HttpsError('not-found') — the topic has no approved questions
+ *           HttpsError('not-found') — the topic has no approved questions usable as flashcards
  */
 export async function getFlashcardsForUser(
   db: Firestore,
@@ -135,13 +151,16 @@ export async function getFlashcardsForUser(
     .where('status', '==', 'approved')
     .get();
 
-  if (snapshot.empty) {
-    throw new HttpsError('not-found', `No approved questions exist for chunkId "${chunkId}".`);
+  // Drop "NOT"/"EXCEPT" questions: they stay in tests and mini-quizzes, where choices are shown.
+  const docs = snapshot.docs.filter((doc) => !needsChoicesToMakeSense(doc.data().text));
+
+  if (docs.length === 0) {
+    throw new HttpsError('not-found', `No approved flashcard questions exist for chunkId "${chunkId}".`);
   }
 
   // Shuffle so each study session presents the topic's cards in a different order.
   const random = options.random ?? Math.random;
-  const shuffled = shuffle(snapshot.docs, random);
+  const shuffled = shuffle(docs, random);
 
   // Map to the card shape: answers included, but sourceRef/selfCheck/review fields left out.
   const cards: Flashcard[] = shuffled.map((doc) => {

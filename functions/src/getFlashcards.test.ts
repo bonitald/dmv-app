@@ -130,6 +130,24 @@ describe('getFlashcardsForUser', () => {
     ).resolves.toBeDefined();
   });
 
+  test('excludes negated questions that need the choices to make sense', async () => {
+    await seedQuestion('keep', { text: 'What should you do if you are not sure who goes first?' });
+    await seedQuestion('not', { text: 'Which of the following is NOT a factor that affects BAC?' });
+    await seedQuestion('except', { text: 'All of the following affect BAC EXCEPT:' });
+
+    const result = await getFlashcardsForUser(db, { uid: 'alice-uid' }, 'right-of-way');
+
+    expect(result.cards.map((c) => c.id)).toEqual(['keep']);
+  });
+
+  test('returns not-found when every approved question in the topic is negated', async () => {
+    await seedQuestion('not', { text: 'Which of the following is NOT required?' });
+
+    await expect(
+      getFlashcardsForUser(db, { uid: 'alice-uid' }, 'right-of-way')
+    ).rejects.toMatchObject({ code: 'not-found' });
+  });
+
   test('never returns explanation', async () => {
     await seedQuestion('q1', { explanation: 'Because a.' });
     const result = await getFlashcardsForUser(db, { uid: 'alice-uid' }, 'right-of-way');
