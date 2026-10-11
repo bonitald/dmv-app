@@ -45,6 +45,7 @@ export function QuizRunner({
 
   const question = questions[index];
   const isLast = index === questions.length - 1;
+  const allAnswered = countUnanswered(questions, answers) === 0;
   const busy = submitState === 'submitting' || submitState === 'waiting-for-connection';
 
   function select(choice: string) {
@@ -63,7 +64,10 @@ export function QuizRunner({
     if (busy) return;
     const unanswered = countUnanswered(questions, answers);
     if (unanswered === 0) {
-      submitNow();
+      Alert.alert('All questions have been answered.', 'Are you ready to submit?', [
+        { text: 'Not yet', style: 'cancel' },
+        { text: 'Submit', onPress: submitNow },
+      ]);
       return;
     }
     Alert.alert(`${unanswered} unanswered`, 'Unanswered questions count as wrong.', [
@@ -108,7 +112,7 @@ export function QuizRunner({
             onPress={() => setIndex(index - 1)}
             style={styles.barButton}
           />
-          {isLast ? (
+          {isLast || allAnswered ? (
             <Button
               label={submitState === 'submitting' ? 'Submitting…' : 'Submit'}
               disabled={busy}

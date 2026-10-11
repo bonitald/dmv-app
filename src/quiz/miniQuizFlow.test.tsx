@@ -88,7 +88,12 @@ async function answerAllAndSubmit(n: number) {
     await fireEvent.press(await screen.findByText(`A${i}`));
     if (i < n) await fireEvent.press(screen.getByText('Next'));
   }
+  const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
   await fireEvent.press(screen.getByText('Submit'));
+  // Everything is answered, so the runner asks for confirmation first.
+  const confirm = alert.mock.calls.at(-1)![2]!.find((b) => b.text === 'Submit')!;
+  alert.mockRestore();
+  await act(async () => confirm.onPress!());
 }
 
 beforeEach(async () => {

@@ -95,12 +95,47 @@ test('submitting with unanswered questions warns first; Submit anyway submits on
   expect(onSubmit).toHaveBeenCalledWith({ q1: 'Yes' });
 });
 
-test('with everything answered, Submit submits without a warning', async () => {
+const three: QuizQuestion[] = [
+  ...questions,
+  { id: 'q3', text: 'Third question?', choices: ['A', 'B'], type: 'fact', chunkId: 'c3', conceptId: 'k3' },
+];
+
+test('before everything is answered a middle question still shows Next', async () => {
+  await setup({ questions: three, initialAnswers: { q1: 'Yes' } });
+  await fireEvent.press(screen.getByLabelText('Question 2'));
+  expect(screen.getByText('Next')).toBeTruthy();
+  expect(screen.queryByText('Submit')).toBeNull();
+});
+
+test('answering every question shows Submit instead of Next on a middle question', async () => {
+  await setup({ questions: three, initialAnswers: { q1: 'Yes', q3: 'A' } });
+  await fireEvent.press(screen.getByLabelText('Question 2'));
+  expect(screen.getByText('Next')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Left car'));
+  expect(screen.getByText('Submit')).toBeTruthy();
+  expect(screen.queryByText('Next')).toBeNull();
+});
+
+test('with everything answered, Submit asks for confirmation; Not yet does not submit, Submit does once', async () => {
   const alert = jest.spyOn(Alert, 'alert');
   const { onSubmit } = await setup({ initialAnswers: { q1: 'Yes', q2: 'Left car' } });
   await fireEvent.press(screen.getByLabelText('Question 2, answered'));
   await fireEvent.press(screen.getByText('Submit'));
-  expect(alert).not.toHaveBeenCalled();
+
+  expect(alert).toHaveBeenCalledWith(
+    'All questions have been answered.',
+    'Are you ready to submit?',
+    expect.any(Array)
+  );
+  expect(onSubmit).not.toHaveBeenCalled();
+  const buttons = alert.mock.calls[0][2]!;
+  expect(buttons.map((b) => b.text)).toEqual(['Not yet', 'Submit']);
+  buttons.find((b) => b.text === 'Not yet')!.onPress?.();
+  expect(onSubmit).not.toHaveBeenCalled();
+  const submit = buttons.find((b) => b.text === 'Submit')!;
+  submit.onPress!();
+  submit.onPress!();
+  expect(onSubmit).toHaveBeenCalledTimes(1);
   expect(onSubmit).toHaveBeenCalledWith({ q1: 'Yes', q2: 'Left car' });
 });
 
