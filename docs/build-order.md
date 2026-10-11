@@ -135,7 +135,9 @@ deployed to dev 2026-10-10 (the first attempt hit a transient `generateUploadUrl
 the retry succeeded; invoker smoke check still 401). Device-tested on the Android emulator:
 everything passed. Rules 54, functions 71, question bank 47, app 121, components 112, tsc clean.
 The count of choice-worded cards ("Which of the following...") was not reported; they are shown
-as-is, to revisit if reviewers flag cards. Stories: ph-2-us-5, 7, 11, 12 Complete; ph-2-us-3
+as-is, to revisit if reviewers flag cards. **Resolved (2026-10-11, 8e52e08):** negated "NOT" /
+"EXCEPT" questions are now filtered out of flashcard decks by `getFlashcards`; they stay in tests
+and mini-quizzes. Deployed to dev and confirmed on device. Stories: ph-2-us-5, 7, 11, 12 Complete; ph-2-us-3
 In Progress (mini-quiz button is a placeholder until ph-2-us-8); ph-2-us-10 In Progress;
 ph-9-us-7 stays open for its other cards ("Continue learning" is done). Final whole-branch review
 fixes (028d960): the flashcard's hidden face takes no touches (Android scroll), the coming-soon
