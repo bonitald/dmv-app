@@ -14,6 +14,9 @@ export interface ConceptProgress {
   latestMiniQuizCorrect?: number;
   latestMiniQuizTotal?: number;
   latestMiniQuizAt?: Date;
+  /** Quizzes passed (>= 80%) and not passed on this topic; written only by scoreTest. Absent until first counted. */
+  miniQuizPassCount?: number;
+  miniQuizFailCount?: number;
 }
 
 export type ProgressMap = Record<string, ConceptProgress>;
@@ -35,6 +38,8 @@ export function toProgress(data: Record<string, unknown> | undefined): ConceptPr
   const at = toDate(data.latestMiniQuizAt);
   const correct = typeof data.latestMiniQuizCorrect === 'number' ? data.latestMiniQuizCorrect : undefined;
   const total = typeof data.latestMiniQuizTotal === 'number' ? data.latestMiniQuizTotal : undefined;
+  const passCount = typeof data.miniQuizPassCount === 'number' ? data.miniQuizPassCount : undefined;
+  const failCount = typeof data.miniQuizFailCount === 'number' ? data.miniQuizFailCount : undefined;
   // A doc scoreTest created before the topic was ever opened has a score but no status.
   const status: ConceptStatus =
     typeof data.status === 'string' && STORED.includes(data.status)
@@ -48,6 +53,8 @@ export function toProgress(data: Record<string, unknown> | undefined): ConceptPr
     ...(correct !== undefined ? { latestMiniQuizCorrect: correct } : {}),
     ...(total !== undefined ? { latestMiniQuizTotal: total } : {}),
     ...(at ? { latestMiniQuizAt: at } : {}),
+    ...(passCount !== undefined ? { miniQuizPassCount: passCount } : {}),
+    ...(failCount !== undefined ? { miniQuizFailCount: failCount } : {}),
   };
 }
 

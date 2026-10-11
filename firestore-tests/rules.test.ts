@@ -364,7 +364,7 @@ describe('users/{uid}/conceptProgress (ph-2-us-11)', () => {
     );
   });
 
-  test.each(['latestMiniQuizCorrect', 'latestMiniQuizTotal'])(
+  test.each(['latestMiniQuizCorrect', 'latestMiniQuizTotal', 'miniQuizPassCount', 'miniQuizFailCount'])(
     'a client write of %s is denied',
     async (field) => {
       await assertFails(

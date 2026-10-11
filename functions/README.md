@@ -247,7 +247,9 @@ never write them.
 
 For a **mini-quiz**, the same transaction also merges `{ latestMiniQuizScore (0–1),
 latestMiniQuizCorrect, latestMiniQuizTotal, latestMiniQuizAt (server timestamp), latestTestId }` into `users/{uid}/conceptProgress/{chunkId}`
-(ph-2-us-11), creating the doc if needed. It never writes `status`: that field is the client's
+(ph-2-us-11), creating the doc if needed. It also increments exactly one tally with `FieldValue.increment(1)`:
+`miniQuizPassCount` when the score is at least 80% (the 'move-on' threshold), else `miniQuizFailCount`;
+the other counter is not written, so it is absent until that outcome first happens. It never writes `status`: that field is the client's
 (rules allow the owner to set only `status` and `statusUpdatedAt`). Practice tests and baseline
 sections don't touch Concept Progress.
 

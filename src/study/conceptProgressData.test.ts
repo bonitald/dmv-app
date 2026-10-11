@@ -25,6 +25,20 @@ describe('toProgress', () => {
     });
   });
 
+  test('reads the passed and not-passed quiz counts when present', () => {
+    expect(toProgress({ status: 'reviewed', miniQuizPassCount: 2, miniQuizFailCount: 1 })).toEqual({
+      status: 'reviewed',
+      miniQuizPassCount: 2,
+      miniQuizFailCount: 1,
+    });
+  });
+
+  test('ignores non-numeric quiz counts', () => {
+    expect(toProgress({ status: 'reviewed', miniQuizPassCount: '2', miniQuizFailCount: null })).toEqual({
+      status: 'reviewed',
+    });
+  });
+
   test('a score but no status is in progress', () => {
     expect(toProgress({ latestMiniQuizScore: 0.4 })).toEqual({
       status: 'in-progress',

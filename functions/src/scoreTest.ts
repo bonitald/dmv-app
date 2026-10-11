@@ -237,7 +237,8 @@ async function gradeQuestions(
  *           `questions/{id}`
  * Writes:   `users/{uid}/testAttempts/{testId}`; sets the assignment's `scored: true`; for a
  *           mini-quiz, merges the latest score and its correct/total counts into `users/{uid}/conceptProgress/{chunkId}`
- *           (ph-2-us-11) without touching the client-owned `status`
+ *           and increments `miniQuizPassCount` (score >= MINI_QUIZ_PASS_THRESHOLD) or `miniQuizFailCount`
+ *           (otherwise), exactly one of the two (ph-2-us-11), without touching the client-owned `status`
  * Errors:   HttpsError('not-found') — no such assignment for this user
  *           HttpsError('already-exists') — the assignment was already scored
  */
@@ -310,6 +311,12 @@ async function scoreAssignedTest(
           latestMiniQuizTotal: totalCount,
           latestMiniQuizAt: FieldValue.serverTimestamp(),
           latestTestId: testId,
+          // Slice 4b: running tally of passed vs not-passed quizzes for this topic. Same test as
+          // the 'move-on' recommendation; only the matching counter is touched (no zero writes),
+          // and increment() is atomic so retakes can't lose a count.
+          ...(score >= MINI_QUIZ_PASS_THRESHOLD
+            ? { miniQuizPassCount: FieldValue.increment(1) }
+            : { miniQuizFailCount: FieldValue.increment(1) }),
         },
         { merge: true }
       );

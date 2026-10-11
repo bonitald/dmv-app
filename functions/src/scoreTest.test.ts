@@ -264,8 +264,23 @@ describe('scoreTestForUser', () => {
         'latestMiniQuizScore',
         'latestMiniQuizTotal',
         'latestTestId',
+        'miniQuizPassCount',
       ]);
       expect(progress.latestMiniQuizScore).toBe(1);
+    });
+
+    test('a passed quiz counts as a pass only; a later failed quiz adds a not-passed count', async () => {
+      await seedQuestion('q1', 'row', 'a');
+
+      await takeMiniQuiz(['a']);
+      let progress = (await progressRef().get()).data()!;
+      expect(progress.miniQuizPassCount).toBe(1);
+      expect(progress.miniQuizFailCount).toBeUndefined();
+
+      await takeMiniQuiz(['b']);
+      progress = (await progressRef().get()).data()!;
+      expect(progress.miniQuizPassCount).toBe(1);
+      expect(progress.miniQuizFailCount).toBe(1);
     });
 
     test('retaking the quiz overwrites the latest score', async () => {
