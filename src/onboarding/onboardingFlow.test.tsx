@@ -105,7 +105,7 @@ describe('first launch (ph-9-us-3)', () => {
 describe('Home (ph-9-us-7 / ph-9-us-5)', () => {
   const ROW = { chunkId: 'row', title: 'Right of way', description: '', order: 1, approvedQuestionCount: 3 };
 
-  test('the study card continues the last topic opened, and opens its flashcards', async () => {
+  test('the study card names the last topic opened, and opens the concept list', async () => {
     mockProfile = { onboarding: { choice: 'learn' }, testDate: null };
     mockTopics = { status: 'ready', topics: [ROW] };
     await AsyncStorage.setItem('dmv-app:study:last-opened:u1', 'row');
@@ -115,7 +115,9 @@ describe('Home (ph-9-us-7 / ph-9-us-5)', () => {
     expect(screen.getByText('Right of way')).toBeTruthy();
     expect(screen.queryByText('Learn concept by concept')).toBeNull();
     await fireEvent.press(screen.getByText('Continue learning'));
-    expect(await screen.findByLabelText('Loading cards')).toBeTruthy();
+    // The concept list's row for the topic (its label carries the status), not the deck.
+    expect(await screen.findByLabelText(/^Right of way, /)).toBeTruthy();
+    expect(screen.queryByLabelText('Loading cards')).toBeNull();
   });
 
   test('a remembered topic that is no longer in the catalog falls back to the list card', async () => {

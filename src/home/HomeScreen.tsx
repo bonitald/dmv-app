@@ -64,9 +64,10 @@ function TestCard() {
   );
 }
 
-// ph-9-us-7 (Slice 4a): "Continue learning" opens the last topic whose flashcards loaded on this
+// ph-9-us-7 (Slice 4a): "Continue learning" names the last topic whose flashcards loaded on this
 // device, read again each time Home comes back into view. Before any topic has been opened, or
-// if that topic is no longer in the catalog, it's "Learn concept by concept" and opens the list.
+// if that topic is no longer in the catalog, it's "Learn concept by concept". Either way it opens
+// the concept list, so the user picks what to study rather than being dropped into a deck.
 function StudyCard() {
   const navigation = useNavigation();
   const { uid } = useAuth();
@@ -91,6 +92,7 @@ function StudyCard() {
       ? topics.topics.find((t) => t.chunkId === lastOpened)
       : undefined;
 
+  const openList = () => navigation.navigate('Main', { screen: 'Study' });
   if (topic) {
     return (
       <RouteCard
@@ -98,7 +100,7 @@ function StudyCard() {
         eyebrow="STUDY"
         title="Continue learning"
         body={topic.title}
-        onPress={() => navigation.navigate('Flashcards', { chunkId: topic.chunkId })}
+        onPress={openList}
       />
     );
   }
@@ -108,7 +110,7 @@ function StudyCard() {
       eyebrow="STUDY"
       title="Learn concept by concept"
       body="Flashcards and a quick quiz for each part of the handbook."
-      onPress={() => navigation.navigate('Main', { screen: 'Study' })}
+      onPress={openList}
     />
   );
 }
