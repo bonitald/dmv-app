@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { ActivityIndicator, PanResponder, StyleSheet, Text, View } from 'react-native';
 import type { Flashcard } from '../api/types';
 import { useAuth } from '../auth/AuthProvider';
@@ -6,35 +6,55 @@ import { Button } from '../components/Button';
 import { NoConnection } from '../components/NoConnection';
 import type { RootStackScreenProps } from '../navigation/types';
 import { getDeckPass, setDeckPass, setLastOpenedTopic } from '../profile/localFlags';
-import { colors, spacing, typography } from '../theme/tokens';
+import { colors, radius, spacing, typography } from '../theme/tokens';
 import { useTopics } from '../topics/useTopics';
 import { markOpened } from './conceptProgress';
 import { progressFor } from './conceptProgressData';
 import {
   deckReducer,
   isHorizontalDrag,
-  shuffled,
   swipeDirection,
   type DeckAction,
   type DeckError,
   type DeckState,
 } from './deck';
+import { readTopicHistory } from './cardPerformance';
+import { buildPass, restorePass, type PassMode } from './deckOrder';
 import { FlipCard } from './FlipCard';
 import { useConceptProgress } from './useConceptProgress';
 import { useFlashcardDeck } from './useFlashcardDeck';
 
-// ph-2-us-3: one topic's flashcards, one at a time, then an end-of-deck choice: the mini-quiz
-// (a placeholder until Slice 4b) or start over in a fresh order from this session's copy.
-// Nothing is recorded per card, but the card the deck was left on is kept on the device so
-// reopening the topic resumes there (the end of the deck clears it). Opening counts only once the deck has cards, so an empty or
-// failed topic never turns "in progress" or becomes Home's "Continue learning".
+// ph-2-us-3 / ph-2-us-4: one topic's flashcards, one at a time, as a "pass": a full pass
+// (weak cards first) or a missed-only pass (the cards missed in the last mini-quiz). A saved
+// pass resumes where it was left; a needs-revisit topic opens missed-only; a new `pass` route
+// param (Review Again) restarts the open viewer. The end of a pass offers the mini-quiz or all
+// cards. The card the pass was left on is kept on the device (the end of the pass clears it).
+// Opening counts only once the deck has cards, so an empty or failed topic never turns
+// "in progress" or becomes Home's "Continue learning".
+interface Pass {
+  /** Bumped for every new pass, so the Deck remounts at its start. */
+  id: number;
+  mode: PassMode;
+  cards: Flashcard[];
+  index: number;
+}
+
 export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Flashcards'>) {
-  const { chunkId } = route.params;
+  const { chunkId, pass: passParam } = route.params;
   const { uid } = useAuth();
   const deck = useFlashcardDeck(chunkId);
-  const startCardId = useSavedPosition(uid, chunkId);
   const progress = useConceptProgress();
   const topics = useTopics();
+  const [pass, setPass] = useState<Pass | null>(null);
+  const passCount = useRef(0);
+  const handledNonce = useRef<number | undefined>(undefined);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const title =
     topics.status === 'ready' ? topics.topics.find((t) => t.chunkId === chunkId)?.title : undefined;
@@ -58,64 +78,99 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
     markOpened(uid, chunkId, progressFor(progress.byChunk, chunkId).status);
   }, [uid, chunkId, deck.status, progress]);
 
-  if (deck.status === 'loading' || (deck.status === 'ready' && startCardId === undefined)) {
+  const startPass = useCallback(
+    async (mode: PassMode) => {
+      if (deck.status !== 'ready' || !uid) return;
+      const history = await readTopicHistory(uid, chunkId);
+      if (!mounted.current) return;
+      const built = buildPass(deck.cards, history, mode);
+      passCount.current += 1;
+      setPass({ id: passCount.current, mode: built.mode, cards: built.cards, index: 0 });
+    },
+    [deck, uid, chunkId]
+  );
+
+  // First pass, once the deck and status are known: a saved pass resumes; otherwise a
+  // needs-revisit topic gets its missed cards and anything else a full pass. A status read
+  // that failed counts as "not needs-revisit" (full deck), which is always safe.
+  const progressKnown = progress.status !== 'loading';
+  useEffect(() => {
+    if (pass || deck.status !== 'ready' || !uid || !progressKnown) return;
+    if (passParam) return; // the param effect below starts it
+    let cancelled = false;
+    (async () => {
+      const saved = await getDeckPass(uid, chunkId);
+      const restored = saved ? restorePass(deck.cards, saved) : null;
+      if (cancelled) return;
+      if (restored) {
+        passCount.current += 1;
+        setPass({ id: passCount.current, ...restored });
+        return;
+      }
+      const status = progress.status === 'ready' ? progressFor(progress.byChunk, chunkId).status : 'not-started';
+      const history = await readTopicHistory(uid, chunkId);
+      if (cancelled) return;
+      const built = buildPass(deck.cards, history, status === 'needs-revisit' ? 'missed-only' : 'full');
+      passCount.current += 1;
+      setPass({ id: passCount.current, mode: built.mode, cards: built.cards, index: 0 });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [pass, deck, uid, chunkId, progressKnown, progress, passParam]);
+
+  // Review Again (Slice 4b): a new `pass` param restarts the open viewer with that pass,
+  // reading fresh history (the quiz just recorded it). No new getFlashcards call.
+  useEffect(() => {
+    if (!passParam || passParam.nonce === handledNonce.current || deck.status !== 'ready' || !uid) return;
+    handledNonce.current = passParam.nonce;
+    void startPass(passParam.mode);
+  }, [passParam, deck.status, uid, startPass]);
+
+  const savePosition = useCallback(
+    (p: Pass, cardId: string | null) => {
+      if (!uid) return;
+      void setDeckPass(uid, chunkId, cardId ? { mode: p.mode, cardIds: p.cards.map((c) => c.id), cardId } : null);
+    },
+    [uid, chunkId]
+  );
+
+  if (deck.status === 'error') {
+    return <DeckErrorView error={deck.error} onRetry={deck.retry} onBack={() => navigation.goBack()} />;
+  }
+  if (deck.status === 'loading' || !pass) {
     return (
       <View style={styles.center}>
         <ActivityIndicator color={colors.primary} accessibilityLabel="Loading cards" />
       </View>
     );
   }
-  if (deck.status === 'error') {
-    return <DeckErrorView error={deck.error} onRetry={deck.retry} onBack={() => navigation.goBack()} />;
-  }
   return (
     <Deck
-      cards={deck.cards}
-      startCardId={startCardId ?? null}
-      onMove={(cardId) => {
-        if (uid) {
-          void setDeckPass(
-            uid,
-            chunkId,
-            cardId ? { mode: 'full', cardIds: deck.cards.map((c) => c.id), cardId } : null
-          );
-        }
-      }}
+      key={pass.id}
+      pass={pass}
+      onMove={(cardId) => savePosition(pass, cardId)}
       onQuiz={() => navigation.navigate('MiniQuiz', { chunkId })}
+      onAllCards={() => void startPass('full')}
     />
   );
 }
 
-/** The saved card id for this topic: `undefined` while reading, `null` when there is none. */
-function useSavedPosition(uid: string | null, chunkId: string): string | null | undefined {
-  const [cardId, setCardId] = useState<string | null | undefined>(undefined);
-  useEffect(() => {
-    if (!uid) return;
-    let cancelled = false;
-    getDeckPass(uid, chunkId).then((saved) => {
-      if (!cancelled) setCardId(saved?.cardId ?? null);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [uid, chunkId]);
-  return cardId;
-}
-
 interface DeckProps {
-  cards: Flashcard[];
-  /** The card to open on; a missing or unknown id opens the first card. */
-  startCardId: string | null;
+  pass: Pass;
   /** The card now showing, or `null` at the end of the deck. */
   onMove: (cardId: string | null) => void;
   onQuiz: () => void;
+  /** "Show all cards", "See all cards" and "Start this concept over": a new full pass. */
+  onAllCards: () => void;
 }
 
-function Deck({ cards, startCardId, onMove, onQuiz }: DeckProps) {
+function Deck({ pass, onMove, onQuiz, onAllCards }: DeckProps) {
   const [state, dispatch] = useReducer(
     (s: DeckState<Flashcard>, a: DeckAction<Flashcard>) => deckReducer(s, a),
-    { cards, index: Math.max(0, cards.findIndex((c) => c.id === startCardId)) }
+    { cards: pass.cards, index: pass.index }
   );
+  const missedOnly = pass.mode === 'missed-only';
 
   const currentId = state.cards[state.index]?.id ?? null;
   const lastSaved = useRef(currentId);
@@ -147,16 +202,18 @@ function Deck({ cards, startCardId, onMove, onQuiz }: DeckProps) {
           End of this concept
         </Text>
         <Text style={[typography.body, styles.muted]}>
-          {total === 1
-            ? "You've been through the only card in this concept."
-            : `You've been through all ${total} cards.`}{' '}
+          {missedOnly
+            ? `You've been through the ${total} you missed.`
+            : total === 1
+              ? "You've been through the only card in this concept."
+              : `You've been through all ${total} cards.`}{' '}
           Check what stuck with a quick quiz, or go through them again.
         </Text>
         <Button label="Take the mini-quiz" onPress={onQuiz} />
         <Button
-          label="Start this concept over"
+          label={missedOnly ? 'See all cards' : 'Start this concept over'}
           variant="secondary"
-          onPress={() => dispatch({ type: 'restart', cards: shuffled(state.cards) })}
+          onPress={onAllCards}
         />
         <Button label="Back to the last card" variant="text" onPress={() => dispatch({ type: 'previous' })} />
       </View>
@@ -166,6 +223,12 @@ function Deck({ cards, startCardId, onMove, onQuiz }: DeckProps) {
   const card = state.cards[state.index];
   return (
     <View style={styles.screen} {...pan.panHandlers}>
+      {missedOnly && (
+        <View style={styles.banner}>
+          <Text style={typography.bodySemibold}>{`Reviewing the ${total} you missed`}</Text>
+          <Button label="Show all cards" variant="text" onPress={onAllCards} />
+        </View>
+      )}
       <Text style={[typography.small, styles.progress]}>
         {state.index + 1} of {total}
       </Text>
@@ -180,6 +243,7 @@ function Deck({ cards, startCardId, onMove, onQuiz }: DeckProps) {
         />
         <Button label="Next" onPress={() => dispatch({ type: 'next' })} style={styles.navButton} />
       </View>
+      {state.index === 0 && <Button label="Skip to quiz" variant="text" onPress={onQuiz} />}
     </View>
   );
 }
@@ -244,6 +308,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.space5,
     gap: spacing.space2,
+  },
+  banner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.row,
+    paddingHorizontal: spacing.space3,
   },
   centerText: { textAlign: 'center' },
   progress: { textAlign: 'center' },

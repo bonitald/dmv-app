@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Text } from 'react-native';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { getFlashcards } from '../api/callables';
 import { CallableError } from '../api/callableErrors';
@@ -52,8 +52,27 @@ function tree() {
   );
 }
 
+function treeWith(params: object) {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Flashcards" component={FlashcardScreen as never} initialParams={params} />
+        <Stack.Screen name="MiniQuiz">{() => <Text>Mini-quiz screen</Text>}</Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+async function seedHistory(missedIds: string[], cards: Record<string, unknown> = {}) {
+  await AsyncStorage.setItem('dmv-app:card-perf:u1:row', JSON.stringify({ cards, lastQuizMissedIds: missedIds }));
+}
+const weak = { graded: 1, missed: 1, correctStreak: 0, lastCorrect: false };
+
+afterEach(() => jest.restoreAllMocks());
+
 beforeEach(async () => {
   jest.clearAllMocks();
+  jest.spyOn(Math, 'random').mockReturnValue(0.999);
   clearDeckCache();
   await AsyncStorage.clear();
   mockProgress = { status: 'ready', byChunk: {}, cachedEmpty: false };
@@ -157,7 +176,9 @@ test.each([{ status: 'loading' }, { status: 'error' }] as ConceptProgressState[]
     mockProgress = progress;
     mockGet.mockResolvedValue(deckOf(card(1)));
     await render(tree());
-    await screen.findByLabelText('Question: Question 1');
+    // While progress is still loading the first pass waits for it (so a needs-revisit topic
+    // doesn't open full); a failed read opens the full deck.
+    if (progress.status === 'error') await screen.findByLabelText('Question: Question 1');
     await waitFor(async () =>
       expect(await AsyncStorage.getItem('dmv-app:study:last-opened:u1')).toBe('row')
     );
@@ -258,4 +279,99 @@ test('retry after a connection failure loads the deck', async () => {
 
   await fireEvent.press(await screen.findByText('Try again'));
   expect(await screen.findByLabelText('Question: Question 1')).toBeTruthy();
+});
+
+test('a full pass puts weak cards first', async () => {
+  await seedHistory([], { q3: weak });
+  mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
+  await render(tree());
+  expect(await screen.findByLabelText('Question: Question 3')).toBeTruthy();
+  expect(screen.getByText('1 of 3')).toBeTruthy();
+});
+
+test('a needs-revisit topic opens on only the cards missed in its last quiz', async () => {
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'needs-revisit' } }, cachedEmpty: false } as ConceptProgressState;
+  await seedHistory(['q2', 'q3'], { q2: weak, q3: weak });
+  mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
+  await render(tree());
+  expect(await screen.findByText('Reviewing the 2 you missed')).toBeTruthy();
+  expect(screen.getByLabelText('Question: Question 2')).toBeTruthy();
+  expect(screen.getByText('1 of 2')).toBeTruthy();
+
+  await fireEvent.press(screen.getByText('Show all cards'));
+  expect(screen.queryByText('Reviewing the 2 you missed')).toBeNull();
+  expect(screen.getByText('1 of 3')).toBeTruthy();
+});
+
+test('a needs-revisit topic with no history opens the full deck without a banner', async () => {
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'needs-revisit' } }, cachedEmpty: false } as ConceptProgressState;
+  mockGet.mockResolvedValue(deckOf(card(1), card(2)));
+  await render(tree());
+  await screen.findByLabelText('Question: Question 1');
+  expect(screen.queryByText(/you missed/)).toBeNull();
+  expect(screen.getByText('1 of 2')).toBeTruthy();
+});
+
+test('the end of a missed-only pass offers the quiz and all cards', async () => {
+  await seedHistory(['q2']);
+  mockGet.mockResolvedValue(deckOf(card(1), card(2)));
+  await render(treeWith({ chunkId: 'row', pass: { mode: 'missed-only', nonce: 1 } }));
+  await screen.findByLabelText('Question: Question 2');
+  await fireEvent.press(screen.getByText('Next'));
+  expect(screen.getByText("You've been through the 1 you missed.", { exact: false })).toBeTruthy();
+  expect(screen.getByText('Take the mini-quiz')).toBeTruthy();
+  await fireEvent.press(screen.getByText('See all cards'));
+  expect(screen.getByText('1 of 2')).toBeTruthy();
+});
+
+test('a missed-only pass param after a perfect score opens the full deck', async () => {
+  await seedHistory([]);
+  mockGet.mockResolvedValue(deckOf(card(1), card(2)));
+  await render(treeWith({ chunkId: 'row', pass: { mode: 'missed-only', nonce: 1 } }));
+  await screen.findByLabelText('Question: Question 1');
+  expect(screen.queryByText(/you missed/)).toBeNull();
+  expect(screen.getByText('1 of 2')).toBeTruthy();
+});
+
+test('a new pass param restarts the open viewer', async () => {
+  mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
+  const ref = createNavigationContainerRef();
+  await render(
+    <NavigationContainer ref={ref}>
+      <Stack.Navigator>
+        <Stack.Screen name="Flashcards" component={FlashcardScreen as never} initialParams={{ chunkId: 'row' }} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+  await screen.findByLabelText('Question: Question 1');
+  await fireEvent.press(screen.getByText('Next'));
+  await seedHistory(['q3']);
+  await act(() => ref.setParams({ chunkId: 'row', pass: { mode: 'missed-only', nonce: 2 } } as never));
+  expect(await screen.findByText('Reviewing the 1 you missed')).toBeTruthy();
+  expect(screen.getByLabelText('Question: Question 3')).toBeTruthy();
+  expect(mockGet).toHaveBeenCalledTimes(1);
+});
+
+test('Skip to quiz shows on the first card only and opens the quiz', async () => {
+  mockGet.mockResolvedValue(deckOf(card(1), card(2)));
+  await render(tree());
+  await screen.findByLabelText('Question: Question 1');
+  await fireEvent.press(screen.getByText('Next'));
+  expect(screen.queryByText('Skip to quiz')).toBeNull();
+  await fireEvent.press(screen.getByText('Previous'));
+  await fireEvent.press(screen.getByText('Skip to quiz'));
+  expect(await screen.findByText('Mini-quiz screen')).toBeTruthy();
+});
+
+test('resuming restores the saved pass order and card', async () => {
+  await AsyncStorage.setItem(
+    'dmv-app:study:deck-position:u1:row',
+    JSON.stringify({ mode: 'full', cardIds: ['q3', 'q1', 'q2'], cardId: 'q1' })
+  );
+  mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
+  await render(tree());
+  expect(await screen.findByLabelText('Question: Question 1')).toBeTruthy();
+  expect(screen.getByText('2 of 3')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Next'));
+  expect(screen.getByLabelText('Question: Question 2')).toBeTruthy();
 });

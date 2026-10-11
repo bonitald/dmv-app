@@ -1,6 +1,7 @@
 import type { NavigatorScreenParams } from '@react-navigation/native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { OnboardingChoice } from '../profile/profileData';
+import type { PassMode } from '../study/deckOrder';
 
 // ph-0-us-8 / ph-9-us-3 / ph-9-us-7: route params for the whole app, in one place so every
 // screen's `navigation` is typed.
@@ -27,8 +28,9 @@ export type RootStackParamList = {
   /** Question-by-question review of a graded attempt (ph-4-us-4). */
   Review: { testId: string };
   /** One topic's flip-card flashcards (ph-2-us-3). Above the tabs so Back returns to the list,
-   * results or review, wherever it was opened from. */
-  Flashcards: { chunkId: string };
+   * results or review, wherever it was opened from. A new `pass` (Review Again, Slice 4b)
+   * starts that pass in the open viewer. */
+  Flashcards: { chunkId: string; pass?: { mode: PassMode; nonce: number } };
   /** The topic's mini-quiz. A placeholder until Slice 4b (ph-2-us-8). */
   MiniQuiz: { chunkId: string };
   TestDateEditor: undefined;
