@@ -14,6 +14,7 @@ import { HomeScreen } from '../home/HomeScreen';
 import { ReviewScreen } from '../review/ReviewScreen';
 import { FlashcardScreen } from '../study/FlashcardScreen';
 import { ConceptListScreen } from '../study/ConceptListScreen';
+import { ConceptReportScreen } from '../progress/ConceptReportScreen';
 import { SettingsScreen } from '../settings/SettingsScreen';
 import { WelcomeScreen } from '../onboarding/WelcomeScreen';
 import { ChoiceScreen } from '../onboarding/ChoiceScreen';
@@ -104,7 +105,15 @@ const PracticeTestsStack = makeStack(
   'Based on the Colorado Driver Handbook.'
 );
 const DrivingLogStack = makeStack('DrivingLogHome', 'Driving Log', 'Driving Log');
-const ProgressStack = makeStack('ProgressHome', 'Progress', 'Progress / Outcome');
+// ph-4-us-6: the Progress tab is the concept report (Phase 5 adds the outcome log here later).
+const ProgressStackNav = createNativeStackNavigator();
+function ProgressStack() {
+  return (
+    <ProgressStackNav.Navigator screenOptions={headerOptions}>
+      <ProgressStackNav.Screen name="ProgressHome" component={ConceptReportScreen} options={{ title: 'Progress' }} />
+    </ProgressStackNav.Navigator>
+  );
+}
 
 const TAB_ICONS: Record<keyof RootTabParamList, keyof typeof Ionicons.glyphMap> = {
   Home: 'home',
