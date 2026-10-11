@@ -4,7 +4,7 @@
   "private": true,
   "main": "lib/index.js",
   "engines": {
-    "node": "20"
+    "node": "22"
   },
   "scripts": {
     "build": "tsc",
@@ -20,5 +20,8 @@
     "jest": "^30.5.1",
     "ts-jest": "^29.4.12",
     "typescript": "^5.9.3"
+  },
+  "volta": {
+    "node": "22.23.3"
   }
 }
