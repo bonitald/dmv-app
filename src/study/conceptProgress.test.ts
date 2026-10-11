@@ -34,7 +34,6 @@ test.each(['in-progress', 'reviewed', 'needs-revisit'] as const)(
 
 test.each([
   ['review-again', 'in-progress'],
-  ['come-back-later', 'needs-revisit'],
   ['mark-reviewed', 'reviewed'],
 ] as const)('choice %s writes %s', (choice, status) => {
   setStatusFromChoice('u1', 'row', choice);

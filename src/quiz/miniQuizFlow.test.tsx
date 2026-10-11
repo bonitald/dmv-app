@@ -132,14 +132,14 @@ test('Review Again pops back to the flashcards with a missed-only pass', async (
   expect(ref.getRootState().routes.map((r) => r.name)).toEqual(['Main', 'Flashcards']);
 });
 
-test('Come Back Later opens the next topic with questions, replacing this topic', async () => {
+test('Mark Reviewed after a failed quiz returns to the concept list', async () => {
   (scoreTest as jest.Mock).mockResolvedValue(graded('review-again'));
   await renderFlow();
   await answerAllAndSubmit(2);
-  await fireEvent.press(await screen.findByText('Come Back Later, Continue to Next Concept'));
-  expect(setStatusFromChoice).toHaveBeenCalledWith('u1', 'row', 'come-back-later');
-  expect(await screen.findByText(/^Flashcards .*"chunkId":"signs"/)).toBeTruthy();
-  expect(ref.getRootState().routes.map((r) => r.name)).toEqual(['Main', 'Flashcards']);
+  await fireEvent.press(await screen.findByText('Mark Reviewed'));
+  expect(setStatusFromChoice).toHaveBeenCalledWith('u1', 'row', 'mark-reviewed');
+  expect(await screen.findByText(/^Main .*"screen":"Study"/)).toBeTruthy();
+  expect(ref.getRootState().routes.map((r) => r.name)).toEqual(['Main']);
 });
 
 test('Mark Reviewed returns to the concept list', async () => {

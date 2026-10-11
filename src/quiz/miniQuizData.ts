@@ -1,11 +1,10 @@
 import type { PerQuestionResult, ScoreTestResult } from '../api/types';
 import { isMissed, toReviewItems, type ReviewItem } from '../review/reviewData';
 import type { NextStepChoice } from '../study/conceptProgressData';
-import type { Topic } from '../topics/topicsData';
 
 // ph-2-us-8 / ph-2-us-9: the mini-quiz's logic outside the screen: its graded outcome (from
 // scoreTest, or from the saved attempt when it was already graded), the results copy, the
-// previous quiz per topic for excludeIds, and where "Come Back Later" goes. No Firebase
+// previous quiz per topic for excludeIds. No Firebase
 // imports, so it runs under plain-Node Jest.
 
 export type Recommendation = 'move-on' | 'review-again';
@@ -90,27 +89,4 @@ export function rememberQuiz(chunkId: string, questionIds: string[]): void {
 
 export function lastQuizIds(chunkId: string): string[] {
   return lastQuiz.get(chunkId) ?? [];
-}
-
-/** The next topic in handbook order that has approved questions, or null after the last one. */
-export function nextTopicId(topics: Topic[], chunkId: string): string | null {
-  const at = topics.findIndex((t) => t.chunkId === chunkId);
-  if (at === -1) return null;
-  return topics.slice(at + 1).find((t) => t.approvedQuestionCount > 0)?.chunkId ?? null;
-}
-
-export interface RouteLike {
-  name: string;
-  key?: string;
-  params?: object;
-}
-
-/**
- * The root stack after "Come Back Later": the trailing Flashcards and MiniQuiz of the finished
- * topic are replaced by the next topic's Flashcards, so Back goes where the topic was opened from.
- */
-export function routesForNextTopic<R extends RouteLike>(routes: R[], nextChunkId: string): RouteLike[] {
-  let end = routes.length;
-  while (end > 0 && (routes[end - 1].name === 'MiniQuiz' || routes[end - 1].name === 'Flashcards')) end--;
-  return [...routes.slice(0, end), { name: 'Flashcards', params: { chunkId: nextChunkId } }];
 }

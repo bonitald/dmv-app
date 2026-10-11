@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { CommonActions, usePreventRemove } from '@react-navigation/native';
+import { usePreventRemove } from '@react-navigation/native';
 import { assembleMiniQuiz, scoreTest } from '../api/callables';
 import { toCallableError } from '../api/callableErrors';
 import type { QuizQuestion } from '../api/types';
@@ -21,16 +21,14 @@ import {
   fromAttempt,
   fromScoreResult,
   lastQuizIds,
-  nextTopicId,
   rememberQuiz,
-  routesForNextTopic,
   type MiniQuizOutcome,
 } from './miniQuizData';
 import { MiniQuizResults } from './MiniQuizResults';
 import { QuizRunner, type SubmitState } from './QuizRunner';
 
 // ph-2-us-8 / ph-2-us-9: one topic's mini-quiz on the shared runner, then its results and the
-// three next steps. Not kept in quizSession (that holds one active test, the baseline's): a
+// two next steps. Not kept in quizSession (that holds one active test, the baseline's): a
 // killed quiz is simply abandoned and the next one gets a new testId. Offline at submit, the
 // answers are held on screen and sent on reconnect.
 
@@ -151,18 +149,9 @@ export function MiniQuizScreen({ navigation, route }: RootStackScreenProps<'Mini
         navigation.popTo('Flashcards', { chunkId, pass: { mode: 'missed-only', nonce: Date.now() } });
         return;
       }
-      const next =
-        choice === 'come-back-later' && topics.status === 'ready' ? nextTopicId(topics.topics, chunkId) : null;
-      if (next) {
-        navigation.dispatch((state) => {
-          const routes = routesForNextTopic(state.routes, next);
-          return CommonActions.reset({ ...state, routes: routes as typeof state.routes, index: routes.length - 1 });
-        });
-        return;
-      }
       navigation.popTo('Main', { screen: 'Study', params: { screen: 'StudyHome' } });
     },
-    [uid, chunkId, navigation, topics]
+    [uid, chunkId, navigation]
   );
 
   switch (phase.kind) {

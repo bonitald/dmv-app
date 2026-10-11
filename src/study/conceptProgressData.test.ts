@@ -78,7 +78,6 @@ describe('nextStatus (ph-2-us-10 transitions)', () => {
 
   test.each([
     ['review-again', 'in-progress'],
-    ['come-back-later', 'needs-revisit'],
     ['mark-reviewed', 'reviewed'],
   ] as const)('%s sets %s, whatever the current status', (choice, expected) => {
     expect(statusForChoice(choice)).toBe(expected);

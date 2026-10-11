@@ -22,7 +22,7 @@ export interface ConceptProgress {
 export type ProgressMap = Record<string, ConceptProgress>;
 
 /** The three choices on the post-quiz recommendation screen (ph-2-us-9). */
-export type NextStepChoice = 'review-again' | 'come-back-later' | 'mark-reviewed';
+export type NextStepChoice = 'review-again' | 'mark-reviewed';
 
 const STORED: readonly string[] = ['in-progress', 'reviewed', 'needs-revisit'];
 
@@ -66,8 +66,6 @@ export function statusForChoice(choice: NextStepChoice): StoredStatus {
   switch (choice) {
     case 'review-again':
       return 'in-progress';
-    case 'come-back-later':
-      return 'needs-revisit';
     case 'mark-reviewed':
       return 'reviewed';
   }

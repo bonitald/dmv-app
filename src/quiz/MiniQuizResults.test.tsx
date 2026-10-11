@@ -20,19 +20,19 @@ test('shows the score, recommendation, missed questions with your answer and the
   expect(screen.getByText('You can restart any concept from the concept list.')).toBeTruthy();
 });
 
-test('every choice is enabled and reported; review answers is reported', async () => {
+test('exactly two choices, both enabled and reported; review answers is reported', async () => {
   const onChoice = jest.fn();
   const onReview = jest.fn();
   await render(<MiniQuizResults outcome={outcome(0.9, 'move-on')} onChoice={onChoice} onReview={onReview} />);
   for (const [label, choice] of [
     ['Review Again', 'review-again'],
-    ['Come Back Later, Continue to Next Concept', 'come-back-later'],
     ['Mark Reviewed', 'mark-reviewed'],
   ] as const) {
     expect(screen.getByRole('button', { name: label }).props.accessibilityState.disabled).toBe(false);
     await fireEvent.press(screen.getByText(label));
     expect(onChoice).toHaveBeenLastCalledWith(choice);
   }
+  expect(screen.queryByText(/Later/)).toBeNull();
   await fireEvent.press(screen.getByText('Review answers'));
   expect(onReview).toHaveBeenCalled();
 });

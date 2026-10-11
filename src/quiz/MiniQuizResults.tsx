@@ -6,12 +6,11 @@ import { colors, spacing, typography } from '../theme/tokens';
 import { recommendationLine, recommendedChoice, scoreLine, type MiniQuizOutcome } from './miniQuizData';
 
 // ph-2-us-9: after a mini-quiz, the score, a recommendation (never a gate) and what was missed,
-// then the three next steps. The recommended one comes first in the primary style; the others
-// stay enabled. Encouraging, not graded-feeling.
+// then the two next steps. The recommended one comes first in the primary style; the other
+// stays enabled. Encouraging, not graded-feeling.
 
 const CHOICES: { choice: NextStepChoice; label: string }[] = [
   { choice: 'review-again', label: 'Review Again' },
-  { choice: 'come-back-later', label: 'Come Back Later, Continue to Next Concept' },
   { choice: 'mark-reviewed', label: 'Mark Reviewed' },
 ];
 

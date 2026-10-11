@@ -1,14 +1,11 @@
 import type { ScoreTestResult } from '../api/types';
-import type { Topic } from '../topics/topicsData';
 import {
   fromAttempt,
   fromScoreResult,
   lastQuizIds,
-  nextTopicId,
   recommendationLine,
   recommendedChoice,
   rememberQuiz,
-  routesForNextTopic,
   scoreLine,
 } from './miniQuizData';
 
@@ -51,29 +48,4 @@ test('remembers the last quiz per topic for excludeIds', () => {
   rememberQuiz('row', ['a', 'b']);
   rememberQuiz('signs', ['s']);
   expect(lastQuizIds('row')).toEqual(['a', 'b']);
-});
-
-const topic = (chunkId: string, order: number, approvedQuestionCount = 5): Topic => ({
-  chunkId, title: chunkId, description: '', order, approvedQuestionCount,
-});
-
-test('nextTopicId skips topics with no approved questions and returns null at the end', () => {
-  const topics = [topic('a', 1), topic('b', 2, 0), topic('c', 3), topic('d', 4, 0)];
-  expect(nextTopicId(topics, 'a')).toBe('c');
-  expect(nextTopicId(topics, 'c')).toBeNull();
-  expect(nextTopicId(topics, 'unknown')).toBeNull();
-});
-
-test('routesForNextTopic replaces the trailing Flashcards and MiniQuiz with the next topic', () => {
-  const routes = [
-    { name: 'Main', key: 'm' },
-    { name: 'Review', key: 'r', params: { testId: 'x' } },
-    { name: 'Flashcards', key: 'f', params: { chunkId: 'a' } },
-    { name: 'MiniQuiz', key: 'q', params: { chunkId: 'a' } },
-  ];
-  expect(routesForNextTopic(routes, 'c')).toEqual([
-    { name: 'Main', key: 'm' },
-    { name: 'Review', key: 'r', params: { testId: 'x' } },
-    { name: 'Flashcards', params: { chunkId: 'c' } },
-  ]);
 });
