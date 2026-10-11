@@ -5,7 +5,7 @@ import { useAuth } from '../auth/AuthProvider';
 import { Button } from '../components/Button';
 import { NoConnection } from '../components/NoConnection';
 import type { RootStackScreenProps } from '../navigation/types';
-import { getDeckPosition, setDeckPosition, setLastOpenedTopic } from '../profile/localFlags';
+import { getDeckPass, setDeckPass, setLastOpenedTopic } from '../profile/localFlags';
 import { colors, spacing, typography } from '../theme/tokens';
 import { useTopics } from '../topics/useTopics';
 import { markOpened } from './conceptProgress';
@@ -73,7 +73,13 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
       cards={deck.cards}
       startCardId={startCardId ?? null}
       onMove={(cardId) => {
-        if (uid) void setDeckPosition(uid, chunkId, cardId);
+        if (uid) {
+          void setDeckPass(
+            uid,
+            chunkId,
+            cardId ? { mode: 'full', cardIds: deck.cards.map((c) => c.id), cardId } : null
+          );
+        }
       }}
       onQuiz={() => navigation.navigate('MiniQuiz', { chunkId })}
     />
@@ -86,8 +92,8 @@ function useSavedPosition(uid: string | null, chunkId: string): string | null | 
   useEffect(() => {
     if (!uid) return;
     let cancelled = false;
-    getDeckPosition(uid, chunkId).then((saved) => {
-      if (!cancelled) setCardId(saved);
+    getDeckPass(uid, chunkId).then((saved) => {
+      if (!cancelled) setCardId(saved?.cardId ?? null);
     });
     return () => {
       cancelled = true;

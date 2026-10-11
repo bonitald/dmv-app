@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { PerQuestionResult } from '../api/types';
-import { PREFIX, setDeckPosition } from '../profile/localFlags';
+import { PREFIX, setDeckPass } from '../profile/localFlags';
 import { applyQuizResults, gradedByTopic, NO_HISTORY, parseTopicHistory, type TopicHistory } from './cardPerformanceData';
 
 // ph-2-us-6: per-question quiz history on this phone, one AsyncStorage key per user and topic
@@ -30,6 +30,6 @@ export async function recordQuizResults(uid: string, perQuestion: PerQuestionRes
     } catch (error) {
       console.warn('[cardPerformance] write failed', chunkId, error);
     }
-    await setDeckPosition(uid, chunkId, null);
+    await setDeckPass(uid, chunkId, null);
   }
 }

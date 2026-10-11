@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { parseSavedPass, type SavedPass } from '../study/deckOrder';
 
 // Small per-user flags kept on the device (ph-9-us-3, ph-9-us-5). Keyed by uid so a different
 // user on the same phone (after sign-out, ph-9-us-10) starts fresh. These are conveniences, not
@@ -59,31 +60,32 @@ export async function setLastOpenedTopic(uid: string, chunkId: string): Promise<
   }
 }
 
-// The card a topic's flashcards were left on, so reopening the topic picks up there. Stored as
-// the card id, not an index, so it still finds the card if the deck's order changes. Cleared at
-// the end of the deck, so a finished topic opens from the first card.
+// The pass a topic's flashcards were left in (its order, mode and current card), so reopening
+// the topic resumes the same sequence (Slice 4b). Cleared at the end of the deck and when a quiz
+// on the topic is recorded, so the next open builds a fresh pass. Same key as 4a's card id; an
+// old plain id reads as "no saved pass".
 const DECK_POSITION = 'study:deck-position';
 
 function deckPositionKey(uid: string, chunkId: string): string {
   return `${PREFIX}${DECK_POSITION}:${uid}:${chunkId}`;
 }
 
-/** A storage failure reads as "none", which only costs starting at the first card. */
-export async function getDeckPosition(uid: string, chunkId: string): Promise<string | null> {
+/** A storage failure or unreadable value reads as "none", which only costs starting a new pass. */
+export async function getDeckPass(uid: string, chunkId: string): Promise<SavedPass | null> {
   try {
-    return await AsyncStorage.getItem(deckPositionKey(uid, chunkId));
+    return parseSavedPass(await AsyncStorage.getItem(deckPositionKey(uid, chunkId)));
   } catch (error) {
-    console.warn('[localFlags] deck-position read failed', error);
+    console.warn('[localFlags] deck-pass read failed', error);
     return null;
   }
 }
 
 /** `null` clears it. */
-export async function setDeckPosition(uid: string, chunkId: string, cardId: string | null): Promise<void> {
+export async function setDeckPass(uid: string, chunkId: string, pass: SavedPass | null): Promise<void> {
   try {
-    if (cardId) await AsyncStorage.setItem(deckPositionKey(uid, chunkId), cardId);
+    if (pass) await AsyncStorage.setItem(deckPositionKey(uid, chunkId), JSON.stringify(pass));
     else await AsyncStorage.removeItem(deckPositionKey(uid, chunkId));
   } catch (error) {
-    console.warn('[localFlags] deck-position write failed', error);
+    console.warn('[localFlags] deck-pass write failed', error);
   }
 }

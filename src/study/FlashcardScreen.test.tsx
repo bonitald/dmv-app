@@ -194,7 +194,7 @@ test('reopening a topic resumes on the card it was left on', async () => {
   await fireEvent.press(screen.getByText('Next'));
   await fireEvent.press(screen.getByText('Next'));
   await waitFor(async () =>
-    expect(await AsyncStorage.getItem('dmv-app:study:deck-position:u1:row')).toBe('q3')
+    expect(JSON.parse((await AsyncStorage.getItem('dmv-app:study:deck-position:u1:row')) ?? 'null')?.cardId).toBe('q3')
   );
   await first.unmount();
 
@@ -205,7 +205,7 @@ test('reopening a topic resumes on the card it was left on', async () => {
 
 test('finishing the deck clears the position, so the topic reopens on the first card', async () => {
   mockGet.mockResolvedValue(deckOf(card(1), card(2)));
-  await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', 'q2');
+  await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', JSON.stringify({ mode: 'full', cardIds: ['q1', 'q2'], cardId: 'q2' }));
   const first = await render(tree());
   expect(await screen.findByLabelText('Question: Question 2')).toBeTruthy();
   await fireEvent.press(screen.getByText('Next'));
@@ -221,7 +221,7 @@ test('finishing the deck clears the position, so the topic reopens on the first 
 
 test('a saved card that is no longer in the deck opens the first card', async () => {
   mockGet.mockResolvedValue(deckOf(card(1), card(2)));
-  await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', 'gone');
+  await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', JSON.stringify({ mode: 'full', cardIds: ['gone'], cardId: 'gone' }));
   await render(tree());
   expect(await screen.findByLabelText('Question: Question 1')).toBeTruthy();
 });

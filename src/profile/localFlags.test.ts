@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getDeckPosition, getLastOpenedTopic, setDeckPosition, setLastOpenedTopic } from './localFlags';
+import { getDeckPass, getLastOpenedTopic, setDeckPass, setLastOpenedTopic } from './localFlags';
 
 beforeEach(async () => {
   await AsyncStorage.clear();
@@ -20,12 +20,19 @@ test('a storage failure reads as none', async () => {
   warn.mockRestore();
 });
 
-test('deck position is stored per uid and topic, and null clears it', async () => {
-  expect(await getDeckPosition('u1', 'row')).toBeNull();
-  await setDeckPosition('u1', 'row', 'q7');
-  expect(await getDeckPosition('u1', 'row')).toBe('q7');
-  expect(await getDeckPosition('u1', 'signs')).toBeNull();
-  expect(await getDeckPosition('u2', 'row')).toBeNull();
-  await setDeckPosition('u1', 'row', null);
-  expect(await getDeckPosition('u1', 'row')).toBeNull();
+
+test('deck pass is stored per uid and topic, and null clears it', async () => {
+  const pass = { mode: 'full' as const, cardIds: ['q7', 'q8'], cardId: 'q7' };
+  expect(await getDeckPass('u1', 'row')).toBeNull();
+  await setDeckPass('u1', 'row', pass);
+  expect(await getDeckPass('u1', 'row')).toEqual(pass);
+  expect(await getDeckPass('u1', 'signs')).toBeNull();
+  expect(await getDeckPass('u2', 'row')).toBeNull();
+  await setDeckPass('u1', 'row', null);
+  expect(await getDeckPass('u1', 'row')).toBeNull();
+});
+
+test('a 4a plain card id reads as no saved pass', async () => {
+  await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', 'q7');
+  expect(await getDeckPass('u1', 'row')).toBeNull();
 });
