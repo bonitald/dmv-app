@@ -31,7 +31,7 @@ export type RootStackParamList = {
    * results or review, wherever it was opened from. A new `pass` (Review Again, Slice 4b)
    * starts that pass in the open viewer. */
   Flashcards: { chunkId: string; pass?: { mode: PassMode; nonce: number } };
-  /** The topic's mini-quiz. A placeholder until Slice 4b (ph-2-us-8). */
+  /** The topic's mini-quiz (ph-2-us-8). */
   MiniQuiz: { chunkId: string };
   TestDateEditor: undefined;
 };

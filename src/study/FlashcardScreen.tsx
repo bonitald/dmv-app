@@ -49,6 +49,7 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
   const passCount = useRef(0);
   const handledNonce = useRef<number | undefined>(undefined);
   const mounted = useRef(true);
+  const latestRequest = useRef(0);
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -81,8 +82,11 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
   const startPass = useCallback(
     async (mode: PassMode) => {
       if (deck.status !== 'ready' || !uid) return;
+      latestRequest.current += 1;
+      const request = latestRequest.current;
       const history = await readTopicHistory(uid, chunkId);
-      if (!mounted.current) return;
+      // Unmounted, or a newer request started while this one read: the latest request wins.
+      if (!mounted.current || request !== latestRequest.current) return;
       const built = buildPass(deck.cards, history, mode);
       passCount.current += 1;
       setPass({ id: passCount.current, mode: built.mode, cards: built.cards, index: 0 });
@@ -173,7 +177,8 @@ function Deck({ pass, onMove, onQuiz, onAllCards }: DeckProps) {
   const missedOnly = pass.mode === 'missed-only';
 
   const currentId = state.cards[state.index]?.id ?? null;
-  const lastSaved = useRef(currentId);
+  // Starts unset so the pass is saved as soon as it mounts, not only after the first move.
+  const lastSaved = useRef<string | null | undefined>(undefined);
   useEffect(() => {
     if (currentId === lastSaved.current) return;
     lastSaved.current = currentId;

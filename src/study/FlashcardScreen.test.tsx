@@ -375,3 +375,22 @@ test('resuming restores the saved pass order and card', async () => {
   await fireEvent.press(screen.getByText('Next'));
   expect(screen.getByLabelText('Question: Question 2')).toBeTruthy();
 });
+
+test('Show all cards saves the new full pass, so reopening does not resume the old missed-only one', async () => {
+  await seedHistory(['q2', 'q3']);
+  mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
+  const first = await render(treeWith({ chunkId: 'row', pass: { mode: 'missed-only', nonce: 1 } }));
+  await screen.findByText('Reviewing the 2 you missed');
+  await fireEvent.press(screen.getByText('Next'));
+  await fireEvent.press(screen.getByText('Show all cards'));
+  expect(screen.getByText('1 of 3')).toBeTruthy();
+  await waitFor(async () =>
+    expect(JSON.parse((await AsyncStorage.getItem('dmv-app:study:deck-position:u1:row')) ?? 'null')?.mode).toBe('full')
+  );
+  await first.unmount();
+
+  await render(tree());
+  await screen.findByLabelText('Question: Question 1');
+  expect(screen.queryByText(/you missed/)).toBeNull();
+  expect(screen.getByText('1 of 3')).toBeTruthy();
+});
