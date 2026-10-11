@@ -81,7 +81,7 @@ So that every time I open the app I can get straight into studying or testing.
   4a), weak spots (4b), practice test + latest score (5), save progress (6).
 
 ## Implementation notes (Slice 4a)
-- The "Continue learning" card is done: it shows "Continue learning · <topic>" and opens the last topic whose deck loaded, stored per uid on the device (AsyncStorage, design decision 2). Before any topic is opened it stays "Learn concept by concept" and opens the concept list. The pure `nextConceptToStudy` helper was not needed for this and is still open.
+- The "Continue learning" card is done: it shows "Continue learning · <topic>" for the last topic whose deck loaded, stored per uid on the device (AsyncStorage, design decision 2). Before any topic is opened it stays "Learn concept by concept". Changed 2026-10-10 after device testing: both versions open the concept list, so the user picks what to study instead of being dropped into a deck; the flashcard viewer now resumes each topic on the card it was left on (stored per uid and topic on the device, cleared at the end of the deck). The pure `nextConceptToStudy` helper was not needed for this and is still open.
 - **Carry-forward to Slice 6:** reset last-opened on sign-out.
 
 ## Questions
