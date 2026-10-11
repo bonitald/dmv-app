@@ -111,6 +111,7 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
         setPass({ id: passCount.current, ...restored });
         return;
       }
+      // A cache-only empty snapshot (cachedEmpty) reads as not-started here, so a needs-revisit topic opens a full pass: safe, and only after a cleared cache, when card history is gone too.
       const status = progress.status === 'ready' ? progressFor(progress.byChunk, chunkId).status : 'not-started';
       const history = await readTopicHistory(uid, chunkId);
       if (cancelled) return;

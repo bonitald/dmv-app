@@ -14,7 +14,7 @@ import { toReportRows, type ReportRow } from './conceptStrength';
 export type EvidenceState =
   | { status: 'loading' }
   | { status: 'topics-error'; retry: () => void }
-  | { status: 'ready'; rows: ReportRow[]; baselineError: boolean; retryBaseline: () => void };
+  | { status: 'ready'; rows: ReportRow[]; baselineError: boolean; retryBaseline: (() => void) | null };
 
 export function useConceptEvidence(): EvidenceState {
   const topics = useTopics();
@@ -40,5 +40,8 @@ export function useConceptEvidence(): EvidenceState {
 
   if (topics.status === 'error') return { status: 'topics-error', retry: topics.retry };
   if (topics.status === 'loading' || progress.status === 'loading' || baselineLoading) return { status: 'loading' };
-  return { status: 'ready', rows, baselineError, retryBaseline: attempt.retry };
+  // Try again only helps when the attempt read failed; a failed baseline-progress listener is
+  // permanent, so offering a retry there would do nothing.
+  const retryBaseline = baseline.status === 'complete' && attempt.status === 'error' ? attempt.retry : null;
+  return { status: 'ready', rows, baselineError, retryBaseline };
 }

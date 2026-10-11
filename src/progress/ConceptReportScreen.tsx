@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { openConcept } from '../navigation/openConcept';
+import type { RootStackParamList } from '../navigation/types';
 import { NoConnection } from '../components/NoConnection';
 import { colors, radius, spacing, typography } from '../theme/tokens';
 import {
@@ -31,7 +33,7 @@ const CHIP: Record<Strength, { backgroundColor: string; color: string }> = {
 };
 
 export function ConceptReportScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const evidence = useConceptEvidence();
   const [sort, setSort] = useState<ReportSort>('handbook');
 
@@ -50,7 +52,7 @@ export function ConceptReportScreen() {
   const notice = evidence.baselineError ? (
     <View style={styles.notice}>
       <Text style={[typography.small, styles.noticeText]}>Couldn't load your baseline.</Text>
-      <Button label="Try again" variant="text" onPress={evidence.retryBaseline} />
+      {evidence.retryBaseline && <Button label="Try again" variant="text" onPress={evidence.retryBaseline} />}
     </View>
   ) : null;
 
@@ -92,7 +94,7 @@ export function ConceptReportScreen() {
         </View>
       }
       renderItem={({ item }) => (
-        <ReportRowView row={item} onOpen={() => navigation.navigate('Flashcards', { chunkId: item.chunkId })} />
+        <ReportRowView row={item} onOpen={() => openConcept(navigation, item.chunkId)} />
       )}
     />
   );

@@ -29,6 +29,13 @@ export async function recordQuizResults(uid: string, perQuestion: PerQuestionRes
       await AsyncStorage.setItem(key(uid, chunkId), JSON.stringify(next));
     } catch (error) {
       console.warn('[cardPerformance] write failed', chunkId, error);
+      // Don't let the previous quiz's misses survive: Review Again would drill the wrong cards.
+      // With the key gone the topic falls back to a full deck.
+      try {
+        await AsyncStorage.removeItem(key(uid, chunkId));
+      } catch (removeError) {
+        console.warn('[cardPerformance] cleanup failed', chunkId, removeError);
+      }
     }
     await setDeckPass(uid, chunkId, null);
   }

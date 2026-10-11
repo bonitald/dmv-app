@@ -34,3 +34,15 @@ test('a storage failure reads as no history and a write failure does not throw',
   await expect(recordQuizResults('u1', [r('q1', 'row', false)])).resolves.toBeUndefined();
   warn.mockRestore();
 });
+
+test('a failed history write drops the old missed ids so Review Again cannot drill a previous quiz', async () => {
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  await recordQuizResults('u1', [r('old', 'row', false)]);
+  expect((await readTopicHistory('u1', 'row')).lastQuizMissedIds).toEqual(['old']);
+  jest.spyOn(AsyncStorage, 'setItem').mockRejectedValueOnce(new Error('full'));
+  await recordQuizResults('u1', [r('q1', 'row', false)]);
+  expect((await readTopicHistory('u1', 'row')).lastQuizMissedIds).toEqual([]);
+  expect(warn).toHaveBeenCalled();
+});
+
+afterEach(() => jest.restoreAllMocks());
