@@ -2,7 +2,7 @@
 
 **ID:** ph-2-us-7
 **Layer:** Parent
-**Status:** Not Started
+**Status:** Complete (Slice 4a, 2026-10-10; the latest-score display is unit-tested and shows on device once Slice 4b's mini-quiz exists)
 
 ## Story
 As a teen user,
@@ -28,20 +28,20 @@ forced through a fixed order.
   `topics` doc carries `approvedQuestionCount`.
 
 ## Acceptance Criteria
-- [ ] Given the `topics` collection is populated, when the teen user opens the Study tab, then
+- [x] Given the `topics` collection is populated, when the teen user opens the Study tab, then
   they see every topic ordered by `order` (handbook PDF order), each with its `title` and short
   `description`.
-- [ ] Given the user has a Concept Progress record for a topic, when the list renders, then that
+- [x] Given the user has a Concept Progress record for a topic, when the list renders, then that
   topic shows its status and, if one exists, its latest mini-quiz score.
-- [ ] Given the user has no Concept Progress record for a topic, when the list renders, then the
+- [x] Given the user has no Concept Progress record for a topic, when the list renders, then the
   topic shows "not started". A missing record is not an error.
-- [ ] Given any topic in the list, when the user taps it, then it opens that topic's flashcards
+- [x] Given any topic in the list, when the user taps it, then it opens that topic's flashcards
   (ph-2-us-3), whatever its status or position — no locked or gated topics.
-- [ ] Given a topic has `approvedQuestionCount == 0`, when the list renders, then it's shown but
+- [x] Given a topic has `approvedQuestionCount == 0`, when the list renders, then it's shown but
   clearly marked as "coming soon" and not tappable, rather than opening an empty deck.
-- [ ] Given the user changes a topic's status (ph-2-us-9) and comes back to the list, when the
+- [x] Given the user changes a topic's status (ph-2-us-9) and comes back to the list, when the
   list shows again, then the new status is visible without restarting the app.
-- [ ] Given the device is offline on first open, when the list can't load, then the user sees a
+- [x] Given the device is offline on first open, when the list can't load, then the user sees a
   "no connection" state with retry. Once loaded, Firestore's offline cache is enough to show
   it again.
 
@@ -66,10 +66,17 @@ forced through a fixed order.
   state, not a crash.
 
 ## Tasks
-- [ ] Add `src/study/topics.ts`: read `topics` ordered by `order`.
-- [ ] Build the concept list screen, merging `topics` with Concept Progress (ph-2-us-12).
-- [ ] Replace the Study tab placeholder and wire navigation to the flashcard viewer.
-- [ ] Implement status chips, "coming soon" rows, and offline/error states.
+- [x] Add `src/study/topics.ts`: read `topics` ordered by `order`.
+- [x] Build the concept list screen, merging `topics` with Concept Progress (ph-2-us-12).
+- [x] Replace the Study tab placeholder and wire navigation to the flashcard viewer.
+- [x] Implement status chips, "coming soon" rows, and offline/error states.
+
+## Implementation notes (Slice 4a)
+Built in Slice 4a on `feat/concept-list-flashcards`; plan `docs/superpowers/plans/2026-10-03-slice-4a-concept-list-flashcards.md`, design `docs/superpowers/specs/2026-10-03-slice-4a-concept-list-flashcards-design.md`.
+- **Viewer is on the root stack** (design decision 3), like Baseline and Review, not pushed onto the Study stack as the UI/UX Notes above first said. Back returns to wherever the user came from (list, results, review) and the tab bar is hidden while studying.
+- The Study tab header stays "Study"; the list has its own intro line. A topic doc missing `approvedQuestionCount` counts as 0 ("coming soon"). An error reading Concept Progress is treated as "everything not started".
+- Final-review fixes (commit 028d960): the coming-soon chip uses `inkSoft` for contrast, Concept Progress resets on uid change, and an empty concept list offers Try again.
+- Device-tested on the Android emulator against dev: all passed.
 
 ## Questions
 - ph-1-us-9 asked whether small or empty topics should be hidden. This story shows them as

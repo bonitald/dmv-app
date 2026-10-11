@@ -3,7 +3,7 @@
 **ID:** ph-2-us-3
 **Layer:** Frontend
 **Parent:** ph-2-us-1
-**Status:** Not Started
+**Status:** In Progress — viewer done (Slice 4a, device-tested 2026-10-10); 'Take the mini-quiz' opens a placeholder until ph-2-us-8
 
 ## Story
 As a teen user,
@@ -36,32 +36,32 @@ list.
   choices, and the flashcard never does.
 
 ## Acceptance Criteria
-- [ ] Given the teen user opens a topic from the concept list (ph-2-us-7), when its cards load,
+- [x] Given the teen user opens a topic from the concept list (ph-2-us-7), when its cards load,
   then the first card shows its front: the question text only, with no answer choices.
-- [ ] Given a card's front is showing, when the user taps the card, then it flips to the back,
+- [x] Given a card's front is showing, when the user taps the card, then it flips to the back,
   which shows only the correct answer (no wrong choices, no right/wrong marking).
-- [ ] Given a card's back is showing, when the user taps the card again, then it flips back to
+- [x] Given a card's back is showing, when the user taps the card again, then it flips back to
   the front.
-- [ ] Given any card is showing (either side), when the user taps "Next" or swipes forward, then
+- [x] Given any card is showing (either side), when the user taps "Next" or swipes forward, then
   the next card's front shows; swiping back shows the previous card's front. Nothing is recorded
   per card.
-- [ ] Given the user moves past the last card, when the end-of-deck screen shows, then it offers
+- [x] Given the user moves past the last card, when the end-of-deck screen shows, then it offers
   two choices: "Take the mini-quiz" (ph-2-us-8) and "Start this concept over".
-- [ ] Given the user picks "Start this concept over", when the deck restarts, then it starts from
+- [x] Given the user picks "Start this concept over", when the deck restarts, then it starts from
   the first card with a fresh order (ph-2-us-4), from the session cache (no new `getFlashcards`
   call), and the concept's status is unchanged.
-- [ ] Given the user has already loaded a topic this app session, when they reopen it (including
+- [x] Given the user has already loaded a topic this app session, when they reopen it (including
   "Review Again", ph-2-us-9), then the cards come from an in-memory session cache, not a new
   `getFlashcards` call — reopening a topic shouldn't use up the rate limit.
-- [ ] Given `getFlashcards` returns `not-found`, when the topic opens, then the user sees a
+- [x] Given `getFlashcards` returns `not-found`, when the topic opens, then the user sees a
   "nothing here yet" message rather than an error or a blank screen.
-- [ ] Given `getFlashcards` returns `resource-exhausted`, when the topic opens, then the user sees
+- [x] Given `getFlashcards` returns `resource-exhausted`, when the topic opens, then the user sees
   a friendly "take a short break and try again in a few minutes" message, not a generic error.
-- [ ] Given the device is offline and the topic isn't in the session cache, when the user opens
+- [x] Given the device is offline and the topic isn't in the session cache, when the user opens
   it, then they see a clear "no connection" state with a retry option. There is no offline copy
   of the full bank (extraction-prevention, ph-1-us-10), so offline study only works for topics
   already loaded this session.
-- [ ] Given any other call failure, when it happens, then the user sees a retry option rather
+- [x] Given any other call failure, when it happens, then the user sees a retry option rather
   than a silent failure.
 
 ## UI/UX Notes
@@ -95,17 +95,28 @@ list.
   (already-loaded cards keep working), call timeout.
 
 ## Tasks
-- [ ] Add `@react-native-firebase/functions` and rebuild the dev client (skip if a journey story
+- [x] Add `@react-native-firebase/functions` and rebuild the dev client (skip if a journey story
   already did this).
-- [ ] Add a typed client wrapper for `getFlashcards` that maps callable error codes to UI states
+- [x] Add a typed client wrapper for `getFlashcards` that maps callable error codes to UI states
   (empty / rate-limited / offline / error). Shared with ph-2-us-8's quiz calls.
-- [ ] Add the in-memory session cache keyed by `chunkId`.
-- [ ] Build the flip flashcard component (front: question; back: correct answer).
-- [ ] Build the flashcard viewer screen (next/previous, swipe), progress indicator, and the
+- [x] Add the in-memory session cache keyed by `chunkId`.
+- [x] Build the flip flashcard component (front: question; back: correct answer).
+- [x] Build the flashcard viewer screen (next/previous, swipe), progress indicator, and the
   end-of-deck screen with "Take the mini-quiz" / "Start this concept over".
-- [ ] Implement empty / rate-limited / offline / error states.
-- [ ] Add a `jest-expo` config for component tests (`jest.app.config.js` is Node-only) and cover
+- [x] Implement empty / rate-limited / offline / error states.
+- [x] Add a `jest-expo` config for component tests (`jest.app.config.js` is Node-only) and cover
   the card component and error states.
+
+## Implementation notes (Slice 4a)
+Built in Slice 4a on `feat/concept-list-flashcards`; plan `docs/superpowers/plans/2026-10-03-slice-4a-concept-list-flashcards.md`, design `docs/superpowers/specs/2026-10-03-slice-4a-concept-list-flashcards-design.md`.
+- **Animation and swipe** (design decision 1): React Native's built-in `Animated` (flip) and `PanResponder` (swipe); no Reanimated or Gesture Handler, so no dev-client rebuild.
+- **A tap mid-flip turns the card back smoothly** instead of being ignored (`Animated.timing` is interruptible, so there is no input lock).
+- **"Back to the last card"** text button on the end-of-deck screen, so screen-reader and non-swipe users can step back without the header Back leaving the topic. The header shows the topic title once topics load (falls back to "Flashcards").
+- **"Take the mini-quiz"** is a live button opening a placeholder on the `MiniQuiz` route that Slice 4b fills in (design decision 4). Its criterion is ticked for the offer only; the quiz itself is ph-2-us-8.
+- **Choice-worded questions** (design decision 5): "Which of the following..." cards are shown as-is. No problems were noticed in the device test (the count was not reported); revisit if reviewers flag cards.
+- Last-opened topic is saved as soon as a deck loads, independent of the status read, so Home's shortcut works even if Concept Progress cannot be read. Decks live only in memory for the session (never persisted).
+- Final-review fixes (commit 028d960): the hidden face of `FlipCard` takes no touches (fixes scrolling on Android).
+- **Carry-forward to Slice 4b:** "Review Again" from the mini-quiz back to an existing Flashcards route needs goBack/popTo or a state reset on `chunkId` change.
 
 ## Questions
 - Some questions may be worded around their choices ("Which of the following..."). On a card

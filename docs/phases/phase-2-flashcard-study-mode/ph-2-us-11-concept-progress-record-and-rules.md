@@ -3,7 +3,7 @@
 **ID:** ph-2-us-11
 **Layer:** Backend
 **Parent:** ph-2-us-10
-**Status:** Not Started
+**Status:** Complete (Slice 4a; rules and `scoreTest` deployed to dev 2026-10-10)
 
 ## Story
 As a developer,
@@ -26,25 +26,25 @@ scores.
   plus inline comments).
 
 ## Acceptance Criteria
-- [ ] Given a signed-in user, when they read `users/{uid}/conceptProgress/{chunkId}` for their
+- [x] Given a signed-in user, when they read `users/{uid}/conceptProgress/{chunkId}` for their
   own uid, then it succeeds; for another uid, it's denied.
-- [ ] Given a signed-in user, when they create or update their own doc with only `status`
+- [x] Given a signed-in user, when they create or update their own doc with only `status`
   (one of `in-progress`, `reviewed`, `needs-revisit`) and `statusUpdatedAt`
   (`request.time`), then it succeeds.
-- [ ] Given a client write that sets or changes any other field (`latestMiniQuizScore`,
+- [x] Given a client write that sets or changes any other field (`latestMiniQuizScore`,
   `latestMiniQuizAt`, `latestTestId`, or any unknown key), when it reaches Firestore, then it's
   denied.
-- [ ] Given a client write with a `status` outside the allowed values (including
+- [x] Given a client write with a `status` outside the allowed values (including
   `not-started`), when it reaches Firestore, then it's denied.
-- [ ] Given a client tries to delete a Concept Progress doc, when it reaches Firestore, then it's
+- [x] Given a client tries to delete a Concept Progress doc, when it reaches Firestore, then it's
   denied.
-- [ ] Given `scoreTest` grades a `mini-quiz`, when it writes the attempt, then it also merges
+- [x] Given `scoreTest` grades a `mini-quiz`, when it writes the attempt, then it also merges
   `latestMiniQuizScore`, `latestMiniQuizAt` and `latestTestId` into
   `users/{uid}/conceptProgress/{chunkId}`, in the same transaction/batch as the attempt, without
   touching `status`.
-- [ ] Given `scoreTest` grades a practice test or baseline section, when it runs, then Concept
+- [x] Given `scoreTest` grades a practice test or baseline section, when it runs, then Concept
   Progress is not touched (mini-quiz only).
-- [ ] Given no Concept Progress doc exists yet when a mini-quiz is scored, when `scoreTest`
+- [x] Given no Concept Progress doc exists yet when a mini-quiz is scored, when `scoreTest`
   writes, then it creates the doc with score fields only (no `status`). The client treats a
   missing `status` as "in progress" if a score exists (ph-2-us-12).
 
@@ -84,14 +84,18 @@ scores.
   `statusUpdatedAt` set to a client-chosen time (denied).
 
 ## Tasks
-- [ ] Add the `conceptProgress` match block to `firestore.rules`.
-- [ ] Add rules tests to `firestore-tests/rules.test.ts` for every allow/deny case above
+- [x] Add the `conceptProgress` match block to `firestore.rules`.
+- [x] Add rules tests to `firestore-tests/rules.test.ts` for every allow/deny case above
   (`npm run test:rules`).
-- [ ] Extend `scoreTest` to merge score fields for mini-quiz attempts, atomically with the
+- [x] Extend `scoreTest` to merge score fields for mini-quiz attempts, atomically with the
   attempt write, documented per the `cloud-function-documentation` skill.
-- [ ] Add functions tests (`npm run test:functions`).
-- [ ] Document `conceptProgress` in `functions/README.md` (under `scoreTest` persistence) and
+- [x] Add functions tests (`npm run test:functions`).
+- [x] Document `conceptProgress` in `functions/README.md` (under `scoreTest` persistence) and
   update the `firestore.rules` header comments.
+
+## Implementation notes (Slice 4a)
+Built in Slice 4a on `feat/concept-list-flashcards`; plan `docs/superpowers/plans/2026-10-03-slice-4a-concept-list-flashcards.md`, design `docs/superpowers/specs/2026-10-03-slice-4a-concept-list-flashcards-design.md`.
+- Rules tests 54, functions tests 71. Deployed to dev 2026-10-10: the first attempt hit a transient `generateUploadUrl` upload error, the retry succeeded, and the invoker smoke check still returns 401.
 
 ## Questions
 - Should Concept Progress also keep a best score, or a count of quiz attempts? Assumed not for

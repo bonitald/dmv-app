@@ -129,6 +129,24 @@ Design: `docs/superpowers/specs/2026-10-03-slice-4a-concept-list-flashcards-desi
 
 Home card: "Continue learning".
 
+**Status: Complete (2026-10-10).** Plan:
+`docs/superpowers/plans/2026-10-03-slice-4a-concept-list-flashcards.md`. Rules and functions
+deployed to dev 2026-10-10 (the first attempt hit a transient `generateUploadUrl` upload error;
+the retry succeeded; invoker smoke check still 401). Device-tested on the Android emulator:
+everything passed. Rules 54, functions 71, question bank 47, app 121, components 112, tsc clean.
+The count of choice-worded cards ("Which of the following...") was not reported; they are shown
+as-is, to revisit if reviewers flag cards. Stories: ph-2-us-5, 7, 11, 12 Complete; ph-2-us-3
+In Progress (mini-quiz button is a placeholder until ph-2-us-8); ph-2-us-10 In Progress;
+ph-9-us-7 stays open for its other cards ("Continue learning" is done). Final whole-branch review
+fixes (028d960): the flashcard's hidden face takes no touches (Android scroll), the coming-soon
+chip uses `inkSoft` for contrast, Concept Progress resets on uid change, and an empty concept
+list offers Try again.
+
+**Carry-forwards.** Slice 4b: "Review Again" from the mini-quiz back to an existing Flashcards
+route needs goBack/popTo or a state reset on `chunkId` change; once `reviewed` exists, ignore a
+cache-only empty first progress snapshot before `markOpened`. Slice 6: `clearDeckCache()` and
+reset last-opened and progress on sign-out.
+
 ### 4b — Mini-quiz, recommendation and progress
 
 **Test:** finish a deck → "Take the mini-quiz" → submit → recommendation → pick Review Again /
@@ -223,3 +241,4 @@ Parents closed: ph-9-us-8, and ph-9-us-6 in full.
   they fit in the journey is decided when they're written.
 - About 900 questions still await review. Slice 4a's "coming soon" state and Slice 5's
   scenario minimum depend on how much is approved by then.
+- Cloud Functions Node.js 20 runtime is decommissioned 2026-10-30: `functions/` must move to Node 22 (and upgrade `firebase-functions`, which has breaking changes) before then or deploys stop.

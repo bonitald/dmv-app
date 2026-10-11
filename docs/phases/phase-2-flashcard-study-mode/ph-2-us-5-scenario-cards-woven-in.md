@@ -2,7 +2,7 @@
 
 **ID:** ph-2-us-5
 **Layer:** Parent
-**Status:** Not Started
+**Status:** Complete (Slice 4a, 2026-10-10; badge on the flip flashcard, the quiz card shares it)
 
 ## Story
 As a teen user,
@@ -29,15 +29,15 @@ So that I get comfortable reasoning through road situations, not just recalling 
   not the flashcard.
 
 ## Acceptance Criteria
-- [ ] Given a topic's flashcard set contains both `fact` and `scenario` type cards, when the user
+- [x] Given a topic's flashcard set contains both `fact` and `scenario` type cards, when the user
   browses that topic, then both types appear interleaved in the same draw order (subject to the
   weak-card weighting from ph-2-us-4) — never a separate "scenario mode" toggle or screen.
-- [ ] Given a card's `type` is `scenario`, when it's rendered, then it's visually distinguishable
+- [x] Given a card's `type` is `scenario`, when it's rendered, then it's visually distinguishable
   from a `fact` card (e.g. a label/badge, distinct accent color, or layout cue) without changing
   the core interaction pattern (still reveal-answer/advance like any other card).
-- [ ] Given a card's `type` is `fact`, when it's rendered, then it displays without the scenario
+- [x] Given a card's `type` is `fact`, when it's rendered, then it displays without the scenario
   visual treatment.
-- [ ] Given a scenario card's text is typically longer/more narrative than a fact card's, when it
+- [x] Given a scenario card's text is typically longer/more narrative than a fact card's, when it
   renders, then the card layout accommodates that (no truncation or overflow) rather than
   assuming fact-card-length text throughout.
 
@@ -54,10 +54,14 @@ So that I get comfortable reasoning through road situations, not just recalling 
   `fact` treatment rather than crashing the viewer.
 
 ## Tasks
-- [ ] Apply the mockup's scenario treatment (SCENARIO badge, accent) using existing tokens only —
+- [x] Apply the mockup's scenario treatment (SCENARIO badge, accent) using existing tokens only —
   no new colors/sizes outside `src/theme/tokens.ts`.
-- [ ] Implement the type-aware rendering in the flashcard viewer component from ph-2-us-3.
-- [ ] Verify layout handles longer scenario-card text without overflow on smaller device sizes.
+- [x] Implement the type-aware rendering in the flashcard viewer component from ph-2-us-3.
+- [x] Verify layout handles longer scenario-card text without overflow on smaller device sizes.
+
+## Implementation notes (Slice 4a)
+Built in Slice 4a on `feat/concept-list-flashcards`; plan `docs/superpowers/plans/2026-10-03-slice-4a-concept-list-flashcards.md`, design `docs/superpowers/specs/2026-10-03-slice-4a-concept-list-flashcards-design.md`.
+- The scenario badge is shared with the quiz card; a long scenario card scrolls on the flashcard. Device-tested on the Android emulator against dev: all passed.
 
 ## Questions
 None outstanding.

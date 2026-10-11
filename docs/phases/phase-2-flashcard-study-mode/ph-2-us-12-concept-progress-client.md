@@ -3,7 +3,7 @@
 **ID:** ph-2-us-12
 **Layer:** Frontend
 **Parent:** ph-2-us-10
-**Status:** Not Started
+**Status:** Complete (Slice 4a; `setStatusFromChoice` is built and tested, its screen arrives in Slice 4b)
 
 ## Story
 As a developer,
@@ -23,20 +23,20 @@ same way.
   without a custom queue.
 
 ## Acceptance Criteria
-- [ ] Given a signed-in user, when a screen subscribes to Concept Progress, then it gets a map of
+- [x] Given a signed-in user, when a screen subscribes to Concept Progress, then it gets a map of
   `chunkId → { status, latestMiniQuizScore?, latestMiniQuizAt? }` that updates live when a
   status changes or `scoreTest` writes a new score.
-- [ ] Given a topic has no doc, when it's read, then its status is `not-started`. Given a doc
+- [x] Given a topic has no doc, when it's read, then its status is `not-started`. Given a doc
   with a score but no `status`, then its status is `in-progress`.
-- [ ] Given a topic is `not-started`, when `markOpened(chunkId)` is called (flashcards or quiz
+- [x] Given a topic is `not-started`, when `markOpened(chunkId)` is called (flashcards or quiz
   opened), then status becomes `in-progress`. Given it's already `reviewed` or `needs-revisit`,
   then nothing is written.
-- [ ] Given a next-step choice, when `setStatusFromChoice(chunkId, choice)` is called, then it
+- [x] Given a next-step choice, when `setStatusFromChoice(chunkId, choice)` is called, then it
   writes `in-progress` (Review Again), `needs-revisit` (Come Back Later) or `reviewed` (Mark
   Reviewed), with `statusUpdatedAt` as the server timestamp.
-- [ ] Given the device is offline, when a status is written, then the UI updates immediately
+- [x] Given the device is offline, when a status is written, then the UI updates immediately
   from Firestore's local cache and the write syncs when back online.
-- [ ] Given a write is rejected by rules, when that happens, then it's logged and the UI doesn't
+- [x] Given a write is rejected by rules, when that happens, then it's logged and the UI doesn't
   crash.
 
 ## UI/UX Notes
@@ -58,11 +58,18 @@ same way.
   empty map and doesn't write.
 
 ## Tasks
-- [ ] Add `src/study/conceptProgress.ts`: keep the transition logic in a pure function
+- [x] Add `src/study/conceptProgress.ts`: keep the transition logic in a pure function
   (current status + event → new status or "no write") and unit-test it with
   `npm run test:app`.
-- [ ] Add the Firestore read (live subscription) and write functions around it.
-- [ ] Add a `useConceptProgress()` hook for screens.
+- [x] Add the Firestore read (live subscription) and write functions around it.
+- [x] Add a `useConceptProgress()` hook for screens.
+
+## Implementation notes (Slice 4a)
+Built in Slice 4a on `feat/concept-list-flashcards`; plan `docs/superpowers/plans/2026-10-03-slice-4a-concept-list-flashcards.md`, design `docs/superpowers/specs/2026-10-03-slice-4a-concept-list-flashcards-design.md`.
+- Split into a pure `src/study/conceptProgressData.ts` and a Firebase `src/study/conceptProgress.ts`. `useConceptProgress` reports `error` separately from an empty map, and the viewer never calls `markOpened` from an unknown status, so a failed read cannot downgrade a reviewed topic.
+- `setStatusFromChoice` has no screen yet: the next-step choice screen is ph-2-us-9 (Slice 4b).
+- **Carry-forward to Slice 4b:** once the `reviewed` status can exist, ignore a cache-only empty first progress snapshot before `markOpened`, so a stale empty cache cannot downgrade it.
+- **Carry-forward to Slice 6:** `clearDeckCache()` and resetting last-opened and progress on sign-out.
 
 ## Questions
 None outstanding. Transition choices are recorded (and can be changed) on ph-2-us-10 and

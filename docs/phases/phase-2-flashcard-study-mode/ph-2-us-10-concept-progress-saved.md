@@ -3,7 +3,7 @@
 **ID:** ph-2-us-10
 **Layer:** Parent
 **Children:** ph-2-us-11 (Backend), ph-2-us-12 (Frontend)
-**Status:** Not Started
+**Status:** In Progress (backend and client built in Slice 4a; the mini-quiz criterion is end-to-end in Slice 4b)
 
 ## Story
 As a teen user,
@@ -41,11 +41,11 @@ So that my progress isn't lost if I switch phones, once I've linked an account (
 ## Acceptance Criteria
 - [ ] Given a user finishes a topic's mini-quiz, when `scoreTest` grades it, then that topic's
   Concept Progress record holds the latest score and when it was taken.
-- [ ] Given a user picks a next-step choice or opens a new topic, when the status changes per
+- [x] Given a user picks a next-step choice or opens a new topic, when the status changes per
   the table above, then it's saved to their Concept Progress record.
-- [ ] Given a user reopens the app, when the concept list loads, then every status and latest
+- [x] Given a user reopens the app, when the concept list loads, then every status and latest
   score is still there.
-- [ ] Given a user tries to set their own quiz score or another user's progress from the client,
+- [x] Given a user tries to set their own quiz score or another user's progress from the client,
   when the write reaches Firestore, then it's denied.
 
 ## Dependencies

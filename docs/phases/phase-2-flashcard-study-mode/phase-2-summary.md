@@ -1,6 +1,6 @@
 # Phase 2: Flashcard Study Mode & Concept Learning Path — Summary
 
-## Status: Not Started
+## Status: In Progress (Slice 4a complete 2026-10-10: concept list, flashcard viewer, Concept Progress backend and client; Slice 4b remains)
 
 Depends on Phase 1 (question bank), which is Complete. Phase 1's journey stories (ph-1-us-7 to
 11) already built every server function this phase calls, so Phase 2 is mostly frontend. The
@@ -12,16 +12,16 @@ only new backend work is the Concept Progress record (ph-2-us-11).
 |----|-------|-------|--------|--------|
 | ph-2-us-1 | Browse flashcards organized by topic | Parent | — | Not Started |
 | ph-2-us-2 | `listFlashcardsByTopic` callable Cloud Function | Backend | ph-2-us-1 | Superseded by ph-1-us-9/10 |
-| ph-2-us-3 | Flashcard viewer for a topic | Frontend | ph-2-us-1 | Not Started |
+| ph-2-us-3 | Flashcard viewer for a topic | Frontend | ph-2-us-1 | In Progress (viewer done; mini-quiz button is a placeholder until ph-2-us-8) |
 | ph-2-us-4 | Weak/missed cards resurface more often | Parent | — | Not Started |
-| ph-2-us-5 | Scenario cards woven into the flashcard flow | Parent | — | Not Started |
+| ph-2-us-5 | Scenario cards woven into the flashcard flow | Parent | — | Complete |
 | ph-2-us-6 | Local per-card performance tracking | Parent | — | Not Started |
-| ph-2-us-7 | Concept list in handbook order, with status | Parent | — | Not Started |
+| ph-2-us-7 | Concept list in handbook order, with status | Parent | — | Complete |
 | ph-2-us-8 | Concept mini-quiz after its flashcards | Parent | — | Not Started |
 | ph-2-us-9 | Post-quiz recommendation and next-step choice | Parent | — | Not Started |
-| ph-2-us-10 | Concept progress saved to my account | Parent | — | Not Started |
-| ph-2-us-11 | Concept Progress record, rules, and `scoreTest` score write | Backend | ph-2-us-10 | Not Started |
-| ph-2-us-12 | Client Concept Progress module | Frontend | ph-2-us-10 | Not Started |
+| ph-2-us-10 | Concept progress saved to my account | Parent | — | In Progress |
+| ph-2-us-11 | Concept Progress record, rules, and `scoreTest` score write | Backend | ph-2-us-10 | Complete |
+| ph-2-us-12 | Client Concept Progress module | Frontend | ph-2-us-10 | Complete |
 
 `docs/phases.md` bullet → story: 1 → us-1; 2 → us-4; 3 → us-5; 4 → us-6; 5 → us-7; 6 → us-8;
 7 → us-9; 8 → us-10.
@@ -59,9 +59,7 @@ only new backend work is the Concept Progress record (ph-2-us-11).
 
 ## Open items carried into implementation
 
-- `@react-native-firebase/functions` isn't installed; the first story that calls a function
-  (here ph-2-us-3, or a Phase 3/9 journey story if it comes first) adds it and rebuilds the dev
-  client.
+- `@react-native-firebase/functions` was installed in Slice 2 (done).
 - Component tests need a `jest-expo` config (`jest.app.config.js` is Node-only); added with the
   first screen, which in journey order is onboarding (ph-9-us-3, `build-order.md` Slice 1).
 - The mini-quiz's offline/force-quit resilience is ph-3-us-1's scope, built in `build-order.md`
@@ -71,7 +69,11 @@ only new backend work is the Concept Progress record (ph-2-us-11).
 - Unvalidated tunables: mini-quiz threshold (80%), flashcard rate limit (30 / 10 min),
   weak-card weighting constants (ph-2-us-4).
 - "Come Back Later" → needs revisit regardless of score is an assumption (ph-2-us-9).
-- Questions worded around their choices ("Which of the following...") read oddly on a
-  question-only flashcard front; how to handle them is open (ph-2-us-3).
+- Questions worded around their choices ("Which of the following...") are shown as-is on the flashcard front (decided for Slice 4a). No problems were noticed in the device test; revisit if reviewers flag cards (ph-2-us-3).
 - Whether local per-card performance should ever sync to Firestore stays a future consideration
   (ph-2-us-6).
+
+## Slice 4a carry-forwards
+
+- Slice 4b: "Review Again" from the mini-quiz back to an existing Flashcards route needs goBack/popTo or a state reset on `chunkId` change; once `reviewed` exists, ignore a cache-only empty first progress snapshot before `markOpened`.
+- Slice 6: `clearDeckCache()` and reset last-opened and progress on sign-out.

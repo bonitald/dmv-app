@@ -3,7 +3,7 @@
 **ID:** ph-9-us-7
 **Layer:** Frontend
 **Parent:** ph-9-us-6
-**Status:** In Progress (Slice 1 part complete 2026-09-25; remaining cards land in Slices 2–6)
+**Status:** In Progress (Slice 1 part complete 2026-09-25; "Continue learning" card complete 2026-10-10 in Slice 4a; remaining cards land in Slices 2–6)
 
 ## Story
 As a teen user,
@@ -36,7 +36,7 @@ So that every time I open the app I can get straight into studying or testing.
 - [x] Given onboarding is done, when the app opens, then it lands on the Home tab, the first tab.
 - [ ] Given the baseline isn't finished, when Home renders, then the test card offers Start or
   Resume. Given it's finished, then it offers a practice test with the latest score.
-- [ ] Given concept progress, when Home renders, then "Continue learning" opens the right
+- [x] Given concept progress, when Home renders, then "Continue learning" opens the right
   concept's flashcards, and "All concepts" opens the concept list.
 - [x] Given the user picked "Learn first" at onboarding, when Home renders, then the test card is
   still there. Given "Test what I know", the study card is still there. The route choice never
@@ -79,6 +79,10 @@ So that every time I open the app I can get straight into studying or testing.
   the test date until ph-9-us-10.
 - Still to come, per `docs/build-order.md`: Resume baseline (Slice 2), Continue learning (Slice
   4a), weak spots (4b), practice test + latest score (5), save progress (6).
+
+## Implementation notes (Slice 4a)
+- The "Continue learning" card is done: it shows "Continue learning · <topic>" and opens the last topic whose deck loaded, stored per uid on the device (AsyncStorage, design decision 2). Before any topic is opened it stays "Learn concept by concept" and opens the concept list. The pure `nextConceptToStudy` helper was not needed for this and is still open.
+- **Carry-forward to Slice 6:** reset last-opened on sign-out.
 
 ## Questions
 - Should the Study tab's own first screen stay the concept list (assumed yes), with Home only
