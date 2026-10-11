@@ -214,6 +214,7 @@ This amendment supersedes the earlier decisions it names.
 | A4 | **Reopening a topic whose latest quiz was not passed** (latest score below the 80% pass mark) opens on only the cards missed in that quiz, with "Show all cards". This applies whatever its status, including *reviewed*. A saved pass still resumes first. | Decision 9 (was: *needs revisit* status) |
 | A5 | `scoreTest` also counts **`miniQuizPassCount`** and **`miniQuizFailCount`** per topic on Concept Progress (`FieldValue.increment`, same merge, pass = score ≥ `MINI_QUIZ_PASS_THRESHOLD`). Server-only; clients can't write them (existing `hasOnly` rule; new rules test). Records from before this have no counts. | Extends decision 10 |
 | A6 | **Concept list row:** keeps the status chip, adds a coral **"Last quiz not passed"** marker when the latest quiz score is below the pass mark, and a line **"Quizzes: {p} passed · {f} not passed · latest {c} of {t}"**. Older records without counts or correct/total fall back to "Latest quiz: {n}%". | ph-2-us-7 row ("Latest quiz: N%") |
+| A7 | **Review Again also returns to the concept list** (status `in-progress`). Missed cards come back through A4 when the topic is reopened; "Review answers" stays on the results screen. The Flashcards `pass` route param is removed. | A1's "Review Again → flashcards" and the earlier `pass` param design |
 
 Copy (exact): "Mark Reviewed", "Review Again", "Last quiz not passed", "Quizzes: {p} passed · {f}
 not passed · latest {c} of {t}" (parts with no data are left out, e.g. "Quizzes: 1 passed ·
