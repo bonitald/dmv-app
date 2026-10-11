@@ -2,7 +2,7 @@
 
 **ID:** ph-2-us-8
 **Layer:** Parent
-**Status:** Not Started
+**Status:** Complete (Slice 4b, 2026-10-11)
 
 ## Story
 As a teen user,
@@ -35,24 +35,24 @@ So that I can check I actually learned it before moving on.
   (ph-2-us-6) so the next pass through the flashcards puts missed cards first (ph-2-us-4).
 
 ## Acceptance Criteria
-- [ ] Given the user reaches the end of a topic's flashcards (ph-2-us-3), when they choose
+- [x] Given the user reaches the end of a topic's flashcards (ph-2-us-3), when they choose
   "Take the quiz", then `assembleMiniQuiz` is called for that `chunkId` and the first question
   shows.
-- [ ] Given a quiz is in progress, when the user answers a question, then no right/wrong or
+- [x] Given a quiz is in progress, when the user answers a question, then no right/wrong or
   correct answer is shown until the quiz is submitted.
-- [ ] Given the user has answered every question, when they submit, then answers go to
+- [x] Given the user has answered every question, when they submit, then answers go to
   `scoreTest` and the results screen (ph-2-us-9) shows the score and which questions were missed,
   with the correct answers.
-- [ ] Given `scoreTest` returns, when the result arrives, then its `perQuestion` results are
+- [x] Given `scoreTest` returns, when the result arrives, then its `perQuestion` results are
   recorded locally (ph-2-us-6).
-- [ ] Given the user skips questions and submits, when it's graded, then skipped questions count
+- [x] Given the user skips questions and submits, when it's graded, then skipped questions count
   as wrong (per `scoreTest`) and the user is warned about unanswered questions before submitting.
-- [ ] Given the user retakes a topic's quiz, when `assembleMiniQuiz` is called again, then the
+- [x] Given the user retakes a topic's quiz, when `assembleMiniQuiz` is called again, then the
   previous quiz's question IDs are passed as `excludeIds`, so the retake avoids immediate
   repeats where the topic is big enough.
-- [ ] Given `scoreTest` fails because the device is offline, when the user submits, then their
+- [x] Given `scoreTest` fails because the device is offline, when the user submits, then their
   answers are kept on screen with a retry option, not lost.
-- [ ] Given the topic has fewer than 10 approved questions, when the quiz is assembled, then it
+- [x] Given the topic has fewer than 10 approved questions, when the quiz is assembled, then it
   runs with however many there are.
 
 ## UI/UX Notes
@@ -79,14 +79,23 @@ So that I can check I actually learned it before moving on.
   double-submit (`already-exists` from `scoreTest`) shows the existing result, not an error.
 
 ## Tasks
-- [ ] Use the `assembleMiniQuiz` / `scoreTest` wrappers from ph-3-us-4.
-- [ ] Plug the mini-quiz into ph-3-us-4's runner (fetch via `assembleMiniQuiz`, submit via
+- [x] Use the `assembleMiniQuiz` / `scoreTest` wrappers from ph-3-us-4.
+- [x] Plug the mini-quiz into ph-3-us-4's runner (fetch via `assembleMiniQuiz`, submit via
   `scoreTest`).
-- [ ] Wire end-of-deck → quiz, and quiz → results (ph-2-us-9).
-- [ ] Record `perQuestion` via ph-2-us-6's `recordQuizResults` when grading returns.
-- [ ] Track the last quiz's question IDs per topic in memory for `excludeIds`.
-- [ ] Handle offline/assemble/submit errors per Acceptance Criteria.
+- [x] Wire end-of-deck → quiz, and quiz → results (ph-2-us-9).
+- [x] Record `perQuestion` via ph-2-us-6's `recordQuizResults` when grading returns.
+- [x] Track the last quiz's question IDs per topic in memory for `excludeIds`.
+- [x] Handle offline/assemble/submit errors per Acceptance Criteria.
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- **Quiz size is scaled on the server** (supersedes "up to 10"): `assembleMiniQuiz` returns `round(approved / 3)` questions, at least 5 and at most 15, or the whole pool if the topic has fewer than 5. The app sends no `count`. The "fewer than 10 approved" criterion is met by the whole-pool rule.
+- **No force-quit resume:** mini-quizzes stay out of `quizSession` (it holds one active test per user, so a mini-quiz would drop an in-progress baseline; spec decision 6). A killed quiz is abandoned and a new one gets a new `testId`. Offline at submit still keeps the answers on screen. ph-3-us-1 no longer covers mini-quizzes.
+- **Skip to quiz** sits beside the "N of M" counter on every card.
+- **Confirm before submit (ph-3-us-4):** Submit appears on any question once all are answered, and every submit asks for confirmation: "All questions have been answered. Are you ready to submit?" (Not yet / Submit); with skipped questions it says "N unanswered". This replaces the unanswered-only warning in the criterion above.
+- Retakes pass the previous quiz's question ids as `excludeIds`, held in memory per topic. Leaving mid-quiz asks "Leave the quiz?".
+- Built on the shared runner from ph-3-us-4. Results are ph-2-us-9.
 
 ## Questions
 - Should starting a quiz without doing the flashcards be offered on the concept list itself, or
-  only inside the topic? Decided (Slice 4b): a "Skip to quiz" link beside the card counter on every card of the flashcard viewer.
+  only inside the topic? Decided (Slice 4b): a "Skip to quiz" link beside the card counter on every card of the flashcard viewer (first built on the first card only, then changed to every card after device testing).

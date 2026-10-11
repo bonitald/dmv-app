@@ -3,7 +3,7 @@
 **ID:** ph-2-us-1
 **Layer:** Parent
 **Children:** ph-2-us-2 (Backend, superseded by ph-1-us-9/10), ph-2-us-3 (Frontend)
-**Status:** Not Started
+**Status:** Complete (Slice 4b, 2026-10-11)
 
 ## Story
 As a teen user,
@@ -24,11 +24,11 @@ content systematically, rather than seeing an unordered pile of cards.
   callable (ph-1-us-10).
 
 ## Acceptance Criteria
-- [ ] Given the question bank has multiple topics, when a teen user opens the Study tab, then
+- [x] Given the question bank has multiple topics, when a teen user opens the Study tab, then
   they see the topics to choose from (the concept list, ph-2-us-7).
-- [ ] Given a teen user selects a topic, when its cards load, then they are shown one at a time
+- [x] Given a teen user selects a topic, when its cards load, then they are shown one at a time
   in a flashcard viewer (ph-2-us-3).
-- [ ] Given no direct client read path to `questions` exists (ph-1-us-1), when flashcard content
+- [x] Given no direct client read path to `questions` exists (ph-1-us-1), when flashcard content
   is fetched, then it goes through `getFlashcards` (ph-1-us-10), never a collection read.
 
 ## Dependencies
@@ -39,3 +39,7 @@ content systematically, rather than seeing an unordered pile of cards.
 
 ## Notes
 No separate Tasks/Test Notes here — see child story ph-2-us-3.
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- Delivered through the Study tab concept list (ph-2-us-7) and the flashcard viewer (ph-2-us-3); no Slice 4b code of its own. Closed with the slice because its children are done.

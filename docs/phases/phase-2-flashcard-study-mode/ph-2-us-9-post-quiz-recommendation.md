@@ -2,7 +2,7 @@
 
 **ID:** ph-2-us-9
 **Layer:** Parent
-**Status:** Not Started
+**Status:** Complete (Slice 4b, 2026-10-11)
 
 ## Story
 As a teen user,
@@ -23,27 +23,23 @@ So that I get guidance on where I stand without being blocked from studying my o
 - How each choice changes status is defined in ph-2-us-10.
 
 ## Acceptance Criteria
-- [ ] Given `scoreTest` returns a mini-quiz result, when the results screen shows, then the
+- [x] Given `scoreTest` returns a mini-quiz result, when the results screen shows, then the
   user sees their score, the questions they missed with the correct answers (`perQuestion`), and
   a recommendation: "move on" wording for `move-on`, "review again" wording for `review-again`.
-- [ ] Given any score, when the results screen shows, then all three choices are available —
-  the recommendation highlights one but never disables the others.
-- [ ] Given the user taps "Review Again", when it's handled, then the topic's status becomes
-  in progress and the flashcard viewer restarts on the same topic (from the session cache,
-  no new `getFlashcards` call).
-- [ ] Given the user taps "Come Back Later, Continue to Next Concept", when it's handled, then
-  the topic's status becomes needs revisit and the next topic in handbook order that has
-  approved questions opens.
-- [ ] Given the user taps "Mark Reviewed", when it's handled, then the topic's status becomes
+- [x] Given any score, when the results screen shows, then both choices are available —
+  the recommendation highlights one but never disables the other. *(Changed: the story said three choices; see Implementation notes.)*
+- [x] Given the user taps "Review Again", when it's handled, then the topic's status becomes
+  in progress. *(Changed: it returns to the concept list rather than restarting the viewer; the missed cards come back when the topic is reopened, ph-2-us-4.)*
+- [ ] ~~Given the user taps "Come Back Later, Continue to Next Concept"...~~ *Superseded (spec A3): the choice was removed.*
+- [x] Given the user taps "Mark Reviewed", when it's handled, then the topic's status becomes
   reviewed and the user returns to the concept list.
-- [ ] Given the results screen, when it renders, then a note tells the user they can restart any
+- [x] Given the results screen, when it renders, then a note tells the user they can restart any
   concept later from the concept list.
-- [ ] Given the user leaves the results screen without choosing (back button / tab switch), when
+- [x] Given the user leaves the results screen without choosing (back button / tab switch), when
   that happens, then the status stays as it was before (in progress) — no choice is inferred.
-- [ ] Given the choice can't be saved (offline), when the user taps it, then the navigation still
+- [x] Given the choice can't be saved (offline), when the user taps it, then the navigation still
   happens and the status write is retried/queued (Firestore offline persistence), not dropped.
-- [ ] Given the last topic in handbook order, when the user picks "Continue to Next Concept",
-  then they return to the concept list instead.
+- [ ] ~~Given the last topic in handbook order, when the user picks "Continue to Next Concept"...~~ *Superseded (spec A3): there is no next-concept navigation.*
 
 ## UI/UX Notes
 - **Screens/flows**: mini-quiz (ph-2-us-8) → results/recommendation → flashcards (Review
@@ -65,11 +61,18 @@ So that I get guidance on where I stand without being blocked from studying my o
   quiz attempt still saved server-side by `scoreTest`).
 
 ## Tasks
-- [ ] Build the results screen (score, missed questions with correct answers, recommendation),
+- [x] Build the results screen (score, missed questions with correct answers, recommendation),
   reusing the shared result pieces from ph-4-us-1 and linking "Review answers" to ph-4-us-4.
-- [ ] Implement the three choices and their navigation.
-- [ ] Call ph-2-us-12's status setter for each choice.
-- [ ] "Next topic" helper: next by `order` with `approvedQuestionCount > 0`.
+- [x] Implement the choices and their navigation. *(Two choices, both to the concept list.)*
+- [x] Call ph-2-us-12's status setter for each choice.
+- [ ] ~~"Next topic" helper~~ *Superseded (spec A3): removed with Come Back Later.*
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- **Two choices, not three (spec A1-A3):** **Mark Reviewed** (status `reviewed`) and **Review Again** (status `in-progress`). "Come Back Later, Continue to Next Concept" was removed, with its next-topic helper. Mark Reviewed is highlighted on a pass (`move-on`), Review Again on a fail (`review-again`); both are always enabled.
+- **Both choices return to the concept list (A2, A7).** The user picks what to do next. Review Again no longer restarts the viewer or passes a route param; the missed cards come back through the not-passed reopen rule (ph-2-us-4). "Review answers" stays on the results screen.
+- Nothing sets `needs-revisit` any more; the value stays valid in the rules and still displays for existing records (ph-2-us-10).
+- The results screen shows the score, the recommendation, the missed questions with the right answers, and Review answers (the existing Review screen). The "Come Back Later" question below is closed because that choice no longer exists.
 
 ## Questions
 - **"Come Back Later" → needs revisit** is assumed regardless of score (the user is saying they

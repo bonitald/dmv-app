@@ -10,16 +10,16 @@ only new backend work is the Concept Progress record (ph-2-us-11).
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
-| ph-2-us-1 | Browse flashcards organized by topic | Parent | — | Not Started |
+| ph-2-us-1 | Browse flashcards organized by topic | Parent | — | Complete |
 | ph-2-us-2 | `listFlashcardsByTopic` callable Cloud Function | Backend | ph-2-us-1 | Superseded by ph-1-us-9/10 |
-| ph-2-us-3 | Flashcard viewer for a topic | Frontend | ph-2-us-1 | In Progress (viewer done; mini-quiz button is a placeholder until ph-2-us-8) |
-| ph-2-us-4 | Weak/missed cards resurface more often | Parent | — | Not Started |
+| ph-2-us-3 | Flashcard viewer for a topic | Frontend | ph-2-us-1 | Complete |
+| ph-2-us-4 | Weak/missed cards resurface more often | Parent | — | Complete |
 | ph-2-us-5 | Scenario cards woven into the flashcard flow | Parent | — | Complete |
-| ph-2-us-6 | Local per-card performance tracking | Parent | — | Not Started |
+| ph-2-us-6 | Local per-card performance tracking | Parent | — | Complete |
 | ph-2-us-7 | Concept list in handbook order, with status | Parent | — | Complete |
-| ph-2-us-8 | Concept mini-quiz after its flashcards | Parent | — | Not Started |
-| ph-2-us-9 | Post-quiz recommendation and next-step choice | Parent | — | Not Started |
-| ph-2-us-10 | Concept progress saved to my account | Parent | — | In Progress |
+| ph-2-us-8 | Concept mini-quiz after its flashcards | Parent | — | Complete |
+| ph-2-us-9 | Post-quiz recommendation and next-step choice | Parent | — | Complete |
+| ph-2-us-10 | Concept progress saved to my account | Parent | — | Complete |
 | ph-2-us-11 | Concept Progress record, rules, and `scoreTest` score write | Backend | ph-2-us-10 | Complete |
 | ph-2-us-12 | Client Concept Progress module | Frontend | ph-2-us-10 | Complete |
 
@@ -68,7 +68,7 @@ only new backend work is the Concept Progress record (ph-2-us-11).
   ph-2-us-7 shows them as "coming soon" rather than hiding them.
 - Unvalidated tunables: mini-quiz threshold (80%), flashcard rate limit (30 / 10 min),
   weak-card weighting constants (ph-2-us-4).
-- "Come Back Later" → needs revisit regardless of score is an assumption (ph-2-us-9).
+- "Come Back Later" was removed in Slice 4b (spec A3): the results screen has two choices, Mark Reviewed and Review Again, both returning to the concept list. Nothing sets needs revisit any more (ph-2-us-9, ph-2-us-10).
 - Questions worded around their choices ("Which of the following...") are shown as-is on the flashcard front (decided for Slice 4a). No problems were noticed in the device test; revisit if reviewers flag cards (ph-2-us-3).
 - Whether local per-card performance should ever sync to Firestore stays a future consideration
   (ph-2-us-6).

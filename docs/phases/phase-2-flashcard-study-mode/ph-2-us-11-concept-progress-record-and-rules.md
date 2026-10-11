@@ -56,6 +56,8 @@ scores.
   - `latestMiniQuizScore`: number 0–1 — server-only (`scoreTest`).
   - `latestMiniQuizAt`: timestamp — server-only.
   - `latestTestId`: string — server-only; links to the `testAttempts` doc with full detail.
+  - *(Slice 4b)* `latestMiniQuizCorrect`, `latestMiniQuizTotal`: numbers — server-only; "N of M right".
+  - *(Slice 4b)* `miniQuizPassCount`, `miniQuizFailCount`: numbers — server-only counters (`FieldValue.increment`).
 - **Security rules**: new `match /users/{uid}/conceptProgress/{chunkId}`:
   - read: owner only.
   - create: owner, `request.resource.data.keys().hasOnly(['status','statusUpdatedAt'])`, status in
@@ -96,6 +98,12 @@ scores.
 ## Implementation notes (Slice 4a)
 Built in Slice 4a on `feat/concept-list-flashcards`; plan `docs/superpowers/plans/2026-10-03-slice-4a-concept-list-flashcards.md`, design `docs/superpowers/specs/2026-10-03-slice-4a-concept-list-flashcards-design.md`.
 - Rules tests 54, functions tests 71. Deployed to dev 2026-10-10: the first attempt hit a transient `generateUploadUrl` upload error, the retry succeeded, and the invoker smoke check still returns 401.
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- `scoreTest` also saves `latestMiniQuizCorrect` and `latestMiniQuizTotal` (spec decision 10) and increments `miniQuizPassCount` or `miniQuizFailCount` per topic (pass = score >= `MINI_QUIZ_PASS_THRESHOLD`, 0.8; spec A5), in the same merge as the score. Clients cannot write them (the existing `hasOnly` rule; new rules tests). Records from before Slice 4b have no counts or correct/total.
+- `assembleMiniQuiz` sizes the quiz on the server: `round(pool / 3)`, at least 5, at most 15, the whole pool if fewer than 5 (ph-2-us-8).
+- Rules tests 58, functions tests 86. Deployed to dev (`dmv-app-dev`), invoker smoke check 401.
 
 ## Questions
 - Should Concept Progress also keep a best score, or a count of quiz attempts? Assumed not for

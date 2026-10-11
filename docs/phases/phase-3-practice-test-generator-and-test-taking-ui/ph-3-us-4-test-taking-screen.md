@@ -3,7 +3,7 @@
 **ID:** ph-3-us-4
 **Layer:** Frontend
 **Parent:** ph-3-us-2
-**Status:** In Progress (baseline use complete and device-tested 2026-09-28, Slice 2; the question strip now auto-scrolls to the current question. Practice-tab criteria and the `assembleTest` flow land in Slice 5 (ph-4-us-1 / ph-3-us-3); `assembleTest`/`assembleMiniQuiz` wrappers already exist in `src/api/callables.ts`)
+**Status:** In Progress (baseline use complete and device-tested 2026-09-28, Slice 2; the question strip now auto-scrolls to the current question. Submit now appears on any question once all are answered and always asks for confirmation (Slice 4b, 2026-10-11), and the mini-quiz also uses the runner. Practice-tab criteria and the `assembleTest` flow land in Slice 5 (ph-4-us-1 / ph-3-us-3); `assembleTest`/`assembleMiniQuiz` wrappers already exist in `src/api/callables.ts`)
 
 ## Story
 As a teen user,
@@ -95,6 +95,11 @@ submit by accident.
 - [ ] Add a minimal results placeholder until Phase 4's results screen lands.
 - [ ] Add a `jest-expo` config (`jest.app.config.js` is Node-only) and component-test the runner
   (if ph-2-us-3 hasn't already).
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- **Submit when all answered, always confirm (Slice 4b):** Submit appears on any question once every question is answered, not only the last. Every submit asks for confirmation: "All questions have been answered. Are you ready to submit?" (Not yet / Submit); with skipped questions it says "N unanswered". This extends the unanswered-warning criterion above.
+- The runner now also carries the mini-quiz (ph-2-us-8). Plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`.
 
 ## Questions
 - Should a practice test show right/wrong after each question (study-style) as an option? Assumed

@@ -11,10 +11,10 @@ mix and repeat-avoidance in `assembleTest`, and recording `timing` in `scoreTest
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
-| ph-3-us-1 | Use the on-device test cache in the test-taking flow | Frontend | — | In Progress (baseline use complete) |
+| ph-3-us-1 | Use the on-device test cache in the test-taking flow | Frontend | — | In Progress (baseline use complete; mini-quiz part dropped in Slice 4b) |
 | ph-3-us-2 | Start a practice test that mixes fact and scenario questions | Parent | — | Not Started |
 | ph-3-us-3 | `assembleTest` guarantees a fact/scenario mix and topic spread | Backend | ph-3-us-2 | Not Started |
-| ph-3-us-4 | Test-taking screen (shared quiz runner) | Frontend | ph-3-us-2 | In Progress (baseline use complete) |
+| ph-3-us-4 | Test-taking screen (shared quiz runner) | Frontend | ph-3-us-2 | In Progress (baseline use complete; submit-when-all-answered and confirm-before-submit added in Slice 4b) |
 | ph-3-us-5 | Unlimited, distinct practice tests | Parent | — | Not Started |
 | ph-3-us-6 | `assembleTest` avoids repeating a user's recent questions | Backend | ph-3-us-5 | Not Started |
 | ph-3-us-7 | Timed or untimed practice test mode | Parent | — | Not Started |

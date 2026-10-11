@@ -144,16 +144,16 @@ fixes (028d960): the flashcard's hidden face takes no touches (Android scroll), 
 chip uses `inkSoft` for contrast, Concept Progress resets on uid change, and an empty concept
 list offers Try again.
 
-**Carry-forwards.** Slice 4b: "Review Again" from the mini-quiz back to an existing Flashcards
-route needs goBack/popTo or a state reset on `chunkId` change; once `reviewed` exists, ignore a
-cache-only empty first progress snapshot before `markOpened`. Slice 6: `clearDeckCache()` and
-reset last-opened and progress on sign-out.
+**Carry-forwards.** Slice 6: `clearDeckCache()` and reset last-opened and progress on sign-out.
+(Slice 4b resolved the other two: "Review Again" now returns to the concept list, and a cache-only
+empty Concept Progress snapshot is ignored.)
 
 ### 4b — Mini-quiz, recommendation and progress
 
-**Test:** finish a deck → "Take the mini-quiz" → submit → recommendation → pick Review Again /
-Come Back Later / Mark Reviewed → the list shows the new status → reopen the deck and the missed
-cards come first → Progress tab shows that topic as strong / shaky / likely gap.
+**Test:** finish a deck → "Take the mini-quiz" → submit (confirm) → recommendation → pick Review
+Again or Mark Reviewed (both return to the list) → the list shows the new status and a "Last quiz
+not passed" marker if it applies → reopen a not-passed topic and only the missed cards show →
+Progress tab shows that topic as strong / shaky / likely gap.
 
 | Order | Story | What it adds |
 |-------|-------|--------------|
@@ -164,6 +164,23 @@ cards come first → Progress tab shows that topic as strong / shaky / likely ga
 | 5 | ph-4-us-6, **concept report part** | Strength rule and Progress-tab concept report, with "Needs work first" sort |
 
 Parents closed: ph-2-us-1, ph-2-us-10. (ph-2-us-2 was superseded by Phase 1.)
+
+**Status: Complete (2026-10-11).** Plan: `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`;
+design: `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md`. Functions
+deployed to `dmv-app-dev` (smoke check 401). Device-tested on the Android emulator: all issues
+found were resolved. Rules 58, functions 86, question bank 47, app 189, components 162, tsc clean.
+Amendments made during device testing (spec A1-A7): the results screen has two choices, Mark
+Reviewed and Review Again, both returning to the concept list (Come Back Later removed; nothing
+sets needs-revisit any more); `scoreTest` counts passed and not-passed quizzes per topic and the
+concept list shows a "Last quiz not passed" marker plus a "Quizzes: ..." line; reopening a topic
+whose latest quiz was not passed opens on only its missed cards; "Skip to quiz" is on every card;
+every submit asks for confirmation (Submit also appears once all questions are answered). The
+Progress tab's dead-button bug is fixed. Mini-quizzes are not resumed after a force-quit (spec
+decision 6), so ph-3-us-1 no longer covers them.
+
+**Carry-forwards.** Slice 5a: practice "Topics to work on" and practice evidence in the concept
+report. Slice 5b: practice and baseline results feeding card performance (ph-4-us-5). Slice 6:
+clear the `card-perf` keys and the saved deck pass on sign-out.
 
 ---
 

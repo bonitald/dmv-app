@@ -3,7 +3,7 @@
 **ID:** ph-2-us-3
 **Layer:** Frontend
 **Parent:** ph-2-us-1
-**Status:** In Progress — viewer done (Slice 4a, device-tested 2026-10-10); 'Take the mini-quiz' opens a placeholder until ph-2-us-8
+**Status:** Complete (Slice 4b, 2026-10-11)
 
 ## Story
 As a teen user,
@@ -117,6 +117,13 @@ Built in Slice 4a on `feat/concept-list-flashcards`; plan `docs/superpowers/plan
 - Last-opened topic is saved as soon as a deck loads, independent of the status read, so Home's shortcut works even if Concept Progress cannot be read. Decks live only in memory for the session (never persisted).
 - Final-review fixes (commit 028d960): the hidden face of `FlipCard` takes no touches (fixes scrolling on Android).
 - **Carry-forward to Slice 4b:** "Review Again" from the mini-quiz back to an existing Flashcards route needs goBack/popTo or a state reset on `chunkId` change.
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- "Take the mini-quiz" now opens the real mini-quiz (ph-2-us-8) instead of the placeholder.
+- "Skip to quiz" sits beside the "N of M" counter on every card.
+- A pass is not always every card in server order: the deck is a weighted or missed-only pass (ph-2-us-4). "Start this concept over" starts a new full pass.
+- The Slice 4a carry-forward ("Review Again" back to an existing Flashcards route needing a reset) is resolved: Review Again returns to the concept list (ph-2-us-9), and the `pass` route param was dropped.
 
 ## Questions
 - Some questions may be worded around their choices ("Which of the following..."). On a card

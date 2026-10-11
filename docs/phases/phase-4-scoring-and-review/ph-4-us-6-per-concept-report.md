@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-6
 **Layer:** Parent
-**Status:** In Progress (baseline results part complete, Slice 3, device-tested on the Android emulator against dev 2026-09-29. Concept report is Slice 4b; practice "Topics to work on" is Slice 5a)
+**Status:** In Progress (baseline results part complete, Slice 3, device-tested on the Android emulator against dev 2026-09-29. Concept report complete in Slice 4b, device-tested on the Android emulator 2026-10-11; practice "Topics to work on" is Slice 5a)
 
 ## Story
 As a teen user,
@@ -53,15 +53,15 @@ Every label is shown as indicative ("based on N answers").
   points it at the flashcards.)* A "Start with what you missed" button opens the first missed topic.
 - [x] Given the baseline results screen, when the user taps "Review answers", then the 45-question
   review opens (ph-4-us-4).
-- [ ] Given the user has later mini-quiz or practice-test results, when they open the concept
+- [x] Given the user has later mini-quiz or practice-test results, when they open the concept
   report (Progress tab), then each topic shows strong / shaky / likely gap per the rule above,
   and how many answers it's based on.
-- [ ] Given the concept report, when the user sorts by "Needs work first", then likely gap topics
+- [x] Given the concept report, when the user sorts by "Needs work first", then likely gap topics
   come first, then shaky, then not tested, then strong.
 - [ ] Given a practice test is graded, when its results show (ph-4-us-1), then a "Topics to work
   on" section lists that test's weakest topics (from its `perTopic`), each linking to its
   flashcards.
-- [ ] Given a user who hasn't done the baseline or any test, when they open the report, then it
+- [x] Given a user who hasn't done the baseline or any test, when they open the report, then it
   explains what fills it in, and offers the baseline and the concept list.
 
 ## UI/UX Notes
@@ -93,16 +93,22 @@ Every label is shown as indicative ("based on N answers").
   error); offline with cached data.
 
 ## Tasks
-- [ ] Add a pure `conceptStrength(evidence)` function implementing the rule, with constants, unit
+- [x] Add a pure `conceptStrength(evidence)` function implementing the rule, with constants, unit
   tested with `npm run test:app`.
-- [ ] Add an evidence loader combining the baseline attempt, Concept Progress and recent practice
+- [x] Add an evidence loader combining the baseline attempt, Concept Progress and recent practice
   attempts.
 - [x] Build the baseline results screen (replacing ph-3-us-13's placeholder), including the
   "how you're tracking" line. If ph-4-us-1 hasn't landed yet, add the shared `PASS_MARK` here
   and let ph-4-us-1 reuse it.
-- [ ] Build the concept report on the Progress tab (replacing its `PlaceholderScreen`), with sort
+- [x] Build the concept report on the Progress tab (replacing its `PlaceholderScreen`), with sort
   and links into the Study tab.
 - [ ] Add the "Topics to work on" section to practice results (ph-4-us-1).
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- Concept report built on the Progress tab: each topic is strong / shaky / likely gap (or Got it / Missed it from the baseline only), with a basis line, a "Handbook order" / "Needs work first" sort, an empty state that offers the baseline and the concept list, and a note when the baseline could not be read. Rows link into the Study tab.
+- `conceptStrength` implements the rule above; the loader passes no practice-test evidence until Slice 5a. The Progress tab's dead-button bug was fixed in this slice.
+- Still open: the practice results "Topics to work on" section and its task (Slice 5a), so the story stays In Progress.
 
 ## Questions
 - Band edges (80% / 50%) and `MIN_PRACTICE_ANSWERS = 3` are proposals. The 80% edge matches the

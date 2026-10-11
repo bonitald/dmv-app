@@ -2,7 +2,7 @@
 
 **ID:** ph-2-us-7
 **Layer:** Parent
-**Status:** Complete (Slice 4a, 2026-10-10; the latest-score display is unit-tested and shows on device once Slice 4b's mini-quiz exists)
+**Status:** Complete (Slice 4a, 2026-10-10; row marker and quiz line added in Slice 4b, 2026-10-11)
 
 ## Story
 As a teen user,
@@ -77,6 +77,12 @@ Built in Slice 4a on `feat/concept-list-flashcards`; plan `docs/superpowers/plan
 - The Study tab header stays "Study"; the list has its own intro line. A topic doc missing `approvedQuestionCount` counts as 0 ("coming soon"). An error reading Concept Progress is treated as "everything not started".
 - Final-review fixes (commit 028d960): the coming-soon chip uses `inkSoft` for contrast, Concept Progress resets on uid change, and an empty concept list offers Try again.
 - Device-tested on the Android emulator against dev: all passed.
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- The list row keeps the status chip and adds a coral "Last quiz not passed" marker when the latest quiz score is below the pass mark (spec A6). This replaces the "Latest quiz: N%" display.
+- A new line reads "Quizzes: {p} passed · {f} not passed · latest {c} of {t}" (parts with no data are left out). Records without counts or correct/total fall back to "Latest quiz: {n}%".
+- The `needs-revisit` chip still displays for old records, but nothing sets it any more (ph-2-us-9).
 
 ## Questions
 - ph-1-us-9 asked whether small or empty topics should be hidden. This story shows them as

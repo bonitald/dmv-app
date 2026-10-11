@@ -159,6 +159,17 @@ If you see entries like `Kill 'com.take.dev'... reason: min watermark is breache
 
 ---
 
+### "isn't responding", taps do nothing, or the emulator resumes a frozen app
+
+If the app (or System UI) shows "isn't responding", taps do nothing, or the emulator keeps resuming a frozen app, Quick Boot is restoring a bad snapshot. Cold boot without loading it:
+
+```powershell
+emulator -avd Android-Medium-Phone -no-snapshot-load -dns-server 8.8.8.8,1.1.1.1
+adb reverse tcp:8081 tcp:8081
+```
+
+---
+
 ### `fetch failed` when running `expo start`
 
 Expo CLI is trying to reach `api.expo.dev` and failing (corporate network, VPN, etc.). Start in offline mode:

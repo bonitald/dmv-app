@@ -3,7 +3,7 @@
 **ID:** ph-2-us-10
 **Layer:** Parent
 **Children:** ph-2-us-11 (Backend), ph-2-us-12 (Frontend)
-**Status:** In Progress (backend and client built in Slice 4a; the mini-quiz criterion is end-to-end in Slice 4b)
+**Status:** Complete (Slice 4b, 2026-10-11)
 
 ## Story
 As a teen user,
@@ -33,13 +33,13 @@ So that my progress isn't lost if I switch phones, once I've linked an account (
 | User opens a topic's flashcards or quiz while it's not started | in progress |
 | Opening a topic that's reviewed or needs revisit | unchanged (opening never downgrades) |
 | "Start this concept over" at end of deck (ph-2-us-3) | unchanged |
-| "Review Again" (ph-2-us-9) | in progress |
-| "Come Back Later, Continue to Next Concept" | needs revisit |
-| "Mark Reviewed" | reviewed |
-| Mini-quiz graded by `scoreTest` | status unchanged; score fields updated |
+| "Review Again" (ph-2-us-9) | in progress (returns to the concept list) |
+| ~~"Come Back Later, Continue to Next Concept"~~ | Removed in Slice 4b (spec A3). Nothing sets needs revisit any more; the value stays valid in the rules and still displays for old records |
+| "Mark Reviewed" | reviewed (returns to the concept list) |
+| Mini-quiz graded by `scoreTest` | status unchanged; score, correct/total and pass/fail count fields updated |
 
 ## Acceptance Criteria
-- [ ] Given a user finishes a topic's mini-quiz, when `scoreTest` grades it, then that topic's
+- [x] Given a user finishes a topic's mini-quiz, when `scoreTest` grades it, then that topic's
   Concept Progress record holds the latest score and when it was taken.
 - [x] Given a user picks a next-step choice or opens a new topic, when the status changes per
   the table above, then it's saved to their Concept Progress record.
@@ -52,3 +52,8 @@ So that my progress isn't lost if I switch phones, once I've linked an account (
 - **Children**: ph-2-us-11 (record, rules, `scoreTest` write), ph-2-us-12 (client module).
 - **Consumed by**: ph-2-us-7 (list shows status), ph-2-us-9 (choices set status), Phase 4
   (concept report) and Phase 9 (account linking keeps it).
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- Delivered end to end in Slice 4b: the mini-quiz writes the score fields (ph-2-us-11) and the two next-step choices set status (ph-2-us-9).
+- The status table above is updated: the Come Back Later row is struck through, and nothing sets needs revisit any more.

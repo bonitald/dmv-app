@@ -2,7 +2,7 @@
 
 **ID:** ph-2-us-4
 **Layer:** Parent
-**Status:** Not Started
+**Status:** Complete (Slice 4b, 2026-10-11)
 
 ## Story
 As a teen user,
@@ -30,17 +30,17 @@ full spaced-repetition system.
   shuffle (`getFlashcards`) is replaced by this order.
 
 ## Acceptance Criteria
-- [ ] Given a teen user has missed some of a topic's questions in its mini-quiz (tracked by
+- [x] Given a teen user has missed some of a topic's questions in its mini-quiz (tracked by
   ph-2-us-6), when they start that topic's flashcards again, then those cards tend to come
   earlier in the deck than cards they've answered correctly.
-- [ ] Given a card's question has never been graded, when the ordering runs, then it's treated as
+- [x] Given a card's question has never been graded, when the ordering runs, then it's treated as
   neutral priority (neither boosted nor suppressed) — a lack of data is not the same as "known
   well."
-- [ ] Given a question has been answered correctly in several quizzes in a row, when the ordering
+- [x] Given a question has been answered correctly in several quizzes in a row, when the ordering
   runs again, then its boost goes away (it doesn't stay permanently "weak" after being learned).
-- [ ] Given this is explicitly not a full SRS, when the ordering runs, then it does not schedule
+- [x] Given this is explicitly not a full SRS, when the ordering runs, then it does not schedule
   cards for specific future dates/intervals — it only weights the order of the current deck.
-- [ ] Given the ordering runs, when the deck is built, then every card in the topic is still
+- [x] Given the ordering runs, when the deck is built, then every card in the topic is still
   included exactly once — weighting changes order, never drops cards.
 
 ## Dependencies
@@ -60,11 +60,18 @@ full spaced-repetition system.
   ordering — treat it as neutral/never-graded.
 
 ## Tasks
-- [ ] Add `src/study/deckOrder.ts`: a weighted shuffle, weight = f(missCount, correctStreak), with
+- [x] Add `src/study/deckOrder.ts`: a weighted shuffle, weight = f(missCount, correctStreak), with
   the injected random source pattern used by `functions/src/shuffle.ts` so tests are
   deterministic.
-- [ ] Unit test it directly against the Acceptance Criteria scenarios (`npm run test:app`).
-- [ ] Use it to order the deck in the flashcard viewer (ph-2-us-3) each time a pass starts.
+- [x] Unit test it directly against the Acceptance Criteria scenarios (`npm run test:app`).
+- [x] Use it to order the deck in the flashcard viewer (ph-2-us-3) each time a pass starts.
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- Pure ordering in `src/study/deckOrder.ts`: a card missed before and not yet right twice in a row is weighted 3x, never-graded cards are neutral, and the order is a weighted shuffle with an injected random source.
+- **Differs from the story text:** there are two kinds of pass. A **full** pass is every card once, missed cards tending to come first. A **missed-only** pass is just the cards missed in the topic's last quiz (skipped questions count as missed). "Every card appears once per pass" applies to full passes only.
+- **Not-passed reopen rule (spec A4, replaced the earlier "needs revisit" rule):** reopening a topic whose latest quiz was not passed (below the 80% pass mark), whatever its status, opens on only its missed cards, with a "Show all cards" control. A passed latest quiz opens the full weighted deck.
+- The current pass (card order and the card showing) is saved per topic and resumes first when the topic is reopened. "Show all cards" and "Start this concept over" start a new full pass.
 
 ## Questions
 - Exact weighting formula (how much to boost a missed card, how fast the boost decays after

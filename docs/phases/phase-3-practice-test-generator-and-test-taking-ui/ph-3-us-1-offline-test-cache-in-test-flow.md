@@ -2,7 +2,7 @@
 
 **ID:** ph-3-us-1
 **Layer:** Frontend
-**Status:** In Progress (baseline use complete and device-tested 2026-09-28, Slice 2. Decisions 2026-09-25: no launch "Resume / Discard" prompt yet (reopening the baseline restores answers; the prompt waits for practice tests), and cached answers don't expire. Answers are held while NetInfo reports offline and sent on reconnect; if the server is unreachable while the phone looks online, the user gets Try again. Practice-test and mini-quiz use land with Slices 5 and 4b)
+**Status:** In Progress (baseline use complete and device-tested 2026-09-28, Slice 2. Decisions 2026-09-25: no launch "Resume / Discard" prompt yet (reopening the baseline restores answers; the prompt waits for practice tests), and cached answers don't expire. Answers are held while NetInfo reports offline and sent on reconnect; if the server is unreachable while the phone looks online, the user gets Try again. Practice-test use lands with Slice 5. The mini-quiz part is dropped: mini-quizzes are not stored for force-quit resume, see Implementation notes (Slice 4b))
 
 ## Story
 As a teen user,
@@ -18,8 +18,7 @@ So that I'm not interrupted or lose progress partway through a test.
   (`saveTestCache` / `getTestCache` / `clearTestCache`, AsyncStorage). Their remaining acceptance
   criteria describe how the test-taking screen uses that cache, which is Phase 3's job, so they
   were moved here and Phase 1 was closed.
-- Applies to all three session kinds: practice test (`assembleTest`), mini-quiz
-  (`assembleMiniQuiz`), and baseline section (`startOrResumeBaseline`).
+- Applies to practice test (`assembleTest`) and baseline section (`startOrResumeBaseline`). Mini-quizzes (`assembleMiniQuiz`) were dropped from this story in Slice 4b.
 
 ## Acceptance Criteria
 From ph-1-us-5:
@@ -77,6 +76,10 @@ Added when carrying over:
 - [ ] Clear the cache entry and active `testId` on submit or abandon.
 - [ ] On launch, detect an active `testId` and offer resume or discard.
 - [ ] Tests for the scenarios above.
+
+## Implementation notes (Slice 4b)
+Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
+- **Mini-quiz part dropped (spec decision 6):** mini-quizzes are not stored in the on-device session (`quizSession` holds one active test per user, so a mini-quiz would drop an in-progress baseline). A killed mini-quiz is abandoned and a new one gets a new `testId`; offline at submit still holds the answers on screen. This story now covers the baseline (done) and practice tests (Slice 5).
 
 ## Questions
 - Should an unsubmitted test be kept indefinitely after a force-quit, or expire after some time?
