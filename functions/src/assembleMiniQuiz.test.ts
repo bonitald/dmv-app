@@ -1,5 +1,5 @@
 import { getDb } from './adminApp';
-import { assembleMiniQuizForUser } from './assembleMiniQuiz';
+import { assembleMiniQuizForUser, miniQuizSize } from './assembleMiniQuiz';
 
 describe('assembleMiniQuizForUser', () => {
   const db = getDb();
@@ -88,7 +88,7 @@ describe('assembleMiniQuizForUser', () => {
     expect(result.questions[0]).not.toHaveProperty('sourceRef');
   });
 
-  test('caps the returned count at the server maximum even if more is requested', async () => {
+  test('never returns more than the topic holds even if more is requested', async () => {
     for (let i = 1; i <= 12; i++) {
       await seedQuestion(`q${i}`);
     }
@@ -98,7 +98,7 @@ describe('assembleMiniQuizForUser', () => {
       count: 999,
     });
 
-    expect(result.questions.length).toBe(10);
+    expect(result.questions.length).toBe(12);
   });
 
   test('persists a mini-quiz testAssignments record with the chunkId', async () => {
@@ -152,5 +152,39 @@ describe('assembleMiniQuizForUser', () => {
     const result = await assembleMiniQuizForUser(db, { uid: 'alice-uid' }, { chunkId: 'right-of-way', count: 1 });
     expect(result.questions[0]).not.toHaveProperty('explanation');
     expect(JSON.stringify(result)).not.toContain('Because a.');
+  });
+
+  test.each([
+    [1, 1],
+    [3, 3],
+    [4, 4],
+    [9, 5],
+    [16, 5],
+    [17, 6],
+    [31, 10],
+    [45, 15],
+    [60, 15],
+  ])('miniQuizSize(%i) is %i', (pool, expected) => {
+    expect(miniQuizSize(pool)).toBe(expected);
+  });
+
+  test('with no count, the quiz is sized from the topic (31 approved → 10)', async () => {
+    for (let i = 1; i <= 31; i++) await seedQuestion(`q${i}`);
+    const result = await assembleMiniQuizForUser(db, { uid: 'alice-uid' }, { chunkId: 'right-of-way' });
+    expect(result.questions).toHaveLength(10);
+  });
+
+  test('a big topic gets up to 15 questions', async () => {
+    for (let i = 1; i <= 50; i++) await seedQuestion(`q${i}`);
+    const result = await assembleMiniQuizForUser(db, { uid: 'alice-uid' }, { chunkId: 'right-of-way' });
+    expect(result.questions).toHaveLength(15);
+  });
+
+  test('an explicit count is still honoured and capped at 15', async () => {
+    for (let i = 1; i <= 20; i++) await seedQuestion(`q${i}`);
+    const three = await assembleMiniQuizForUser(db, { uid: 'alice-uid' }, { chunkId: 'right-of-way', count: 3 });
+    expect(three.questions).toHaveLength(3);
+    const capped = await assembleMiniQuizForUser(db, { uid: 'alice-uid' }, { chunkId: 'right-of-way', count: 40 });
+    expect(capped.questions).toHaveLength(15);
   });
 });

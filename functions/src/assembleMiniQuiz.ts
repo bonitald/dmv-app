@@ -5,9 +5,17 @@ import { getDb } from './adminApp';
 import type { AssembledQuestion } from './assembleTest';
 import { shuffle } from './shuffle';
 
-// ph-1-us-7: server-enforced cap on how many questions one mini-quiz can request.
-const MAX_MINI_QUIZ_COUNT = 10;
-const DEFAULT_MINI_QUIZ_COUNT = 10;
+// ph-1-us-7 / ph-2-us-8: a mini-quiz is about a third of its topic, at least 5 and at most 15
+// questions (the whole topic if it has fewer than 5). Decided here, not by the app, so the cap
+// is enforced in one place.
+const MAX_MINI_QUIZ_COUNT = 15;
+const MIN_MINI_QUIZ_COUNT = 5;
+
+/** How many questions a mini-quiz on a topic with `poolSize` approved questions gets. */
+export function miniQuizSize(poolSize: number): number {
+  if (poolSize < MIN_MINI_QUIZ_COUNT) return poolSize;
+  return Math.min(MAX_MINI_QUIZ_COUNT, Math.max(MIN_MINI_QUIZ_COUNT, Math.round(poolSize / 3)));
+}
 
 export interface AssembleMiniQuizResult {
   testId: string;
@@ -29,12 +37,12 @@ interface AssembleMiniQuizOptions {
  *
  * Implements ph-1-us-7. Same shape as `assembleTestForUser` (ph-1-us-4) — no answers, a
  * persisted `testAssignments` record under the returned `testId` — but scoped to one topic
- * (`chunkId`) and capped at MAX_MINI_QUIZ_COUNT rather than the whole approved bank.
+ * (`chunkId`) and sized by `miniQuizSize` (ph-2-us-8) rather than the whole approved bank.
  *
  * Trigger:  called by the `assembleMiniQuiz` onCall wrapper below
  * Auth:     requires a signed-in caller; otherwise `unauthenticated`
  * Inputs:   input.chunkId — required, the topic to quiz
- *           input.count — optional, defaults to 10, capped at 10
+ *           input.count — optional; defaults to miniQuizSize(topic's approved questions), capped at 15
  *           input.excludeIds — optional, previous set's question IDs; used to avoid an
  *             immediate repeat on "Review Again" when the topic's pool is large enough to do so
  * Returns:  { testId, questions[] } — no correctAnswer/sourceRef/selfCheck/review metadata;
@@ -60,15 +68,14 @@ export async function assembleMiniQuizForUser(
     throw new HttpsError('invalid-argument', 'chunkId must be a non-empty string.');
   }
 
-  const requestedCount = input.count === undefined ? DEFAULT_MINI_QUIZ_COUNT : input.count;
+  // An explicit count is still accepted (and capped) so the contract stays backwards
+  // compatible; the app no longer sends one.
   if (
-    typeof requestedCount !== 'number' ||
-    !Number.isInteger(requestedCount) ||
-    requestedCount <= 0
+    input.count !== undefined &&
+    (typeof input.count !== 'number' || !Number.isInteger(input.count) || input.count <= 0)
   ) {
     throw new HttpsError('invalid-argument', 'count must be a positive integer.');
   }
-  const count = Math.min(requestedCount, MAX_MINI_QUIZ_COUNT);
 
   const excludeIds = Array.isArray(input.excludeIds)
     ? input.excludeIds.filter((id): id is string => typeof id === 'string')
@@ -85,6 +92,13 @@ export async function assembleMiniQuizForUser(
   if (snapshot.empty) {
     throw new HttpsError('not-found', `No approved questions exist for chunkId "${chunkId}".`);
   }
+
+  // Size from the topic's whole approved pool (before excludeIds is applied), so the quiz
+  // length doesn't shrink on "Review Again".
+  const count =
+    typeof input.count === 'number'
+      ? Math.min(input.count, MAX_MINI_QUIZ_COUNT)
+      : miniQuizSize(snapshot.size);
 
   // Prefer the pool with the previous set excluded, but only if enough remains — otherwise
   // fall back to the full pool (repeats are unavoidable on a small topic, per ph-1-us-7 AC).

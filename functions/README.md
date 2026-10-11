@@ -58,7 +58,7 @@ for review/drill sessions on a single topic rather than full practice tests.
 ```json
 {
   "chunkId": "string (required) — the handbook topic/chunk to quiz on (e.g. 'right-of-way')",
-  "count": "number (optional) — how many questions to return; defaults to 10, capped at 10",
+  "count": "number (optional) — how many questions to return; defaults to about a third of the topic's approved questions (min 5, max 15; all of them if fewer than 5); an explicit `count` is capped at 15",
   "excludeIds": "string[] (optional) — question IDs from a previous quiz on this topic; used to avoid immediate repeats when the pool is large enough"
 }
 ```
