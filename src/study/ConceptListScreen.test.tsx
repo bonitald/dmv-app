@@ -11,7 +11,7 @@ jest.mock('@react-native-firebase/app', () => ({ getApp: jest.fn() }));
 const mockRetry = jest.fn();
 let mockTopics: { status: string; topics?: Topic[] } = { status: 'loading' };
 jest.mock('../topics/useTopics', () => ({ useTopics: () => ({ ...mockTopics, retry: mockRetry }) }));
-let mockProgress: ConceptProgressState = { status: 'ready', byChunk: {} };
+let mockProgress: ConceptProgressState = { status: 'ready', byChunk: {}, cachedEmpty: false };
 jest.mock('./useConceptProgress', () => ({ useConceptProgress: () => mockProgress }));
 
 const topic = (chunkId: string, title: string, order: number, approvedQuestionCount = 3): Topic => ({
@@ -44,13 +44,14 @@ async function renderList() {
 beforeEach(() => {
   jest.clearAllMocks();
   mockTopics = { status: 'ready', topics: TOPICS };
-  mockProgress = { status: 'ready', byChunk: {} };
+  mockProgress = { status: 'ready', byChunk: {}, cachedEmpty: false };
 });
 
 test('every topic in order with its description, status and latest score', async () => {
   mockProgress = {
     status: 'ready',
     byChunk: { a: { status: 'reviewed', latestMiniQuizScore: 0.8 }, c: { status: 'in-progress' } },
+    cachedEmpty: false,
   };
   await renderList();
 
@@ -66,7 +67,7 @@ test('every topic in order with its description, status and latest score', async
 });
 
 test("tapping any topic opens its flashcards, whatever its status", async () => {
-  mockProgress = { status: 'ready', byChunk: { d: { status: 'reviewed' } } };
+  mockProgress = { status: 'ready', byChunk: { d: { status: 'reviewed' } }, cachedEmpty: false };
   await renderList();
   await fireEvent.press(screen.getByLabelText('Delta, Reviewed'));
   expect(navRef.getCurrentRoute()).toMatchObject({ name: 'Flashcards', params: { chunkId: 'd' } });

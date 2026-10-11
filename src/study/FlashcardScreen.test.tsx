@@ -17,7 +17,7 @@ jest.mock('@react-native-firebase/app', () => ({ getApp: jest.fn() }));
 jest.mock('../auth/AuthProvider', () => ({ useAuth: () => ({ status: 'ready', uid: 'u1' }) }));
 jest.mock('../api/callables', () => ({ getFlashcards: jest.fn() }));
 jest.mock('./conceptProgress', () => ({ markOpened: jest.fn() }));
-let mockProgress: ConceptProgressState = { status: 'ready', byChunk: {} };
+let mockProgress: ConceptProgressState = { status: 'ready', byChunk: {}, cachedEmpty: false };
 jest.mock('./useConceptProgress', () => ({ useConceptProgress: () => mockProgress }));
 jest.mock('../topics/useTopics', () => ({
   useTopics: () => ({
@@ -56,7 +56,7 @@ beforeEach(async () => {
   jest.clearAllMocks();
   clearDeckCache();
   await AsyncStorage.clear();
-  mockProgress = { status: 'ready', byChunk: {} };
+  mockProgress = { status: 'ready', byChunk: {}, cachedEmpty: false };
 });
 
 test('shows the first front with progress and no choices; Next and Previous move', async () => {
@@ -144,7 +144,7 @@ test('opening marks a not-started topic and remembers it for Home', async () => 
 });
 
 test('a reviewed topic is passed as reviewed, so markOpened leaves it alone', async () => {
-  mockProgress = { status: 'ready', byChunk: { row: { status: 'reviewed' } } };
+  mockProgress = { status: 'ready', byChunk: { row: { status: 'reviewed' } }, cachedEmpty: false };
   mockGet.mockResolvedValue(deckOf(card(1)));
   await render(tree());
   await screen.findByLabelText('Question: Question 1');
@@ -164,6 +164,17 @@ test.each([{ status: 'loading' }, { status: 'error' }] as ConceptProgressState[]
     expect(markOpened).not.toHaveBeenCalled();
   }
 );
+
+test('a cache-only empty progress snapshot never writes a status', async () => {
+  mockProgress = { status: 'ready', byChunk: {}, cachedEmpty: true };
+  mockGet.mockResolvedValue(deckOf(card(1)));
+  await render(tree());
+  await screen.findByLabelText('Question: Question 1');
+  await waitFor(async () =>
+    expect(await AsyncStorage.getItem('dmv-app:study:last-opened:u1')).toBe('row')
+  );
+  expect(markOpened).not.toHaveBeenCalled();
+});
 
 test('reopening a topic this session makes no new call', async () => {
   mockGet.mockResolvedValue(deckOf(card(1)));

@@ -37,7 +37,7 @@ jest.mock('../review/useTestAttempt', () => ({
 }));
 jest.mock('../study/conceptProgress', () => ({ markOpened: jest.fn() }));
 jest.mock('../study/useConceptProgress', () => ({
-  useConceptProgress: () => ({ status: 'ready', byChunk: {} }),
+  useConceptProgress: () => ({ status: 'ready', byChunk: {}, cachedEmpty: false }),
 }));
 jest.mock('../api/callables', () => ({
   startOrResumeBaseline: jest.fn(() => new Promise(() => {})),

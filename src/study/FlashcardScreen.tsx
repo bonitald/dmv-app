@@ -53,7 +53,7 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
   // downgraded by a read that's still loading or failed (ph-2-us-10: opening never downgrades).
   const marked = useRef(false);
   useEffect(() => {
-    if (marked.current || !uid || deck.status !== 'ready' || progress.status !== 'ready') return;
+    if (marked.current || !uid || deck.status !== 'ready' || progress.status !== 'ready' || progress.cachedEmpty) return;
     marked.current = true;
     markOpened(uid, chunkId, progressFor(progress.byChunk, chunkId).status);
   }, [uid, chunkId, deck.status, progress]);

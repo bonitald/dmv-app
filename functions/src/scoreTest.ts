@@ -236,7 +236,7 @@ async function gradeQuestions(
  * Reads:    `users/{uid}/testAssignments/{testId}` (written by assembleTest/assembleMiniQuiz),
  *           `questions/{id}`
  * Writes:   `users/{uid}/testAttempts/{testId}`; sets the assignment's `scored: true`; for a
- *           mini-quiz, merges the latest score into `users/{uid}/conceptProgress/{chunkId}`
+ *           mini-quiz, merges the latest score and its correct/total counts into `users/{uid}/conceptProgress/{chunkId}`
  *           (ph-2-us-11) without touching the client-owned `status`
  * Errors:   HttpsError('not-found') — no such assignment for this user
  *           HttpsError('already-exists') — the assignment was already scored
@@ -304,6 +304,10 @@ async function scoreAssignedTest(
         progressRef,
         {
           latestMiniQuizScore: score,
+          // ph-2-us-11 / Slice 4b: the counts behind the score, so the Progress tab can say
+          // "7 of 10 right" without reading the attempt.
+          latestMiniQuizCorrect: correctCount,
+          latestMiniQuizTotal: totalCount,
           latestMiniQuizAt: FieldValue.serverTimestamp(),
           latestTestId: testId,
         },

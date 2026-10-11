@@ -364,6 +364,19 @@ describe('users/{uid}/conceptProgress (ph-2-us-11)', () => {
     );
   });
 
+  test.each(['latestMiniQuizCorrect', 'latestMiniQuizTotal'])(
+    'a client write of %s is denied',
+    async (field) => {
+      await assertFails(
+        setDoc(doc(alice(), path), {
+          status: 'reviewed',
+          statusUpdatedAt: serverTimestamp(),
+          [field]: 10,
+        })
+      );
+    }
+  );
+
   test('deleting is denied', async () => {
     await seed(path, { status: 'reviewed', statusUpdatedAt: new Date() });
     await assertFails(deleteDoc(doc(alice(), path)));

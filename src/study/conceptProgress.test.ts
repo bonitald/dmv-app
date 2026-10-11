@@ -1,4 +1,5 @@
-import { markOpened, setStatusFromChoice } from './conceptProgress';
+import { onSnapshot } from '@react-native-firebase/firestore';
+import { markOpened, setStatusFromChoice, subscribeConceptProgress } from './conceptProgress';
 
 // The Firestore calls are mocked so the write rules run under plain-Node Jest.
 const mockSetDoc = jest.fn((..._args: unknown[]) => Promise.resolve());
@@ -58,4 +59,26 @@ test('a rejected write is logged, not thrown', async () => {
     expect.any(Error)
   );
   warn.mockRestore();
+});
+
+test('subscribes with metadata changes and reports a cache-only empty snapshot', () => {
+  const onChange = jest.fn();
+  const onError = jest.fn();
+  subscribeConceptProgress('u1', onChange, onError);
+
+  const [ref, options, next, err] = (onSnapshot as jest.Mock).mock.calls[0];
+  expect(ref).toEqual({ path: 'users/u1/conceptProgress' });
+  expect(options).toEqual({ includeMetadataChanges: true });
+  expect(err).toBe(onError);
+
+  next({ docs: [], empty: true, metadata: { fromCache: true } });
+  expect(onChange).toHaveBeenLastCalledWith({}, true);
+  next({ docs: [], empty: true, metadata: { fromCache: false } });
+  expect(onChange).toHaveBeenLastCalledWith({}, false);
+  next({
+    docs: [{ id: 'row', data: () => ({ status: 'reviewed' }) }],
+    empty: false,
+    metadata: { fromCache: true },
+  });
+  expect(onChange).toHaveBeenLastCalledWith({ row: { status: 'reviewed' } }, false);
 });

@@ -12,6 +12,19 @@ describe('toProgress', () => {
     ).toEqual({ status: 'reviewed', latestMiniQuizScore: 0.8, latestMiniQuizAt: at });
   });
 
+  test('reads correct and total when present', () => {
+    expect(
+      toProgress({ status: 'reviewed', latestMiniQuizScore: 0.7, latestMiniQuizCorrect: 7, latestMiniQuizTotal: 10 })
+    ).toEqual({ status: 'reviewed', latestMiniQuizScore: 0.7, latestMiniQuizCorrect: 7, latestMiniQuizTotal: 10 });
+  });
+
+  test('ignores non-numeric correct and total', () => {
+    expect(toProgress({ latestMiniQuizScore: 0.5, latestMiniQuizCorrect: '5' })).toEqual({
+      status: 'in-progress',
+      latestMiniQuizScore: 0.5,
+    });
+  });
+
   test('a score but no status is in progress', () => {
     expect(toProgress({ latestMiniQuizScore: 0.4 })).toEqual({
       status: 'in-progress',

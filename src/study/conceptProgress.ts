@@ -29,17 +29,20 @@ function progressCollection(uid: string) {
 
 export function subscribeConceptProgress(
   uid: string,
-  onChange: (map: ProgressMap) => void,
+  onChange: (map: ProgressMap, cachedEmpty: boolean) => void,
   onError: (error: unknown) => void
 ): () => void {
+  // Metadata changes too, so a cache-only empty first snapshot is followed by the server's
+  // answer even when the data is the same (Slice 4a carry-forward).
   return onSnapshot(
     progressCollection(uid),
+    { includeMetadataChanges: true },
     (snapshot) => {
       const map: ProgressMap = {};
       snapshot.docs.forEach((d) => {
         map[d.id] = toProgress(d.data() as Record<string, unknown>);
       });
-      onChange(map);
+      onChange(map, snapshot.empty && snapshot.metadata.fromCache);
     },
     onError
   );

@@ -10,6 +10,9 @@ export interface ConceptProgress {
   status: ConceptStatus;
   /** 0–1, written only by scoreTest (ph-2-us-11). */
   latestMiniQuizScore?: number;
+  /** Right answers and questions in that quiz (Slice 4b). Missing on older records. */
+  latestMiniQuizCorrect?: number;
+  latestMiniQuizTotal?: number;
   latestMiniQuizAt?: Date;
 }
 
@@ -30,6 +33,8 @@ export function toProgress(data: Record<string, unknown> | undefined): ConceptPr
   if (!data) return { status: 'not-started' };
   const score = typeof data.latestMiniQuizScore === 'number' ? data.latestMiniQuizScore : undefined;
   const at = toDate(data.latestMiniQuizAt);
+  const correct = typeof data.latestMiniQuizCorrect === 'number' ? data.latestMiniQuizCorrect : undefined;
+  const total = typeof data.latestMiniQuizTotal === 'number' ? data.latestMiniQuizTotal : undefined;
   // A doc scoreTest created before the topic was ever opened has a score but no status.
   const status: ConceptStatus =
     typeof data.status === 'string' && STORED.includes(data.status)
@@ -40,6 +45,8 @@ export function toProgress(data: Record<string, unknown> | undefined): ConceptPr
   return {
     status,
     ...(score !== undefined ? { latestMiniQuizScore: score } : {}),
+    ...(correct !== undefined ? { latestMiniQuizCorrect: correct } : {}),
+    ...(total !== undefined ? { latestMiniQuizTotal: total } : {}),
     ...(at ? { latestMiniQuizAt: at } : {}),
   };
 }

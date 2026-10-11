@@ -246,6 +246,8 @@ describe('scoreTestForUser', () => {
       const progress = (await progressRef().get()).data()!;
       expect(progress.status).toBe('reviewed');
       expect(progress.latestMiniQuizScore).toBe(0.5);
+      expect(progress.latestMiniQuizCorrect).toBe(1);
+      expect(progress.latestMiniQuizTotal).toBe(2);
       expect(progress.latestTestId).toBe(testId);
       expect(progress.latestMiniQuizAt).toBeDefined();
     });
@@ -256,7 +258,13 @@ describe('scoreTestForUser', () => {
       await takeMiniQuiz(['a']);
 
       const progress = (await progressRef().get()).data()!;
-      expect(Object.keys(progress).sort()).toEqual(['latestMiniQuizAt', 'latestMiniQuizScore', 'latestTestId']);
+      expect(Object.keys(progress).sort()).toEqual([
+        'latestMiniQuizAt',
+        'latestMiniQuizCorrect',
+        'latestMiniQuizScore',
+        'latestMiniQuizTotal',
+        'latestTestId',
+      ]);
       expect(progress.latestMiniQuizScore).toBe(1);
     });
 
