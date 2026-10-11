@@ -38,11 +38,11 @@ describe('quizLine', () => {
   test('passed, not passed and latest', () => {
     expect(
       quizLine({ status: 'reviewed', miniQuizPassCount: 2, miniQuizFailCount: 1, latestMiniQuizCorrect: 4, latestMiniQuizTotal: 10, latestMiniQuizScore: 0.4 })
-    ).toBe('Quizzes: 2 passed · 1 not passed · latest 4 of 10');
+    ).toBe('Quizzes: 2 passed Â· 1 not passed Â· latest 4 of 10');
   });
   test('leaves out parts with no data', () => {
     expect(quizLine({ status: 'reviewed', miniQuizPassCount: 1, miniQuizFailCount: 0, latestMiniQuizCorrect: 9, latestMiniQuizTotal: 10 })).toBe(
-      'Quizzes: 1 passed · latest 9 of 10'
+      'Quizzes: 1 passed Â· latest 9 of 10'
     );
     expect(quizLine({ status: 'reviewed', latestMiniQuizCorrect: 9, latestMiniQuizTotal: 10, latestMiniQuizScore: 0.9 })).toBe('Quizzes: latest 9 of 10');
     expect(quizLine({ status: 'reviewed', miniQuizFailCount: 3 })).toBe('Quizzes: 3 not passed');

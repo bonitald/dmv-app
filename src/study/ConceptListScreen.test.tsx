@@ -47,7 +47,7 @@ beforeEach(() => {
   mockProgress = { status: 'ready', byChunk: {}, cachedEmpty: false };
 });
 
-test('every topic in order with its description, status and latest score', async () => {
+test('every topic in order with its description, status and latest quiz line', async () => {
   mockProgress = {
     status: 'ready',
     byChunk: { a: { status: 'reviewed', latestMiniQuizScore: 0.8 }, c: { status: 'in-progress' } },
@@ -118,7 +118,7 @@ test('a topic whose latest quiz was not passed shows the marker and the quizzes 
   };
   await renderList();
   expect(screen.getAllByText('Last quiz not passed')).toHaveLength(1);
-  expect(screen.getByText('Quizzes: 2 passed · 1 not passed · latest 4 of 10')).toBeTruthy();
-  expect(screen.getByText('Quizzes: 1 passed · latest 9 of 10')).toBeTruthy();
-  expect(screen.getByLabelText('Alpha, Reviewed, Last quiz not passed, Quizzes: 2 passed · 1 not passed · latest 4 of 10')).toBeTruthy();
+  expect(screen.getByText('Quizzes: 2 passed Â· 1 not passed Â· latest 4 of 10')).toBeTruthy();
+  expect(screen.getByText('Quizzes: 1 passed Â· latest 9 of 10')).toBeTruthy();
+  expect(screen.getByLabelText('Alpha, Reviewed, Last quiz not passed, Quizzes: 2 passed Â· 1 not passed Â· latest 4 of 10')).toBeTruthy();
 });

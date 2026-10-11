@@ -11,7 +11,7 @@ export interface ConceptRow {
   status: ConceptStatus;
   /** The latest mini-quiz is below the pass mark (whatever the status). */
   lastQuizNotPassed: boolean;
-  /** "Quizzes: …" counts line, or "Latest quiz: N%" for older records; null if never taken. */
+  /** "Quizzes: ..." counts line, or "Latest quiz: N%" for older records; null if never taken. */
   quizLine: string | null;
   /** No approved questions yet: shown, but not opened (ph-2-us-7). */
   comingSoon: boolean;
@@ -31,7 +31,7 @@ export function quizLine(p: ConceptProgress): string | null {
   if (typeof p.latestMiniQuizCorrect === 'number' && typeof p.latestMiniQuizTotal === 'number') {
     parts.push(`latest ${p.latestMiniQuizCorrect} of ${p.latestMiniQuizTotal}`);
   }
-  if (parts.length > 0) return `Quizzes: ${parts.join(' · ')}`;
+  if (parts.length > 0) return `Quizzes: ${parts.join(' Â· ')}`;
   if (typeof p.latestMiniQuizScore === 'number') return `Latest quiz: ${Math.round(p.latestMiniQuizScore * 100)}%`;
   return null;
 }
