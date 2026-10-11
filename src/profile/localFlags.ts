@@ -58,3 +58,32 @@ export async function setLastOpenedTopic(uid: string, chunkId: string): Promise<
     console.warn('[localFlags] last-opened write failed', error);
   }
 }
+
+// The card a topic's flashcards were left on, so reopening the topic picks up there. Stored as
+// the card id, not an index, so it still finds the card if the deck's order changes. Cleared at
+// the end of the deck, so a finished topic opens from the first card.
+const DECK_POSITION = 'study:deck-position';
+
+function deckPositionKey(uid: string, chunkId: string): string {
+  return `${PREFIX}${DECK_POSITION}:${uid}:${chunkId}`;
+}
+
+/** A storage failure reads as "none", which only costs starting at the first card. */
+export async function getDeckPosition(uid: string, chunkId: string): Promise<string | null> {
+  try {
+    return await AsyncStorage.getItem(deckPositionKey(uid, chunkId));
+  } catch (error) {
+    console.warn('[localFlags] deck-position read failed', error);
+    return null;
+  }
+}
+
+/** `null` clears it. */
+export async function setDeckPosition(uid: string, chunkId: string, cardId: string | null): Promise<void> {
+  try {
+    if (cardId) await AsyncStorage.setItem(deckPositionKey(uid, chunkId), cardId);
+    else await AsyncStorage.removeItem(deckPositionKey(uid, chunkId));
+  } catch (error) {
+    console.warn('[localFlags] deck-position write failed', error);
+  }
+}

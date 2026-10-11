@@ -176,6 +176,45 @@ test('reopening a topic this session makes no new call', async () => {
   expect(mockGet).toHaveBeenCalledTimes(1);
 });
 
+test('reopening a topic resumes on the card it was left on', async () => {
+  mockGet.mockResolvedValue(deckOf(card(1), card(2), card(3)));
+  const first = await render(tree());
+  await screen.findByLabelText('Question: Question 1');
+  await fireEvent.press(screen.getByText('Next'));
+  await fireEvent.press(screen.getByText('Next'));
+  await waitFor(async () =>
+    expect(await AsyncStorage.getItem('dmv-app:study:deck-position:u1:row')).toBe('q3')
+  );
+  await first.unmount();
+
+  await render(tree());
+  expect(await screen.findByLabelText('Question: Question 3')).toBeTruthy();
+  expect(screen.getByText('3 of 3')).toBeTruthy();
+});
+
+test('finishing the deck clears the position, so the topic reopens on the first card', async () => {
+  mockGet.mockResolvedValue(deckOf(card(1), card(2)));
+  await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', 'q2');
+  const first = await render(tree());
+  expect(await screen.findByLabelText('Question: Question 2')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Next'));
+  expect(screen.getByText('End of this concept')).toBeTruthy();
+  await waitFor(async () =>
+    expect(await AsyncStorage.getItem('dmv-app:study:deck-position:u1:row')).toBeNull()
+  );
+  await first.unmount();
+
+  await render(tree());
+  expect(await screen.findByLabelText('Question: Question 1')).toBeTruthy();
+});
+
+test('a saved card that is no longer in the deck opens the first card', async () => {
+  mockGet.mockResolvedValue(deckOf(card(1), card(2)));
+  await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', 'gone');
+  await render(tree());
+  expect(await screen.findByLabelText('Question: Question 1')).toBeTruthy();
+});
+
 test.each([
   [new CallableError('not-found', 'not-found', 'none'), 'Nothing here yet'],
   [new CallableError('resource-exhausted', 'resource-exhausted', 'slow'), 'Take a short break'],

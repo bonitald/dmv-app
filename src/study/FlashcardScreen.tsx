@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useReducer, useRef } from 'react';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { ActivityIndicator, PanResponder, StyleSheet, Text, View } from 'react-native';
 import type { Flashcard } from '../api/types';
 import { useAuth } from '../auth/AuthProvider';
 import { Button } from '../components/Button';
 import { NoConnection } from '../components/NoConnection';
 import type { RootStackScreenProps } from '../navigation/types';
-import { setLastOpenedTopic } from '../profile/localFlags';
+import { getDeckPosition, setDeckPosition, setLastOpenedTopic } from '../profile/localFlags';
 import { colors, spacing, typography } from '../theme/tokens';
 import { useTopics } from '../topics/useTopics';
 import { markOpened } from './conceptProgress';
@@ -25,12 +25,14 @@ import { useFlashcardDeck } from './useFlashcardDeck';
 
 // ph-2-us-3: one topic's flashcards, one at a time, then an end-of-deck choice: the mini-quiz
 // (a placeholder until Slice 4b) or start over in a fresh order from this session's copy.
-// Nothing is recorded per card. Opening counts only once the deck has cards, so an empty or
+// Nothing is recorded per card, but the card the deck was left on is kept on the device so
+// reopening the topic resumes there (the end of the deck clears it). Opening counts only once the deck has cards, so an empty or
 // failed topic never turns "in progress" or becomes Home's "Continue learning".
 export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Flashcards'>) {
   const { chunkId } = route.params;
   const { uid } = useAuth();
   const deck = useFlashcardDeck(chunkId);
+  const startCardId = useSavedPosition(uid, chunkId);
   const progress = useConceptProgress();
   const topics = useTopics();
 
@@ -56,7 +58,7 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
     markOpened(uid, chunkId, progressFor(progress.byChunk, chunkId).status);
   }, [uid, chunkId, deck.status, progress]);
 
-  if (deck.status === 'loading') {
+  if (deck.status === 'loading' || (deck.status === 'ready' && startCardId === undefined)) {
     return (
       <View style={styles.center}>
         <ActivityIndicator color={colors.primary} accessibilityLabel="Loading cards" />
@@ -66,14 +68,56 @@ export function FlashcardScreen({ navigation, route }: RootStackScreenProps<'Fla
   if (deck.status === 'error') {
     return <DeckErrorView error={deck.error} onRetry={deck.retry} onBack={() => navigation.goBack()} />;
   }
-  return <Deck cards={deck.cards} onQuiz={() => navigation.navigate('MiniQuiz', { chunkId })} />;
+  return (
+    <Deck
+      cards={deck.cards}
+      startCardId={startCardId ?? null}
+      onMove={(cardId) => {
+        if (uid) void setDeckPosition(uid, chunkId, cardId);
+      }}
+      onQuiz={() => navigation.navigate('MiniQuiz', { chunkId })}
+    />
+  );
 }
 
-function Deck({ cards, onQuiz }: { cards: Flashcard[]; onQuiz: () => void }) {
+/** The saved card id for this topic: `undefined` while reading, `null` when there is none. */
+function useSavedPosition(uid: string | null, chunkId: string): string | null | undefined {
+  const [cardId, setCardId] = useState<string | null | undefined>(undefined);
+  useEffect(() => {
+    if (!uid) return;
+    let cancelled = false;
+    getDeckPosition(uid, chunkId).then((saved) => {
+      if (!cancelled) setCardId(saved);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [uid, chunkId]);
+  return cardId;
+}
+
+interface DeckProps {
+  cards: Flashcard[];
+  /** The card to open on; a missing or unknown id opens the first card. */
+  startCardId: string | null;
+  /** The card now showing, or `null` at the end of the deck. */
+  onMove: (cardId: string | null) => void;
+  onQuiz: () => void;
+}
+
+function Deck({ cards, startCardId, onMove, onQuiz }: DeckProps) {
   const [state, dispatch] = useReducer(
     (s: DeckState<Flashcard>, a: DeckAction<Flashcard>) => deckReducer(s, a),
-    { cards, index: 0 }
+    { cards, index: Math.max(0, cards.findIndex((c) => c.id === startCardId)) }
   );
+
+  const currentId = state.cards[state.index]?.id ?? null;
+  const lastSaved = useRef(currentId);
+  useEffect(() => {
+    if (currentId === lastSaved.current) return;
+    lastSaved.current = currentId;
+    onMove(currentId);
+  }, [currentId, onMove]);
 
   // Swipe left for next, right for previous. It only claims clearly sideways drags, so a long
   // card can still scroll vertically. Buttons do the same for anyone who doesn't swipe.
