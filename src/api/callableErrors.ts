@@ -6,6 +6,7 @@ export type CallableErrorKind =
   | 'already-exists'
   | 'failed-precondition'
   | 'not-found'
+  | 'permission-denied'
   | 'unauthenticated'
   | 'invalid-argument'
   | 'resource-exhausted'
@@ -29,6 +30,7 @@ const KIND_BY_CODE: Record<string, CallableErrorKind> = {
   'already-exists': 'already-exists',
   'failed-precondition': 'failed-precondition',
   'not-found': 'not-found',
+  'permission-denied': 'permission-denied',
   unauthenticated: 'unauthenticated',
   'invalid-argument': 'invalid-argument',
   'resource-exhausted': 'resource-exhausted',

@@ -9,16 +9,19 @@ export function NoConnection({
   message,
   onRetry,
   title = 'No connection',
+  actionLabel = 'Try again',
 }: {
   message: string;
   onRetry: () => void;
   title?: string;
+  /** Swaps the button's label when the action isn't a retry. */
+  actionLabel?: string;
 }) {
   return (
     <View style={styles.container}>
       <Text style={typography.h1}>{title}</Text>
       <Text style={[typography.body, styles.message]}>{message}</Text>
-      <Button label="Try again" onPress={onRetry} style={styles.button} />
+      <Button label={actionLabel} onPress={onRetry} style={styles.button} />
     </View>
   );
 }

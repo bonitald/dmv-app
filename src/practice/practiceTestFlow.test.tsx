@@ -6,20 +6,21 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { assembleTest, scoreTest } from '../api/callables';
 import { CallableError } from '../api/callableErrors';
 import type { QuizQuestion, ScoreTestResult } from '../api/types';
-import { CACHE_WARNING, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
+import { PRACTICE_CACHE_WARNING, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
 import { PracticeTestScreen } from './PracticeTestScreen';
 import { startPracticeTest } from './startPracticeTest';
 
 jest.mock('@react-native-firebase/app', () => ({ getApp: jest.fn() }));
 jest.mock('../auth/AuthProvider', () => ({ useAuth: () => ({ status: 'ready', uid: 'u1' }) }));
 jest.mock('../api/callables', () => ({ assembleTest: jest.fn(), scoreTest: jest.fn() }));
+let mockTopics: { status: string; topics?: unknown[] } = { status: 'ready' };
 jest.mock('../topics/useTopics', () => ({
-  useTopics: () => ({
-    status: 'ready',
-    topics: [{ chunkId: 'row', title: 'Right of way', description: '', order: 1, approvedQuestionCount: 3 }],
-    retry: jest.fn(),
-  }),
+  useTopics: () => ({ ...mockTopics, retry: jest.fn() }),
 }));
+const readyTopics = {
+  status: 'ready',
+  topics: [{ chunkId: 'row', title: 'Right of way', description: '', order: 1, approvedQuestionCount: 3 }],
+};
 let mockAttempt: { status: string; data?: Record<string, unknown>; offline?: boolean } = { status: 'loading' };
 jest.mock('../review/useTestAttempt', () => ({
   useTestAttempt: (testId: string | null) =>
@@ -93,6 +94,7 @@ beforeEach(async () => {
   await AsyncStorage.clear();
   await setOnline(true);
   mockAttempt = { status: 'loading' };
+  mockTopics = readyTopics;
   (assembleTest as jest.Mock).mockResolvedValue({ testId: 't1', questions: [q(1), q(2)] });
 });
 
@@ -166,7 +168,61 @@ test('a cache write failure shows the warning', async () => {
   jest.spyOn(AsyncStorage, 'setItem').mockRejectedValueOnce(new Error('disk full'));
   await renderFlow();
   expect(await screen.findByText('Question 1')).toBeTruthy();
-  expect(await screen.findByText(CACHE_WARNING)).toBeTruthy();
+  expect(await screen.findByText(PRACTICE_CACHE_WARNING)).toBeTruthy();
+});
+
+test('the cache warning says "test", not "section"', () => {
+  expect(PRACTICE_CACHE_WARNING).toBe("This test can't be saved on your phone. Stay connected until you submit.");
+});
+
+test('leaving while the test is still loading does not leave a saved test behind', async () => {
+  let resolve!: (v: unknown) => void;
+  (assembleTest as jest.Mock).mockReturnValue(new Promise((r) => (resolve = r)));
+  const view = await render(
+    <NavigationContainer ref={ref}>
+      <Stack.Navigator initialRouteName="Main">
+        <Stack.Screen name="Main">{() => <Named label="Main" />}</Stack.Screen>
+        <Stack.Screen name="PracticeTest" component={PracticeTestScreen as never} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+  await act(() => ref.navigate('PracticeTest' as never));
+  await act(() => ref.goBack());
+  await act(async () => resolve({ testId: 't9', questions: [q(1), q(2)] }));
+  expect(await getActiveSession('u1', 'practice')).toBeNull();
+  view.unmount();
+});
+
+test.each(['not-found', 'permission-denied'])('a %s on submit ends the test and offers a way back', async (code) => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  (scoreTest as jest.Mock).mockRejectedValue(
+    Object.assign(new Error('nope'), { code: `functions/${code}` }),
+  );
+  await renderFlow();
+  await submitAll(2);
+  expect(await screen.findByText('Something went wrong')).toBeTruthy();
+  expect(screen.getByText("This test can't be submitted any more. Start a new one from the Practice tab.")).toBeTruthy();
+  expect(await getActiveSession('u1', 'practice')).toBeNull();
+  await fireEvent.press(screen.getByText('Back to Practice'));
+  expect(await screen.findByText(/^Main .*"screen":"PracticeTests"/)).toBeTruthy();
+});
+
+test('an ordinary submit error keeps the answers and Try again', async () => {
+  jest.spyOn(console, 'warn').mockImplementation(() => {});
+  (scoreTest as jest.Mock).mockRejectedValue(new CallableError('unknown', 'internal', 'boom'));
+  await renderFlow();
+  await submitAll(2);
+  await waitFor(() => expect(scoreTest).toHaveBeenCalledTimes(1));
+  expect(await getActiveSession('u1', 'practice')).not.toBeNull();
+});
+
+test('results wait for the topic titles instead of showing a false none line', async () => {
+  (scoreTest as jest.Mock).mockResolvedValue(graded([true, false]));
+  mockTopics = { status: 'loading' };
+  await renderFlow();
+  await submitAll(2);
+  expect(await screen.findByLabelText('Loading your results')).toBeTruthy();
+  expect(screen.queryByText("You didn't miss a single topic.")).toBeNull();
 });
 
 test('leaving mid-test asks first and Leave keeps the session', async () => {

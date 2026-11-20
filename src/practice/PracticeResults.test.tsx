@@ -6,8 +6,8 @@ import { PracticeResults } from './PracticeResults';
 const topic = (chunkId: string, order: number): Topic => ({
   chunkId, title: `Title ${chunkId}`, description: '', order, approvedQuestionCount: 5,
 } as Topic);
-const outcome = (correct: number, perTopic: PracticeOutcome['perTopic'] = [], unavailableCount = 0): PracticeOutcome => ({
-  testId: 't1', createdAt: null, correctCount: correct, totalCount: 25, perTopic, unavailableCount,
+const outcome = (correct: number, perTopic: PracticeOutcome['perTopic'] = [], unavailableCount = 0, totalCount = 25): PracticeOutcome => ({
+  testId: 't1', createdAt: null, correctCount: correct, totalCount, perTopic, unavailableCount,
 });
 const handlers = () => ({ onOpenTopic: jest.fn(), onReview: jest.fn(), onTakeAnother: jest.fn(), onBack: jest.fn() });
 
@@ -54,8 +54,8 @@ test('no misses says so', async () => {
 });
 
 test('an unavailable question shows the left-out line', async () => {
-  await render(<PracticeResults outcome={outcome(20, [], 1)} topics={[]} {...handlers()} />);
-  expect(screen.getByText('1 question was removed from the bank, so this test is scored out of 25.')).toBeTruthy();
+  await render(<PracticeResults outcome={outcome(20, [], 1, 24)} topics={[]} {...handlers()} />);
+  expect(screen.getByText('1 question was removed from the bank, so this test is scored out of 24.')).toBeTruthy();
 });
 
 test('each button calls its handler', async () => {
@@ -67,4 +67,11 @@ test('each button calls its handler', async () => {
   expect(h.onTakeAnother).toHaveBeenCalled();
   expect(h.onReview).toHaveBeenCalled();
   expect(h.onBack).toHaveBeenCalled();
+});
+
+test('with no topic titles, missed topics still show by chunkId and not the none line', async () => {
+  await render(<PracticeResults outcome={outcome(15, [{ chunkId: 'row', correct: 1, total: 3 }])} topics={[]} {...handlers()} />);
+  expect(screen.getByText('row')).toBeTruthy();
+  expect(screen.getByText('2 missed')).toBeTruthy();
+  expect(screen.queryByText("You didn't miss a single topic.")).toBeNull();
 });

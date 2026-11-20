@@ -11,7 +11,7 @@ import type { RootStackScreenProps } from '../navigation/types';
 import { useIsOnline } from '../network/useIsOnline';
 import { toAnswerList, type Answers } from '../quiz/answers';
 import { QuizRunner, type SubmitState } from '../quiz/QuizRunner';
-import { CACHE_WARNING, endSession, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
+import { PRACTICE_CACHE_WARNING, endSession, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
 import { useTestAttempt } from '../review/useTestAttempt';
 import { colors } from '../theme/tokens';
 import { useTopics } from '../topics/useTopics';
@@ -30,6 +30,8 @@ type Phase =
   /** scoreTest said it was already graded: read the saved attempt instead. */
   | { kind: 'recovering'; testId: string }
   | { kind: 'offline' }
+  /** scoreTest permanently rejected this test (gone or not ours): it can't be submitted. */
+  | { kind: 'rejected' }
   | { kind: 'error' };
 
 export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'PracticeTest'>) {
@@ -41,6 +43,8 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const submittingRef = useRef(false);
   const heldAnswersRef = useRef<Answers | null>(null);
+  // Set when the screen unmounts, so an assembleTest still in flight can't save a test nobody saw.
+  const cancelledRef = useRef(false);
 
   const load = useCallback(async () => {
     if (!uid) return;
@@ -55,15 +59,17 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
         }
       }
       const { testId, questions } = await assembleTest();
+      if (cancelledRef.current) return;
       let notice: string | undefined;
       try {
         await startSession(uid, testId, 'practice', questions);
       } catch (error) {
         console.warn('[practice] caching the test failed', error);
-        notice = CACHE_WARNING;
+        notice = PRACTICE_CACHE_WARNING;
       }
       setPhase({ kind: 'running', testId, questions, initialAnswers: {}, notice });
     } catch (raw) {
+      if (cancelledRef.current) return;
       const error = toCallableError(raw);
       if (error.kind !== 'offline') console.warn('[practice] load failed', error);
       setPhase({ kind: error.kind === 'offline' ? 'offline' : 'error' });
@@ -71,7 +77,11 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
   }, [uid, resume]);
 
   useEffect(() => {
+    cancelledRef.current = false;
     void load();
+    return () => {
+      cancelledRef.current = true;
+    };
   }, [load]);
 
   const submit = useCallback(
@@ -96,6 +106,12 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
           heldAnswersRef.current = null;
           await endSession(uid, 'practice', phase.testId);
           setPhase({ kind: 'recovering', testId: phase.testId });
+        } else if (error.kind === 'not-found' || error.kind === 'permission-denied') {
+          // Retrying can never work: drop the saved test and send the teen back to start fresh.
+          console.warn('[practice] submit rejected', error);
+          heldAnswersRef.current = null;
+          await endSession(uid, 'practice', phase.testId);
+          setPhase({ kind: 'rejected' });
         } else {
           console.warn('[practice] submit failed', error);
           setSubmitState('error');
@@ -123,7 +139,12 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
     ]);
   });
 
-  const results = (outcome: PracticeOutcome) => (
+  const results = (outcome: PracticeOutcome) =>
+    topics.status === 'loading' ? (
+      <View style={styles.center}>
+        <ActivityIndicator color={colors.primary} accessibilityLabel="Loading your results" />
+      </View>
+    ) : (
     <PracticeResults
       outcome={outcome}
       topics={topics.status === 'ready' ? topics.topics : []}
@@ -134,7 +155,7 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
       }}
       onBack={() => navigation.popTo('Main', { screen: 'PracticeTests' })}
     />
-  );
+    );
 
   switch (phase.kind) {
     case 'loading':
@@ -165,6 +186,15 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
       return results(phase.outcome);
     case 'offline':
       return <NoConnection message="The test needs a connection to load. Check your connection and try again." onRetry={() => void load()} />;
+    case 'rejected':
+      return (
+        <NoConnection
+          title="Something went wrong"
+          message="This test can't be submitted any more. Start a new one from the Practice tab."
+          actionLabel="Back to Practice"
+          onRetry={() => navigation.popTo('Main', { screen: 'PracticeTests' })}
+        />
+      );
     case 'error':
       return <NoConnection title="Something went wrong" message="We couldn't load the test. Try again in a moment." onRetry={() => void load()} />;
   }

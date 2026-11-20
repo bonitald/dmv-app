@@ -89,9 +89,27 @@ describe('selectPracticeQuestions', () => {
     for (let t = 0; t < 15; t++) {
       pool.push({ id: `a${t}`, type: undefined, chunkId: `t${t}` });
       pool.push({ id: `b${t}`, type: 'weird', chunkId: `t${t}` });
+      pool.push({ id: `c${t}`, type: 'Scenario', chunkId: `t${t}` });
     }
     for (let seed = 1; seed <= 200; seed++) {
-      expect(select(pool, seed)).toHaveLength(25);
+      const result = select(pool, seed);
+      expect(result).toHaveLength(25);
+      expect(scenarioCount(result)).toBe(0);
+    }
+  });
+
+  test('odd types are not mistaken for scenario questions when real ones are scarce', () => {
+    const real = buildPool(5, 1, 0, 'r'); // exactly 5 real scenario questions, fewer than the minimum of 8
+    const pool: Item[] = [...real];
+    for (let t = 0; t < 15; t++) {
+      pool.push({ id: `a${t}`, type: undefined, chunkId: `o${t}` });
+      pool.push({ id: `b${t}`, type: 'weird', chunkId: `o${t}` });
+      pool.push({ id: `c${t}`, type: 'Scenario', chunkId: `o${t}` });
+    }
+    for (let seed = 1; seed <= 200; seed++) {
+      const result = select(pool, seed);
+      expect(result).toHaveLength(25);
+      expect(scenarioCount(result)).toBe(5);
     }
   });
 

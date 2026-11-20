@@ -94,7 +94,11 @@ export interface TopicToWorkOn {
   missed: number;
 }
 
-/** Most-missed first, ties in handbook order; topics with no misses or not in the catalog are left out. */
+/**
+ * Most-missed first, ties in handbook order. Topics missing from the catalog (still loading or
+ * failed to load) are kept, titled by their chunkId, after the known ones (misses, then chunkId),
+ * so a miss is never hidden. Topics with no misses are left out.
+ */
 export function topicsToWorkOn(
   perTopic: PerTopicResult[],
   topics: Topic[],
@@ -102,10 +106,15 @@ export function topicsToWorkOn(
 ): { shown: TopicToWorkOn[]; moreCount: number } {
   const byChunk = new Map(topics.map((t) => [t.chunkId, t]));
   const rows = perTopic
-    .map((p) => ({ topic: byChunk.get(p.chunkId), missed: p.total - p.correct }))
-    .filter((r): r is { topic: Topic; missed: number } => !!r.topic && r.missed > 0)
-    .sort((a, b) => b.missed - a.missed || a.topic.order - b.topic.order)
-    .map((r) => ({ chunkId: r.topic.chunkId, title: r.topic.title, missed: r.missed }));
+    .map((p) => ({ chunkId: p.chunkId, topic: byChunk.get(p.chunkId), missed: p.total - p.correct }))
+    .filter((r) => r.missed > 0)
+    .sort((a, b) => {
+      if (a.topic && b.topic) return b.missed - a.missed || a.topic.order - b.topic.order;
+      if (a.topic) return -1;
+      if (b.topic) return 1;
+      return b.missed - a.missed || (a.chunkId < b.chunkId ? -1 : a.chunkId > b.chunkId ? 1 : 0);
+    })
+    .map((r) => ({ chunkId: r.chunkId, title: r.topic?.title ?? r.chunkId, missed: r.missed }));
   return { shown: rows.slice(0, limit), moreCount: Math.max(0, rows.length - limit) };
 }
 

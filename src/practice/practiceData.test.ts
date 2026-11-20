@@ -65,7 +65,7 @@ describe('lines', () => {
 });
 
 describe('topicsToWorkOn', () => {
-  it('sorts by misses then order, drops zero-miss and unknown topics', () => {
+  it('sorts by misses then order, drops zero-miss, keeps unknown topics last by chunkId', () => {
     const topics = [topic('a', 1), topic('b', 2), topic('c', 3), topic('d', 4)];
     const res = topicsToWorkOn(
       [
@@ -81,8 +81,21 @@ describe('topicsToWorkOn', () => {
       ['c', 2],
       ['a', 1],
       ['b', 1],
+      ['zzz', 3],
     ]);
+    expect(res.shown[res.shown.length - 1].title).toBe('zzz');
     expect(res.moreCount).toBe(0);
+  });
+  it('titles every topic by chunkId when the catalog is empty', () => {
+    const res = topicsToWorkOn(
+      [
+        { chunkId: 'b', correct: 0, total: 1 },
+        { chunkId: 'a', correct: 0, total: 1 },
+        { chunkId: 'c', correct: 0, total: 3 },
+      ],
+      [],
+    );
+    expect(res.shown.map((s) => [s.title, s.missed])).toEqual([['c', 3], ['a', 1], ['b', 1]]);
   });
   it('caps at the limit', () => {
     const topics = Array.from({ length: 7 }, (_, i) => topic(`t${i}`, i));

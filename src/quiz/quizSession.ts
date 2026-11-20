@@ -13,6 +13,9 @@ export type SessionKind = 'baseline' | 'practice';
 export const CACHE_WARNING =
   "This section can't be saved on your phone. Stay connected until you submit.";
 
+export const PRACTICE_CACHE_WARNING =
+  "This test can't be saved on your phone. Stay connected until you submit.";
+
 export interface ActiveSession {
   testId: string;
   kind: SessionKind;

@@ -20,7 +20,7 @@ export function PracticeResultsScreen() {
   const attempt = useTestAttempt(testId);
   const topics = useTopics();
 
-  if (attempt.status === 'loading') {
+  if (attempt.status === 'loading' || (attempt.status === 'ready' && topics.status === 'loading')) {
     return (
       <View style={styles.center}>
         <ActivityIndicator color={colors.primary} accessibilityLabel="Loading your results" />
