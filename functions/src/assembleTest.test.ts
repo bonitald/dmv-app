@@ -1,5 +1,112 @@
 import { getDb } from './adminApp';
-import { assembleTestForUser } from './assembleTest';
+import {
+  assembleTestForUser,
+  MAX_PER_TOPIC,
+  MIN_SCENARIO_COUNT,
+  selectPracticeQuestions,
+} from './assembleTest';
+import { seededRandom } from './shuffle';
+
+interface Item {
+  id: string;
+  type?: unknown;
+  chunkId: string;
+}
+
+// Builds `topics` topics, each with `scenario` scenario and `fact` fact questions.
+function buildPool(topics: number, scenario: number, fact: number, prefix = 't'): Item[] {
+  const pool: Item[] = [];
+  for (let t = 0; t < topics; t++) {
+    for (let i = 0; i < scenario; i++) pool.push({ id: `${prefix}${t}-s${i}`, type: 'scenario', chunkId: `${prefix}${t}` });
+    for (let i = 0; i < fact; i++) pool.push({ id: `${prefix}${t}-f${i}`, type: 'fact', chunkId: `${prefix}${t}` });
+  }
+  return pool;
+}
+
+const opts = { minScenario: MIN_SCENARIO_COUNT, maxPerTopic: MAX_PER_TOPIC };
+const select = (pool: Item[], seed: number, count = 25) =>
+  selectPracticeQuestions(pool, count, seededRandom(`seed-${seed}`), opts, (x) => x);
+const scenarioCount = (items: Item[]) => items.filter((x) => x.type === 'scenario').length;
+const maxTopic = (items: Item[]) => {
+  const counts = new Map<string, number>();
+  for (const x of items) counts.set(x.chunkId, (counts.get(x.chunkId) ?? 0) + 1);
+  return Math.max(...counts.values());
+};
+
+describe('selectPracticeQuestions', () => {
+  test('meets the scenario minimum and topic cap across seeds', () => {
+    const pool = buildPool(45, 2, 4);
+    for (let seed = 1; seed <= 200; seed++) {
+      const result = select(pool, seed);
+      expect(result).toHaveLength(25);
+      expect(scenarioCount(result)).toBeGreaterThanOrEqual(8);
+      expect(maxTopic(result)).toBeLessThanOrEqual(2);
+      expect(new Set(result.map((x) => x.id)).size).toBe(25);
+    }
+  });
+
+  test('includes every scenario question when there are fewer than the minimum', () => {
+    const pool = [...buildPool(3, 1, 0, 's'), ...buildPool(30, 0, 2, 'f')];
+    for (let seed = 1; seed <= 200; seed++) {
+      const result = select(pool, seed);
+      expect(result).toHaveLength(25);
+      expect(scenarioCount(result)).toBe(3);
+    }
+  });
+
+  test('works with no scenario questions', () => {
+    const pool = buildPool(30, 0, 2);
+    for (let seed = 1; seed <= 200; seed++) {
+      const result = select(pool, seed);
+      expect(result).toHaveLength(25);
+      expect(maxTopic(result)).toBeLessThanOrEqual(2);
+    }
+  });
+
+  test('scenario minimum wins over the topic cap', () => {
+    const pool = [...buildPool(3, 4, 0, 's'), ...buildPool(50, 0, 2, 'f')];
+    for (let seed = 1; seed <= 200; seed++) {
+      expect(scenarioCount(select(pool, seed))).toBeGreaterThanOrEqual(8);
+    }
+  });
+
+  test('relaxes the cap to fill the test', () => {
+    const pool = buildPool(2, 0, 20);
+    for (let seed = 1; seed <= 200; seed++) {
+      expect(select(pool, seed)).toHaveLength(25);
+    }
+  });
+
+  test('returns the whole pool when it is smaller than count', () => {
+    const pool = buildPool(5, 0, 2);
+    for (let seed = 1; seed <= 200; seed++) {
+      expect(select(pool, seed)).toHaveLength(10);
+    }
+  });
+
+  test('missing or odd type counts as fact', () => {
+    const pool: Item[] = [];
+    for (let t = 0; t < 15; t++) {
+      pool.push({ id: `a${t}`, type: undefined, chunkId: `t${t}` });
+      pool.push({ id: `b${t}`, type: 'weird', chunkId: `t${t}` });
+    }
+    for (let seed = 1; seed <= 200; seed++) {
+      expect(select(pool, seed)).toHaveLength(25);
+    }
+  });
+
+  test('scenario questions are not grouped', () => {
+    const pool = buildPool(45, 2, 4);
+    const result = select(pool, 7);
+    const positions = result.map((x, i) => (x.type === 'scenario' ? i : -1)).filter((i) => i >= 0);
+    const k = positions.length;
+    const first = Array.from({ length: k }, (_, i) => i);
+    const last = Array.from({ length: k }, (_, i) => 25 - k + i);
+    expect(positions).not.toEqual(first);
+    expect(positions).not.toEqual(last);
+  });
+});
+
 
 describe('assembleTestForUser', () => {
   const db = getDb();
@@ -151,5 +258,22 @@ describe('assembleTestForUser', () => {
     const result = await assembleTestForUser(db, { uid: 'alice-uid' }, { count: 1 });
     expect(result.questions[0]).not.toHaveProperty('explanation');
     expect(JSON.stringify(result)).not.toContain('Because a.');
+  });
+
+  test('assembleTestForUser applies the mix', async () => {
+    for (let i = 0; i < 10; i++) await seedQuestion(`s${i}`, { type: 'scenario', chunkId: `c${i % 20}` });
+    for (let i = 0; i < 30; i++) await seedQuestion(`f${i}`, { type: 'fact', chunkId: `c${i % 20}` });
+
+    const result = await assembleTestForUser(
+      db,
+      { uid: 'alice-uid' },
+      { count: 25, random: seededRandom('mix') }
+    );
+
+    expect(result.questions).toHaveLength(25);
+    expect(result.questions.filter((q) => q.type === 'scenario').length).toBeGreaterThanOrEqual(8);
+    const perTopic = new Map<string, number>();
+    for (const q of result.questions) perTopic.set(q.chunkId, (perTopic.get(q.chunkId) ?? 0) + 1);
+    expect(Math.max(...perTopic.values())).toBeLessThanOrEqual(2);
   });
 });

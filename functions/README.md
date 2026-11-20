@@ -34,11 +34,17 @@ authenticated caller. This is the **only** sanctioned way for a client to read q
 ```
 Deliberately omits `sourceRef`, `selfCheck`, and review metadata — the client never needs those.
 
-**Selection**: reads only `status == 'approved'` questions, shuffles them (Fisher-Yates,
-injectable random source for testing), and returns up to `DEFAULT_QUESTION_COUNT` (25 — the
-same as the real Colorado written knowledge test, `prd.md` Section 9). Randomization
-strategy is intentionally simple for MVP: fully random each call, repeats across a user's tests
-allowed. Revisit if practice starts feeling repetitive.
+**Selection**: reads only `status == 'approved'` questions and returns up to
+`DEFAULT_QUESTION_COUNT` (25 — the same as the real Colorado written knowledge test, `prd.md`
+Section 9). The pick is random (Fisher-Yates, injectable random source for testing) but follows a
+mix (ph-3-us-3, `selectPracticeQuestions`): at least `MIN_SCENARIO_COUNT` (8) scenario questions
+and at most `MAX_PER_TOPIC` (2) questions per `chunkId`. Order of passes over one shuffled pool:
+scenario questions under the topic cap until 8; scenario questions ignoring the cap until 8; any
+question under the cap until 25; any question ignoring the cap until 25; then a final shuffle so
+scenario questions are spread out. Fallbacks: the scenario minimum beats the topic cap; if the bank
+has fewer than 8 scenario questions, all of them are used; if the cap can't be met (few topics) it
+is relaxed to fill the test; a pool smaller than 25 returns everything. A missing or unknown
+`type` counts as fact. Repeats across a user's tests are allowed.
 
 **Persistence**: also writes `users/{uid}/testAssignments/{testId}` — `{ type: 'practice',
 questionIds: string[], createdAt: FieldValue, scored: false }` — recording exactly which question

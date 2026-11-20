@@ -9,6 +9,70 @@ import { shuffle } from './shuffle';
 // easy-to-change constant rather than hardcoded in multiple places.
 const DEFAULT_QUESTION_COUNT = 25;
 
+// ph-3-us-3: a practice test should resemble the real one, so we guarantee a minimum number of
+// situational (scenario) questions and stop any single handbook topic from dominating.
+export const MIN_SCENARIO_COUNT = 8; // at least this many scenario questions, if the bank has them
+export const MAX_PER_TOPIC = 2; // at most this many questions from one chunkId (while avoidable)
+
+/** The two fields of a question that `selectPracticeQuestions` needs to look at. */
+export interface SelectableQuestion {
+  type?: unknown; // 'scenario' marks a scenario question; anything else (or missing) is fact
+  chunkId?: unknown; // handbook topic; used to cap how many questions share a topic
+}
+
+/**
+ * Picks `count` questions from `pool` with a realistic mix: at least `minScenario` scenario
+ * questions and at most `maxPerTopic` per topic, relaxing those rules only when the pool can't
+ * satisfy them. Generic over the item type so it can be unit-tested with plain objects;
+ * `describe` maps an item to its `type` and `chunkId` (for Firestore docs: `(d) => d.data()`).
+ *
+ * Order of passes (each walks one shuffled copy of the pool, so results stay random):
+ *   1. scenario questions under the topic cap, until `minScenario`
+ *   2. scenario questions ignoring the cap, until `minScenario` (the minimum beats the cap)
+ *   3. any question under the topic cap, until `count`
+ *   4. any question ignoring the cap, until `count` (a small/lopsided pool still fills the test)
+ * Finally the picks are shuffled again so the scenario questions are spread through the test
+ * rather than grouped at the start. Returns fewer than `count` only if the pool is smaller.
+ */
+export function selectPracticeQuestions<T>(
+  pool: T[],
+  count: number,
+  random: () => number,
+  opts: { minScenario: number; maxPerTopic: number },
+  describe: (item: T) => SelectableQuestion
+): T[] {
+  const shuffled = shuffle(pool, random);
+  const isScenario = (item: T) => describe(item).type === 'scenario';
+
+  // Picked items are tracked by position in `shuffled` (not by identity) so a pool containing
+  // equal-looking items can never be confused, and so later passes skip what is already taken.
+  const taken = new Set<number>();
+  const perTopic = new Map<unknown, number>(); // how many picks each chunkId has so far
+  const underCap = (item: T) => (perTopic.get(describe(item).chunkId) ?? 0) < opts.maxPerTopic;
+
+  // Walks the shuffled pool and takes items that pass `accept`, until `target` picks exist.
+  const pass = (target: number, accept: (item: T) => boolean, respectCap: boolean) => {
+    for (let i = 0; i < shuffled.length && taken.size < target; i++) {
+      const item = shuffled[i];
+      if (taken.has(i) || !accept(item) || (respectCap && !underCap(item))) continue;
+      taken.add(i);
+      const chunk = describe(item).chunkId;
+      perTopic.set(chunk, (perTopic.get(chunk) ?? 0) + 1);
+    }
+  };
+
+  // The scenario target is bounded by `count` so a tiny test can't be forced over its size.
+  const scenarioTarget = Math.min(opts.minScenario, count);
+  pass(scenarioTarget, isScenario, true); // 1
+  // The scenario passes count only scenario picks toward the target, which is the same as the
+  // total here because nothing else has been taken yet.
+  pass(scenarioTarget, isScenario, false); // 2
+  pass(count, () => true, true); // 3
+  pass(count, () => true, false); // 4
+
+  return shuffle([...taken].map((i) => shuffled[i]), random);
+}
+
 /**
  * One question as it is sent to the client. This is a deliberate subset of the Firestore
  * `questions` document: only the fields listed here leave the server, so anything else stored
@@ -50,6 +114,9 @@ interface AssembleTestOptions {
  *           options.random — random source for question and choice order (default Math.random)
  * Returns:  { testId, questions[] } — questions contain id/text/choices/type/chunkId/conceptId
  *           only
+ *           Selection: random, but at least MIN_SCENARIO_COUNT (8) scenario questions and at
+ *           most MAX_PER_TOPIC (2) per chunkId; both relax if the bank can't satisfy them
+ *           (the scenario minimum takes priority over the topic cap).
  * Reads:    `questions` collection, filtered to status == 'approved'
  * Writes:   `users/{uid}/testAssignments/{testId}` — records exactly which question IDs were
  *           assigned, so `scoreTest` (ph-1-us-11) can grade only what this call actually handed
@@ -76,10 +143,15 @@ export async function assembleTestForUser(
   // anything still awaiting review stay hidden.
   const snapshot = await db.collection('questions').where('status', '==', 'approved').get();
 
-  // Shuffle the full pool, then take the first `count`. Together this picks a random,
-  // duplicate-free set, so each generated test differs from the last.
-  const shuffled = shuffle(snapshot.docs, random);
-  const selected = shuffled.slice(0, count);
+  // Pick a random, duplicate-free set with a realistic mix (scenario minimum, per-topic cap);
+  // see selectPracticeQuestions for the rules and fallbacks. `d.data()` exposes type/chunkId.
+  const selected = selectPracticeQuestions(
+    snapshot.docs,
+    count,
+    random,
+    { minScenario: MIN_SCENARIO_COUNT, maxPerTopic: MAX_PER_TOPIC },
+    (d) => d.data()
+  );
 
   // Generated up front (rather than inline in the return) so the same ID is used both for the
   // client-facing result and the testAssignments document written below.
