@@ -11,7 +11,7 @@ import { NoConnection } from '../components/NoConnection';
 import { useIsOnline } from '../network/useIsOnline';
 import { toAnswerList, type Answers } from '../quiz/answers';
 import { QuizRunner, type SubmitState } from '../quiz/QuizRunner';
-import { endSession, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
+import { CACHE_WARNING, endSession, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
 import { finalBaselineTestId } from '../results/baselineResultsData';
 import { BaselineResults } from '../results/BaselineResults';
 import { colors } from '../theme/tokens';
@@ -38,9 +38,6 @@ type Phase =
   | { kind: 'unavailable' }
   | { kind: 'offline' }
   | { kind: 'error' };
-
-const CACHE_WARNING =
-  "This section can't be saved on your phone. Stay connected until you submit.";
 
 /**
  * Rebuilds the section from a cached session when the server can't be reached. The testId
@@ -79,7 +76,7 @@ export function BaselineScreen() {
     setSubmitState('idle');
     try {
       const section = await startOrResumeBaseline();
-      const active = await getActiveSession(uid);
+      const active = await getActiveSession(uid, 'baseline');
       if (active?.testId === section.testId) {
         setPhase({ kind: 'running', section, initialAnswers: active.answers });
         return;
@@ -110,8 +107,8 @@ export function BaselineScreen() {
       }
       if (error.kind !== 'offline') console.warn('[baseline] start failed', error);
       // Can't reach the server, but this section's questions may be on the phone: keep going.
-      const active = await getActiveSession(uid);
-      if (active?.kind === 'baseline') {
+      const active = await getActiveSession(uid, 'baseline');
+      if (active) {
         setPhase({
           kind: 'running',
           section: sectionFromCache(active.testId, active.questions),
@@ -173,7 +170,7 @@ export function BaselineScreen() {
         // Already graded (e.g. the response was lost on an earlier try): move on.
       }
       heldAnswersRef.current = null;
-      await endSession(uid, section.testId);
+      await endSession(uid, 'baseline', section.testId);
       submittingRef.current = false;
       setSubmitState('idle');
       if (section.section < section.totalSections) {
@@ -227,7 +224,7 @@ export function BaselineScreen() {
           title={`Section ${section.section} of ${section.totalSections}`}
           initialAnswers={phase.initialAnswers}
           onAnswersChange={(answers) => {
-            if (uid) void saveAnswers(uid, section.testId, answers);
+            if (uid) void saveAnswers(uid, 'baseline', section.testId, answers);
           }}
           onSubmit={(answers) => void submit(answers)}
           submitState={submitState}
