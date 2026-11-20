@@ -11,6 +11,8 @@ import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 import { BaselineScreen } from '../baseline/BaselineScreen';
 import { MiniQuizScreen } from '../quiz/MiniQuizScreen';
 import { PracticeTestScreen } from '../practice/PracticeTestScreen';
+import { PracticeHomeScreen } from '../practice/PracticeHomeScreen';
+import { PracticeResultsScreen } from '../practice/PracticeResultsScreen';
 import { HomeScreen } from '../home/HomeScreen';
 import { ReviewScreen } from '../review/ReviewScreen';
 import { FlashcardScreen } from '../study/FlashcardScreen';
@@ -99,12 +101,15 @@ function StudyStack() {
     </StudyStackNav.Navigator>
   );
 }
-const PracticeTestsStack = makeStack(
-  'PracticeTestsHome',
-  'Practice Tests',
-  'Practice Tests',
-  'Based on the Colorado Driver Handbook.'
-);
+// ph-3-us-4: the Practice tab. Results open above the tabs on the root stack.
+const PracticeStackNav = createNativeStackNavigator();
+function PracticeTestsStack() {
+  return (
+    <PracticeStackNav.Navigator screenOptions={headerOptions}>
+      <PracticeStackNav.Screen name="PracticeTestsHome" component={PracticeHomeScreen} options={{ title: 'Practice Tests' }} />
+    </PracticeStackNav.Navigator>
+  );
+}
 const DrivingLogStack = makeStack('DrivingLogHome', 'Driving Log', 'Driving Log');
 // ph-4-us-6: the Progress tab is the concept report (Phase 5 adds the outcome log here later).
 const ProgressStackNav = createNativeStackNavigator();
@@ -191,6 +196,7 @@ export function RootNavigator({ initialRoute }: { initialRoute: InitialRoute }) 
         />
         <RootStack.Screen name="MiniQuiz" component={MiniQuizScreen} options={{ title: 'Mini-quiz' }} />
         <RootStack.Screen name="PracticeTest" component={PracticeTestScreen} options={{ title: 'Practice test' }} />
+        <RootStack.Screen name="PracticeResults" component={PracticeResultsScreen} options={{ title: 'Results' }} />
         <RootStack.Screen
           name="TestDateEditor"
           component={TestDateEditorScreen}

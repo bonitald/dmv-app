@@ -1,0 +1,103 @@
+import { Alert } from 'react-native';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { endSession, getActiveSession } from '../quiz/quizSession';
+import { startPracticeTest } from './startPracticeTest';
+import { PracticeHomeScreen } from './PracticeHomeScreen';
+import type { PracticeOutcome } from './practiceData';
+
+const mockNavigate = jest.fn();
+jest.mock('@react-navigation/native', () => {
+  const { useEffect } = jest.requireActual('react');
+  return {
+    useNavigation: () => ({ navigate: mockNavigate }),
+    useFocusEffect: (effect: () => void | (() => void)) => {
+      useEffect(effect, [effect]);
+    },
+  };
+});
+jest.mock('../auth/AuthProvider', () => ({ useAuth: () => ({ status: 'ready', uid: 'u1' }) }));
+jest.mock('../quiz/quizSession', () => ({ getActiveSession: jest.fn(), endSession: jest.fn() }));
+jest.mock('./startPracticeTest', () => ({ startPracticeTest: jest.fn() }));
+let mockAttempts: unknown = { status: 'ready', attempts: [] };
+jest.mock('./usePracticeAttempts', () => ({ usePracticeAttempts: () => mockAttempts }));
+
+const outcome = (testId: string, correctCount: number): PracticeOutcome => ({
+  testId,
+  createdAt: new Date(2026, 10, 18, 12),
+  correctCount,
+  totalCount: 25,
+  perTopic: [],
+  unavailableCount: 0,
+});
+const answers = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`q${i}`, 0]));
+const saved = {
+  testId: 't1',
+  kind: 'practice',
+  questions: Array.from({ length: 25 }, (_, i) => ({ id: `q${i}` })),
+  answers,
+};
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockAttempts = { status: 'ready', attempts: [] };
+  (getActiveSession as jest.Mock).mockResolvedValue(null);
+  (endSession as jest.Mock).mockResolvedValue(undefined);
+});
+
+test('no saved test: no resume card, start button and the static copy', async () => {
+  await render(<PracticeHomeScreen />);
+  expect(screen.getByText('Practice tests')).toBeTruthy();
+  expect(screen.getByText('25 questions, like the real Colorado test. You need 20 right to pass.')).toBeTruthy();
+  expect(screen.getByText('Based on the Colorado Driver Handbook.')).toBeTruthy();
+  expect(screen.queryByText('You have a test in progress')).toBeNull();
+  await fireEvent.press(screen.getByText('Start a practice test'));
+  expect(startPracticeTest).toHaveBeenCalledWith(expect.anything(), 'u1', 'navigate');
+});
+
+test('a saved test shows its progress; Resume continues it', async () => {
+  (getActiveSession as jest.Mock).mockResolvedValue(saved);
+  await render(<PracticeHomeScreen />);
+  expect(await screen.findByText('12 of 25 answered')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Resume'));
+  expect(mockNavigate).toHaveBeenCalledWith('PracticeTest', { resume: true });
+});
+
+test('Discard asks first, then clears the saved test', async () => {
+  (getActiveSession as jest.Mock).mockResolvedValue(saved);
+  const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+  await render(<PracticeHomeScreen />);
+  await fireEvent.press(await screen.findByText('Discard'));
+  expect(alert).toHaveBeenCalledWith('Discard this test?', 'Your answers will be lost.', expect.any(Array));
+  expect(endSession).not.toHaveBeenCalled();
+  const buttons = alert.mock.calls[0][2] as { text: string; onPress?: () => void }[];
+  expect(buttons.map((b) => b.text)).toEqual(['Cancel', 'Discard']);
+  buttons[1].onPress?.();
+  expect(endSession).toHaveBeenCalledWith('u1', 'practice', 't1');
+  await waitFor(() => expect(screen.queryByText('You have a test in progress')).toBeNull());
+  alert.mockRestore();
+});
+
+test('recent tests in order with Pass / Not yet; a row opens its results', async () => {
+  mockAttempts = { status: 'ready', attempts: [outcome('a', 22), outcome('b', 15)] };
+  await render(<PracticeHomeScreen />);
+  expect(screen.getByText('Nov 18 · 22 of 25')).toBeTruthy();
+  expect(screen.getByText('Nov 18 · 15 of 25')).toBeTruthy();
+  expect(screen.getByText('Pass')).toBeTruthy();
+  expect(screen.getByText('Not yet')).toBeTruthy();
+  await fireEvent.press(screen.getByText('Nov 18 · 15 of 25'));
+  expect(mockNavigate).toHaveBeenCalledWith('PracticeResults', { testId: 'b' });
+});
+
+test('a failed read shows the empty line and no error text', async () => {
+  mockAttempts = { status: 'error' };
+  await render(<PracticeHomeScreen />);
+  expect(screen.getByText('Your tests will show here.')).toBeTruthy();
+  expect(screen.queryByText(/error|wrong|connection/i)).toBeNull();
+});
+
+test('loading shows a spinner in the list area, with the rest of the screen still there', async () => {
+  mockAttempts = { status: 'loading' };
+  await render(<PracticeHomeScreen />);
+  expect(screen.getByLabelText('Loading your tests')).toBeTruthy();
+  expect(screen.getByText('Start a practice test')).toBeTruthy();
+});
