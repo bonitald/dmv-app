@@ -62,7 +62,7 @@ export function ConceptReportScreen() {
         {notice}
         <Text style={typography.h1}>Nothing to show yet</Text>
         <Text style={[typography.body, styles.muted]}>
-          Take the baseline or a concept's mini-quiz, and this shows which concepts you've got and which need work.
+          Take the baseline, a practice test or a concept's mini-quiz, and this shows which concepts you've got and which need work.
         </Text>
         <Button label="Start your baseline" onPress={() => navigation.navigate('Baseline')} />
         <Button label="Go to the concept list" variant="secondary" onPress={studyList} />
@@ -79,7 +79,7 @@ export function ConceptReportScreen() {
       ListHeaderComponent={
         <View style={styles.header}>
           {notice}
-          <Text style={[typography.body, styles.muted]}>A rough guide from your quizzes and baseline.</Text>
+          <Text style={[typography.body, styles.muted]}>A rough guide from your quizzes, practice tests and baseline.</Text>
           <View style={styles.sort} accessibilityRole="radiogroup">
             {(['handbook', 'needs-work'] as const).map((value) => (
               <Button

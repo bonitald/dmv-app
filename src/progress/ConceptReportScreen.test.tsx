@@ -24,7 +24,7 @@ beforeEach(() => jest.clearAllMocks());
 test('rows in handbook order with label and basis; a row opens its flashcards', async () => {
   mockState = { status: 'ready', rows, baselineError: false, retryBaseline: null };
   await render(<ConceptReportScreen />);
-  expect(screen.getByText('A rough guide from your quizzes and baseline.')).toBeTruthy();
+  expect(screen.getByText('A rough guide from your quizzes, practice tests and baseline.')).toBeTruthy();
   const titles = screen.getAllByText(/^Topic /).map((n) => n.props.children);
   expect(titles).toEqual(['Topic a', 'Topic b', 'Topic c', 'Topic d']);
   expect(screen.getByText('9 of 10 right in your latest quiz')).toBeTruthy();
@@ -53,7 +53,7 @@ test('a coming-soon topic is not pressable', async () => {
 test('no evidence anywhere shows what fills it in, with the baseline and the concept list', async () => {
   mockState = { status: 'ready', rows: toReportRows([topic('a', 1)], {}, new Map()), baselineError: false, retryBaseline: null };
   await render(<ConceptReportScreen />);
-  expect(screen.getByText(/Take the baseline or a concept's mini-quiz/)).toBeTruthy();
+  expect(screen.getByText("Take the baseline, a practice test or a concept's mini-quiz, and this shows which concepts you've got and which need work.")).toBeTruthy();
   await fireEvent.press(screen.getByText('Start your baseline'));
   expect(mockNavigate).toHaveBeenCalledWith('Baseline');
   await fireEvent.press(screen.getByText('Go to the concept list'));
