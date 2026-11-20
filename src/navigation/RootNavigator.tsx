@@ -10,6 +10,7 @@ import { colors, typography } from '../theme/tokens';
 import { PlaceholderScreen } from '../screens/PlaceholderScreen';
 import { BaselineScreen } from '../baseline/BaselineScreen';
 import { MiniQuizScreen } from '../quiz/MiniQuizScreen';
+import { PracticeTestScreen } from '../practice/PracticeTestScreen';
 import { HomeScreen } from '../home/HomeScreen';
 import { ReviewScreen } from '../review/ReviewScreen';
 import { FlashcardScreen } from '../study/FlashcardScreen';
@@ -189,6 +190,7 @@ export function RootNavigator({ initialRoute }: { initialRoute: InitialRoute }) 
           options={{ title: 'Flashcards' }}
         />
         <RootStack.Screen name="MiniQuiz" component={MiniQuizScreen} options={{ title: 'Mini-quiz' }} />
+        <RootStack.Screen name="PracticeTest" component={PracticeTestScreen} options={{ title: 'Practice test' }} />
         <RootStack.Screen
           name="TestDateEditor"
           component={TestDateEditorScreen}
