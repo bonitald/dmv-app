@@ -30,6 +30,8 @@ const outcome = (testId: string, correctCount: number): PracticeOutcome => ({
   totalCount: 25,
   perTopic: [],
   unavailableCount: 0,
+  timing: null,
+  unansweredCount: 0,
 });
 const answers = Object.fromEntries(Array.from({ length: 12 }, (_, i) => [`q${i}`, 0]));
 const saved = {

@@ -11,6 +11,7 @@ import {
   percentLine,
   scoreLine,
   sumPracticeEvidence,
+  timedOutLine,
   topicsToWorkOn,
   type PracticeOutcome,
 } from './practiceData';
@@ -22,6 +23,8 @@ const outcome = (c: number, t: number, extra: Partial<PracticeOutcome> = {}): Pr
   totalCount: t,
   perTopic: [],
   unavailableCount: 0,
+  timing: null,
+  unansweredCount: 0,
   ...extra,
 });
 
@@ -60,6 +63,34 @@ describe('lines', () => {
     );
     expect(leftOutLine(outcome(1, 23, { unavailableCount: 2 }))).toBe(
       '2 questions were removed from the bank, so this test is scored out of 23.',
+    );
+  });
+});
+
+describe('timedOutLine', () => {
+  const timedOut = { mode: 'timed' as const, timeLimitSec: 3600, elapsedSec: 3600 };
+  it('is null when the test was not timed out', () => {
+    expect(timedOutLine(outcome(1, 25, { unansweredCount: 3 }))).toBeNull();
+    expect(
+      timedOutLine(outcome(1, 25, { unansweredCount: 3, timing: { ...timedOut, elapsedSec: 3599 } })),
+    ).toBeNull();
+    expect(
+      timedOutLine(outcome(1, 25, { unansweredCount: 3, timing: { mode: 'untimed', elapsedSec: 3600 } })),
+    ).toBeNull();
+  });
+  it('counts the unanswered questions', () => {
+    expect(timedOutLine(outcome(1, 25, { unansweredCount: 3, timing: timedOut }))).toBe(
+      'Time ran out — 3 questions unanswered.',
+    );
+  });
+  it('uses the singular for one unanswered question', () => {
+    expect(timedOutLine(outcome(1, 25, { unansweredCount: 1, timing: timedOut }))).toBe(
+      'Time ran out — 1 question unanswered.',
+    );
+  });
+  it('says every question was answered when none were left', () => {
+    expect(timedOutLine(outcome(20, 25, { unansweredCount: 0, timing: timedOut }))).toBe(
+      'Time ran out — you answered every question.',
     );
   });
 });
@@ -124,7 +155,40 @@ describe('fromPracticeAttempt / fromPracticeScore', () => {
         createdAt: { toDate: () => date },
         perQuestion: [{ unavailable: true }, { correct: true }],
       }),
-    ).toEqual({ testId: 't1', createdAt: date, correctCount: 1, totalCount: 2, perTopic, unavailableCount: 1 });
+    ).toEqual({
+      testId: 't1',
+      createdAt: date,
+      correctCount: 1,
+      totalCount: 2,
+      perTopic,
+      unavailableCount: 1,
+      timing: null,
+      unansweredCount: 0,
+    });
+  });
+  it('counts unanswered questions, skipping unavailable ones', () => {
+    const o = fromPracticeAttempt('t1', {
+      type: 'practice',
+      correctCount: 1,
+      totalCount: 4,
+      perTopic: [],
+      perQuestion: [
+        { choice: null },
+        { choice: null, unavailable: true },
+        { choice: 'B' },
+        { choice: null },
+      ],
+    });
+    expect(o?.unansweredCount).toBe(2);
+  });
+  it('reads a valid saved timing and drops a malformed one', () => {
+    const base = { type: 'practice', correctCount: 1, totalCount: 2, perTopic: [] };
+    const timing = { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 };
+    expect(fromPracticeAttempt('t1', { ...base, timing })?.timing).toEqual(timing);
+    expect(fromPracticeAttempt('t1', { ...base, timing: { mode: 'sometimes' } })?.timing).toBeNull();
+    expect(fromPracticeAttempt('t1', { ...base, timing: 'timed' })?.timing).toBeNull();
+    expect(fromPracticeAttempt('t1', { ...base, timing: null })?.timing).toBeNull();
+    expect(fromPracticeAttempt('t1', base)?.timing).toBeNull();
   });
   it('maps a score result with null createdAt', () => {
     const r = {
@@ -141,6 +205,27 @@ describe('fromPracticeAttempt / fromPracticeScore', () => {
     expect(o.createdAt).toBeNull();
     expect(o.unavailableCount).toBe(1);
     expect(o.testId).toBe('t2');
+    expect(o.timing).toBeNull();
+    expect(o.unansweredCount).toBe(0);
+  });
+  it('copies the timing from a fresh score result', () => {
+    const timing = { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 };
+    const r = {
+      testId: 't3',
+      type: 'practice',
+      correctCount: 1,
+      totalCount: 2,
+      perTopic: [],
+      perQuestion: [
+        { questionId: 'a', choice: 'A' },
+        { questionId: 'b', choice: null },
+      ],
+      recommendation: null,
+      timing,
+    } as unknown as ScoreTestResult;
+    const o = fromPracticeScore(r);
+    expect(o.timing).toEqual(timing);
+    expect(o.unansweredCount).toBe(1);
   });
 });
 

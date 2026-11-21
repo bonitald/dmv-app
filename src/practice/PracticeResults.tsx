@@ -9,6 +9,7 @@ import {
   passed,
   percentLine,
   scoreLine,
+  timedOutLine,
   topicsToWorkOn,
   type PracticeOutcome,
 } from './practiceData';
@@ -34,6 +35,7 @@ export function PracticeResults({
 }) {
   const { shown, moreCount } = topicsToWorkOn(outcome.perTopic, topics);
   const leftOut = leftOutLine(outcome);
+  const timedOut = timedOutLine(outcome);
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
@@ -41,6 +43,7 @@ export function PracticeResults({
         {scoreLine(outcome)}
       </Text>
       <Text style={typography.body}>{percentLine(outcome)}</Text>
+      {timedOut ? <Text style={[typography.small, styles.muted]}>{timedOut}</Text> : null}
       <Text style={[typography.bodySemibold, { color: passed(outcome) ? colors.success : colors.ink }]}>
         {passLine(outcome)}
       </Text>
