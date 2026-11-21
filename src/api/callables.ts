@@ -1,7 +1,14 @@
 import { getApp } from '@react-native-firebase/app';
 import { getFunctions, httpsCallable } from '@react-native-firebase/functions';
 import { toCallableError } from './callableErrors';
-import type { AnswerSubmission, AssembledTest, BaselineSection, FlashcardDeck, ScoreTestResult } from './types';
+import type {
+  AnswerSubmission,
+  AssembledTest,
+  BaselineSection,
+  FlashcardDeck,
+  ScoreTestResult,
+  TimingSubmission,
+} from './types';
 
 // ph-3-us-4: the app's only way to call Cloud Functions. Each wrapper resolves with the typed
 // response or rejects with a CallableError, so screens never see raw Firebase errors.
@@ -23,6 +30,7 @@ export function startOrResumeBaseline(): Promise<BaselineSection> {
 export function scoreTest(input: {
   testId: string;
   answers: AnswerSubmission[];
+  timing?: TimingSubmission;
 }): Promise<ScoreTestResult> {
   return call('scoreTest', input);
 }

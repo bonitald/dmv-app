@@ -66,6 +66,27 @@ export interface PerQuestionResult {
   unavailable?: true;
 }
 
+/** Whether a practice test was taken against a countdown or not (ph-3-us-8). */
+export type TestMode = 'timed' | 'untimed';
+
+/** Client-reported timing sent with `scoreTest`. Informational only: it never affects grading. */
+export interface TimingSubmission {
+  mode: TestMode;
+  /** Present only for timed tests. */
+  timeLimitSec?: number;
+  elapsedSec: number;
+}
+
+/**
+ * Timing saved on a practice attempt and returned by `scoreTest`. `elapsedSec` is null when the
+ * client's number was missing or out of range; `timeLimitSec` is present only for timed tests.
+ */
+export interface AttemptTiming {
+  mode: TestMode;
+  timeLimitSec?: number;
+  elapsedSec: number | null;
+}
+
 export interface ScoreTestResult {
   testId: string;
   type: 'practice' | 'mini-quiz' | 'baseline';
@@ -77,4 +98,6 @@ export interface ScoreTestResult {
   /** Final baseline section only: all 45 questions with answers revealed. */
   baselineReview?: PerQuestionResult[];
   recommendation: 'move-on' | 'review-again' | null;
+  /** Practice tests only: the validated saved timing, or null when none was saved. */
+  timing?: AttemptTiming | null;
 }
