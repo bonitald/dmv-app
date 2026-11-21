@@ -1,14 +1,17 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useNavigation, type NavigationProp } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthProvider';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import type { RootStackParamList } from '../navigation/types';
+import type { TestMode } from '../api/types';
+import { getPracticeMode, setPracticeMode } from '../profile/localFlags';
 import { endSession, getActiveSession, type ActiveSession } from '../quiz/quizSession';
 import { colors, radius, spacing, typography } from '../theme/tokens';
 import { attemptDateLabel, passed, type PracticeOutcome } from './practiceData';
 import { startPracticeTest } from './startPracticeTest';
+import { remainingSeconds, TIMED_TEST_LIMIT_SEC } from './timing';
 import { usePracticeAttempts } from './usePracticeAttempts';
 
 // ph-3-us-4 / ph-4-us-1: the Practice tab. Start a test, resume or discard the one saved on the
@@ -20,6 +23,19 @@ export function PracticeHomeScreen() {
   const { uid } = useAuth();
   const attempts = usePracticeAttempts();
   const [saved, setSaved] = useState<ActiveSession | null>(null);
+  const [readAt, setReadAt] = useState(() => Date.now());
+  const [mode, setMode] = useState<TestMode>('untimed');
+
+  useEffect(() => {
+    if (!uid) return;
+    let cancelled = false;
+    void getPracticeMode(uid).then((savedMode) => {
+      if (!cancelled) setMode(savedMode);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [uid]);
 
   useFocusEffect(
     useCallback(() => {
@@ -27,7 +43,9 @@ export function PracticeHomeScreen() {
       let cancelled = false;
       getActiveSession(uid, 'practice')
         .then((session) => {
-          if (!cancelled) setSaved(session);
+          if (cancelled) return;
+          setReadAt(Date.now());
+          setSaved(session);
         })
         .catch((error) => console.warn('[practice] reading the saved test failed', error));
       return () => {
@@ -35,6 +53,18 @@ export function PracticeHomeScreen() {
       };
     }, [uid])
   );
+
+  // Time left on a timed saved test, worked out when the saved test is read (on focus).
+  const timeLeftSec =
+    saved?.timing?.mode === 'timed'
+      ? remainingSeconds(saved.timing.startedAt, saved.timing.timeLimitSec ?? TIMED_TEST_LIMIT_SEC, readAt)
+      : null;
+  const expired = timeLeftSec === 0;
+
+  const chooseMode = (next: TestMode) => {
+    setMode(next);
+    if (uid) void setPracticeMode(uid, next);
+  };
 
   const discard = () => {
     Alert.alert('Discard this test?', 'Your answers will be lost.', [
@@ -59,15 +89,41 @@ export function PracticeHomeScreen() {
         25 questions, like the real Colorado test. You need 20 right to pass.
       </Text>
 
+      <View style={styles.switch}>
+        <Button
+          label="Untimed"
+          variant={mode === 'untimed' ? 'primary' : 'secondary'}
+          selected={mode === 'untimed'}
+          onPress={() => chooseMode('untimed')}
+        />
+        <Button
+          label="Timed — 60 min, like the real test"
+          variant={mode === 'timed' ? 'primary' : 'secondary'}
+          selected={mode === 'timed'}
+          onPress={() => chooseMode('timed')}
+        />
+      </View>
+
       {saved ? (
         <Card>
           <Text style={typography.h2}>You have a test in progress</Text>
           <Text style={[typography.body, styles.muted]}>
             {`${Object.keys(saved.answers).length} of ${saved.questions.length} answered`}
           </Text>
+          {timeLeftSec !== null ? (
+            <Text style={[typography.body, styles.muted]}>
+              {expired ? "Time's up — open it to submit" : `${Math.ceil(timeLeftSec / 60)} min left`}
+            </Text>
+          ) : null}
           <View style={styles.actions}>
-            <Button label="Resume" onPress={() => navigation.navigate('PracticeTest', { resume: true })} />
-            <Button label="Discard" variant="text" onPress={discard} />
+            {expired ? (
+              <Button label="Open to submit" onPress={() => navigation.navigate('PracticeTest', { resume: true })} />
+            ) : (
+              <>
+                <Button label="Resume" onPress={() => navigation.navigate('PracticeTest', { resume: true })} />
+                <Button label="Discard" variant="text" onPress={discard} />
+              </>
+            )}
           </View>
         </Card>
       ) : null}
@@ -122,6 +178,7 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.space5, gap: spacing.space3 },
   muted: { color: colors.inkSoft },
+  switch: { gap: spacing.space2 },
   actions: { gap: spacing.space2, marginTop: spacing.space2 },
   sectionTitle: { marginTop: spacing.space4 },
   rowCard: { minHeight: 48, justifyContent: 'center' },

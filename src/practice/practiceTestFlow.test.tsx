@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { assembleTest, scoreTest } from '../api/callables';
 import { CallableError } from '../api/callableErrors';
 import type { QuizQuestion, ScoreTestResult } from '../api/types';
+import { setPracticeMode } from '../profile/localFlags';
 import { TIMED_TEST_LIMIT_SEC } from './timing';
 import { PRACTICE_CACHE_WARNING, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
 import { PracticeTestScreen } from './PracticeTestScreen';
@@ -461,6 +462,51 @@ describe('startPracticeTest', () => {
     await act(async () => start.onPress!());
     expect(await screen.findByText(/^PracticeTest/)).toBeTruthy();
     expect(await getActiveSession('u1', 'practice')).toBeNull();
+  });
+
+  test('passes timed from the saved preference', async () => {
+    await setPracticeMode('u1', 'timed');
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'navigate'));
+    expect(await screen.findByText('PracticeTest {"timed":true}')).toBeTruthy();
+  });
+
+  test('expired saved test opens it instead of prompting', async () => {
+    await startSession('u1', 'saved', 'practice', [q(1)], {
+      mode: 'timed',
+      timeLimitSec: TIMED_TEST_LIMIT_SEC,
+      startedAt: Date.now() - (TIMED_TEST_LIMIT_SEC + 5) * 1000,
+    });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'navigate'));
+    expect(alert).not.toHaveBeenCalled();
+    expect(await screen.findByText('PracticeTest {"resume":true}')).toBeTruthy();
+    expect(await getActiveSession('u1', 'practice')).not.toBeNull();
+  });
+
+  test('expired saved test replaces the route in replace mode', async () => {
+    await startSession('u1', 'saved', 'practice', [q(1)], {
+      mode: 'timed',
+      startedAt: Date.now() - (TIMED_TEST_LIMIT_SEC + 5) * 1000,
+    });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'replace'));
+    expect(alert).not.toHaveBeenCalled();
+    expect(await screen.findByText('PracticeTest {"resume":true}')).toBeTruthy();
+  });
+
+  test('unexpired saved test still asks before discarding', async () => {
+    await startSession('u1', 'saved', 'practice', [q(1)], {
+      mode: 'timed',
+      timeLimitSec: TIMED_TEST_LIMIT_SEC,
+      startedAt: Date.now() - 60 * 1000,
+    });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'navigate'));
+    expect(alert).toHaveBeenCalledWith('Start a new test?', expect.any(String), expect.any(Array));
   });
 
   test('Cancel neither clears the session nor navigates', async () => {

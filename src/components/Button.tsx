@@ -10,6 +10,8 @@ interface ButtonProps {
   onPress: () => void;
   variant?: Variant;
   disabled?: boolean;
+  /** For option switches: announces the button as the selected choice. */
+  selected?: boolean;
   accessibilityHint?: string;
   style?: StyleProp<ViewStyle>;
 }
@@ -19,6 +21,7 @@ export function Button({
   onPress,
   variant = 'primary',
   disabled = false,
+  selected,
   accessibilityHint,
   style,
 }: ButtonProps) {
@@ -27,7 +30,7 @@ export function Button({
       onPress={onPress}
       disabled={disabled}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      accessibilityState={selected === undefined ? { disabled } : { disabled, selected }}
       accessibilityHint={accessibilityHint}
       style={({ pressed }) => [
         styles.base,

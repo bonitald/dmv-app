@@ -1,6 +1,7 @@
 import { Alert } from 'react-native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { endSession, getActiveSession } from '../quiz/quizSession';
+import { getPracticeMode, setPracticeMode } from '../profile/localFlags';
 import { startPracticeTest } from './startPracticeTest';
 import { PracticeHomeScreen } from './PracticeHomeScreen';
 import type { PracticeOutcome } from './practiceData';
@@ -17,6 +18,7 @@ jest.mock('@react-navigation/native', () => {
 });
 jest.mock('../auth/AuthProvider', () => ({ useAuth: () => ({ status: 'ready', uid: 'u1' }) }));
 jest.mock('../quiz/quizSession', () => ({ getActiveSession: jest.fn(), endSession: jest.fn() }));
+jest.mock('../profile/localFlags', () => ({ getPracticeMode: jest.fn(), setPracticeMode: jest.fn() }));
 jest.mock('./startPracticeTest', () => ({ startPracticeTest: jest.fn() }));
 let mockAttempts: unknown = { status: 'ready', attempts: [] };
 jest.mock('./usePracticeAttempts', () => ({ usePracticeAttempts: () => mockAttempts }));
@@ -42,6 +44,8 @@ beforeEach(() => {
   mockAttempts = { status: 'ready', attempts: [] };
   (getActiveSession as jest.Mock).mockResolvedValue(null);
   (endSession as jest.Mock).mockResolvedValue(undefined);
+  (getPracticeMode as jest.Mock).mockResolvedValue('untimed');
+  (setPracticeMode as jest.Mock).mockResolvedValue(undefined);
 });
 
 test('no saved test: no resume card, start button and the static copy', async () => {
@@ -75,6 +79,53 @@ test('Discard asks first, then clears the saved test', async () => {
   expect(endSession).toHaveBeenCalledWith('u1', 'practice', 't1');
   await waitFor(() => expect(screen.queryByText('You have a test in progress')).toBeNull());
   alert.mockRestore();
+});
+
+test('switch defaults to Untimed and saves the choice', async () => {
+  await render(<PracticeHomeScreen />);
+  expect(await screen.findByRole('button', { name: 'Untimed', selected: true })).toBeTruthy();
+  await fireEvent.press(screen.getByText('Timed — 60 min, like the real test'));
+  expect(setPracticeMode).toHaveBeenCalledWith('u1', 'timed');
+  expect(await screen.findByRole('button', { name: 'Timed — 60 min, like the real test', selected: true })).toBeTruthy();
+});
+
+test('switch loads the saved choice', async () => {
+  (getPracticeMode as jest.Mock).mockResolvedValue('timed');
+  await render(<PracticeHomeScreen />);
+  expect(await screen.findByRole('button', { name: 'Timed — 60 min, like the real test', selected: true })).toBeTruthy();
+});
+
+test('timed resume card shows minutes left', async () => {
+  (getActiveSession as jest.Mock).mockResolvedValue({
+    ...saved,
+    timing: { mode: 'timed', timeLimitSec: 3600, startedAt: Date.now() - 20 * 60 * 1000 },
+  });
+  await render(<PracticeHomeScreen />);
+  expect(await screen.findByText('40 min left')).toBeTruthy();
+  expect(screen.getByText('Resume')).toBeTruthy();
+  expect(screen.getByText('Discard')).toBeTruthy();
+});
+
+test('expired resume card has Open to submit and no Discard', async () => {
+  (getActiveSession as jest.Mock).mockResolvedValue({
+    ...saved,
+    timing: { mode: 'timed', startedAt: Date.now() - 61 * 60 * 1000 },
+  });
+  await render(<PracticeHomeScreen />);
+  expect(await screen.findByText("Time's up — open it to submit")).toBeTruthy();
+  expect(screen.queryByText('Discard')).toBeNull();
+  expect(screen.queryByText('Resume')).toBeNull();
+  await fireEvent.press(screen.getByText('Open to submit'));
+  expect(mockNavigate).toHaveBeenCalledWith('PracticeTest', { resume: true });
+});
+
+test('untimed and 5a sessions keep Resume and Discard', async () => {
+  (getActiveSession as jest.Mock).mockResolvedValue({ ...saved, timing: { mode: 'untimed', startedAt: 1 } });
+  await render(<PracticeHomeScreen />);
+  expect(await screen.findByText('12 of 25 answered')).toBeTruthy();
+  expect(screen.getByText('Resume')).toBeTruthy();
+  expect(screen.getByText('Discard')).toBeTruthy();
+  expect(screen.queryByText(/min left/)).toBeNull();
 });
 
 test('recent tests in order with Pass / Not yet; a row opens its results', async () => {
