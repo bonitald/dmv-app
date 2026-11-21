@@ -28,8 +28,8 @@ import { MiniQuizResults } from './MiniQuizResults';
 import { QuizRunner, type SubmitState } from './QuizRunner';
 
 // ph-2-us-8 / ph-2-us-9: one topic's mini-quiz on the shared runner, then its results and the
-// two next steps. Not kept in quizSession (that holds one active test, the baseline's): a
-// killed quiz is simply abandoned and the next one gets a new testId. Offline at submit, the
+// two next steps. Not kept in quizSession (that holds one saved test per kind, baseline and
+// practice; mini-quizzes aren't stored): a killed quiz is simply abandoned and the next one gets a new testId. Offline at submit, the
 // answers are held on screen and sent on reconnect.
 
 type Phase =

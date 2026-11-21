@@ -1,6 +1,6 @@
 # Phase 3: Practice Test Generator & Test-Taking UI — Summary
 
-## Status: In Progress (Slice 2 baseline complete 2026-09-28)
+## Status: In Progress (Slice 2 baseline complete 2026-09-28; Slice 5a practice tests complete 2026-11-20)
 
 Depends on Phase 1 (question bank), which is Complete. Phase 1 already built every server
 function the test flows call (`assembleTest`, `startOrResumeBaseline`, `scoreTest`), so Phase 3
@@ -11,10 +11,10 @@ mix and repeat-avoidance in `assembleTest`, and recording `timing` in `scoreTest
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
-| ph-3-us-1 | Use the on-device test cache in the test-taking flow | Frontend | — | In Progress (baseline use complete; mini-quiz part dropped in Slice 4b) |
-| ph-3-us-2 | Start a practice test that mixes fact and scenario questions | Parent | — | Not Started |
-| ph-3-us-3 | `assembleTest` guarantees a fact/scenario mix and topic spread | Backend | ph-3-us-2 | Not Started |
-| ph-3-us-4 | Test-taking screen (shared quiz runner) | Frontend | ph-3-us-2 | In Progress (baseline use complete; submit-when-all-answered and confirm-before-submit added in Slice 4b) |
+| ph-3-us-1 | Use the on-device test cache in the test-taking flow | Frontend | — | In Progress (baseline and practice use complete; mini-quiz part dropped in Slice 4b; timed `startedAt` is Slice 5b) |
+| ph-3-us-2 | Start a practice test that mixes fact and scenario questions | Parent | — | Complete |
+| ph-3-us-3 | `assembleTest` guarantees a fact/scenario mix and topic spread | Backend | ph-3-us-2 | Complete |
+| ph-3-us-4 | Test-taking screen (shared quiz runner) | Frontend | ph-3-us-2 | In Progress (baseline, mini-quiz and practice use complete; timed mode is Slice 5b) |
 | ph-3-us-5 | Unlimited, distinct practice tests | Parent | — | Not Started |
 | ph-3-us-6 | `assembleTest` avoids repeating a user's recent questions | Backend | ph-3-us-5 | Not Started |
 | ph-3-us-7 | Timed or untimed practice test mode | Parent | — | Not Started |

@@ -3,7 +3,7 @@
 **ID:** ph-3-us-4
 **Layer:** Frontend
 **Parent:** ph-3-us-2
-**Status:** In Progress (baseline use complete and device-tested 2026-09-28, Slice 2; the question strip now auto-scrolls to the current question. Submit now appears on any question once all are answered and always asks for confirmation (Slice 4b, 2026-10-11), and the mini-quiz also uses the runner. Practice-tab criteria and the `assembleTest` flow land in Slice 5 (ph-4-us-1 / ph-3-us-3); `assembleTest`/`assembleMiniQuiz` wrappers already exist in `src/api/callables.ts`)
+**Status:** In Progress (baseline 2026-09-28, mini-quiz Slice 4b, practice tests on the Practice tab complete and device-tested 2026-11-20, Slice 5a. Timed mode waits for Slice 5b)
 
 ## Story
 As a teen user,

@@ -3,7 +3,7 @@
 **ID:** ph-3-us-2
 **Layer:** Parent
 **Children:** ph-3-us-3 (Backend), ph-3-us-4 (Frontend)
-**Status:** Not Started
+**Status:** Complete (Slice 5a, device-tested on the Android emulator against dev 2026-11-20)
 
 ## Story
 As a teen user,

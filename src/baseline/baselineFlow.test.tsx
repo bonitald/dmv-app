@@ -159,7 +159,7 @@ test('first time: intro, then section 1 in the runner', async () => {
   await fireEvent.press(screen.getByText('Start section 1'));
   expect(await screen.findByText('Section 1 of 3')).toBeTruthy();
   expect(screen.getByText('Question text 11')).toBeTruthy();
-  expect((await getActiveSession('u1'))?.testId).toBe('baseline-v1-1');
+  expect((await getActiveSession('u1', 'baseline'))?.testId).toBe('baseline-v1-1');
 });
 
 test('section 1 submit shows the check-in with no score; Keep going loads section 2', async () => {
@@ -179,7 +179,7 @@ test('section 1 submit shows the check-in with no score; Keep going loads sectio
       { questionId: 'q12', choice: 'A12' },
     ],
   });
-  expect(await getActiveSession('u1')).toBeNull();
+  expect(await getActiveSession('u1', 'baseline')).toBeNull();
 
   await fireEvent.press(screen.getByText('Keep going'));
   expect(await screen.findByText('Section 2 of 3')).toBeTruthy();
@@ -199,7 +199,7 @@ test('Take a break goes back to Home', async () => {
 test('in progress: skips the intro and restores saved answers for the same section', async () => {
   mockProgress = { status: 'in-progress', currentSection: 2, totalSections: 3 };
   await startSession('u1', 'baseline-v1-2', 'baseline', sectionOf(2).questions);
-  await saveAnswers('u1', 'baseline-v1-2', { q21: 'B21' });
+  await saveAnswers('u1', 'baseline', 'baseline-v1-2', { q21: 'B21' });
   mockStart.mockResolvedValueOnce(sectionOf(2));
 
   await renderFlow();
@@ -211,13 +211,13 @@ test('in progress: skips the intro and restores saved answers for the same secti
 test('a stale session for another section is discarded', async () => {
   mockProgress = { status: 'in-progress', currentSection: 3, totalSections: 3 };
   await startSession('u1', 'baseline-v1-2', 'baseline', sectionOf(2).questions);
-  await saveAnswers('u1', 'baseline-v1-2', { q21: 'B21' });
+  await saveAnswers('u1', 'baseline', 'baseline-v1-2', { q21: 'B21' });
   mockStart.mockResolvedValueOnce(sectionOf(3));
 
   await renderFlow();
   expect(await screen.findByText('Section 3 of 3')).toBeTruthy();
   expect(screen.getByLabelText('Question 1')).toBeTruthy();
-  expect((await getActiveSession('u1'))?.testId).toBe('baseline-v1-3');
+  expect((await getActiveSession('u1', 'baseline'))?.testId).toBe('baseline-v1-3');
 });
 
 const reviewOf = (right: number, total = 45) =>
@@ -399,7 +399,7 @@ test('a failed submit shows the error and keeps the answers', async () => {
   await screen.findByText('Section 1 of 3');
   await answerAllAndSubmit(1);
   expect(await screen.findByText("Couldn't submit. Your answers are saved.")).toBeTruthy();
-  expect((await getActiveSession('u1'))?.answers).toEqual({ q11: 'A11', q12: 'A12' });
+  expect((await getActiveSession('u1', 'baseline'))?.answers).toEqual({ q11: 'A11', q12: 'A12' });
   await fireEvent.press(screen.getByText('Try again'));
   expect(await screen.findByText('Section 1 done')).toBeTruthy();
 });
@@ -450,13 +450,13 @@ describe('offline and leaving (ph-3-us-1)', () => {
     await answerAllAndSubmit(1);
     expect(await screen.findByText("Couldn't submit. Your answers are saved.")).toBeTruthy();
     expect(mockScore).toHaveBeenCalledTimes(1);
-    expect((await getActiveSession('u1'))?.answers).toEqual({ q11: 'A11', q12: 'A12' });
+    expect((await getActiveSession('u1', 'baseline'))?.answers).toEqual({ q11: 'A11', q12: 'A12' });
   });
 
   test('offline on reopen with a cached section: keeps going from the cache', async () => {
     mockProgress = { status: 'in-progress', currentSection: 2, totalSections: 3 };
     await startSession('u1', 'baseline-v1-2', 'baseline', sectionOf(2).questions);
-    await saveAnswers('u1', 'baseline-v1-2', { q21: 'A21' });
+    await saveAnswers('u1', 'baseline', 'baseline-v1-2', { q21: 'A21' });
     mockStart.mockRejectedValueOnce(new CallableError('offline', 'unavailable', 'offline'));
     await renderFlow();
     expect(await screen.findByText('Section 2 of 3')).toBeTruthy();
@@ -488,7 +488,7 @@ describe('offline and leaving (ph-3-us-1)', () => {
 
     await act(() => alert.mock.calls[0][2]!.find((b) => b.text === 'Leave')!.onPress!());
     expect(await screen.findByText('Home screen')).toBeTruthy();
-    expect((await getActiveSession('u1'))?.answers).toEqual({ q11: 'A11' });
+    expect((await getActiveSession('u1', 'baseline'))?.answers).toEqual({ q11: 'A11' });
     alert.mockRestore();
   });
 });

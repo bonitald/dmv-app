@@ -3,7 +3,7 @@
 **ID:** ph-3-us-3
 **Layer:** Backend
 **Parent:** ph-3-us-2
-**Status:** Not Started
+**Status:** Complete (Slice 5a, deployed to dev and device-tested 2026-11-20)
 
 ## Story
 As a developer,
@@ -74,3 +74,8 @@ all-fact or lopsided toward one topic.
 ## Questions
 - Starting values `MIN_SCENARIO_COUNT = 8` and `MAX_PER_TOPIC = 2` are proposals. Tune them once
   the reviewed bank's mix is known.
+
+## Implementation notes (Slice 5a)
+Built in Slice 5a on `feat/practice-tests`; plan `docs/superpowers/plans/2026-11-20-slice-5a-practice-tests.md`, design `docs/superpowers/specs/2026-11-20-slice-5a-practice-tests-design.md`. Device-tested on the Android emulator against dev 2026-11-20.
+- `selectPracticeQuestions` in `functions/src/assembleTest.ts`: `MIN_SCENARIO_COUNT = 8`, `MAX_PER_TOPIC = 2`. When they clash, the scenario minimum wins (decision 4).
+- Approved bank on 2026-11-20: 1415 questions, 514 scenario (36%) / 901 fact; all 45 topics have at least 2 scenario questions, so the constants stay as proposed.

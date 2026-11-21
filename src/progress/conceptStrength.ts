@@ -11,7 +11,7 @@ export type StrengthSource = 'mini-quiz' | 'practice' | 'baseline' | 'none';
 
 export interface ConceptEvidence {
   miniQuiz?: { score: number; correct?: number; total?: number };
-  /** Practice-test answers on this topic. Filled from Slice 5a. */
+  /** Practice-test answers on this topic, summed across recent practice tests. */
   practice?: { correct: number; total: number };
   baseline?: 'got-it' | 'missed-it';
 }
@@ -27,7 +27,7 @@ export interface StrengthResult {
 
 export const STRONG_AT = 0.8; // matches the real test's pass mark
 export const SHAKY_AT = 0.5;
-export const MIN_PRACTICE_ANSWERS = 3;
+export const MIN_PRACTICE_ANSWERS = 2; // one practice test asks at most 2 per topic
 
 export const STRENGTH_LABEL: Record<Strength, string> = {
   strong: 'Strong',
@@ -84,7 +84,8 @@ export type ReportSort = 'handbook' | 'needs-work';
 export function toReportRows(
   topics: Topic[],
   progress: ProgressMap,
-  baseline: Map<string, 'got-it' | 'missed-it'>
+  baseline: Map<string, 'got-it' | 'missed-it'>,
+  practice: Map<string, { correct: number; total: number }> = new Map()
 ): ReportRow[] {
   return topics.map((t) => {
     const p = progressFor(progress, t.chunkId);
@@ -92,6 +93,7 @@ export function toReportRows(
       ...(p.latestMiniQuizScore !== undefined
         ? { miniQuiz: { score: p.latestMiniQuizScore, correct: p.latestMiniQuizCorrect, total: p.latestMiniQuizTotal } }
         : {}),
+      ...(practice.has(t.chunkId) ? { practice: practice.get(t.chunkId) } : {}),
       ...(baseline.has(t.chunkId) ? { baseline: baseline.get(t.chunkId) } : {}),
     };
     return { chunkId: t.chunkId, title: t.title, comingSoon: t.approvedQuestionCount === 0, result: conceptStrength(evidence) };

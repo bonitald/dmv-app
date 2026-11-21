@@ -2,7 +2,7 @@
 
 **ID:** ph-3-us-1
 **Layer:** Frontend
-**Status:** In Progress (baseline use complete and device-tested 2026-09-28, Slice 2. Decisions 2026-09-25: no launch "Resume / Discard" prompt yet (reopening the baseline restores answers; the prompt waits for practice tests), and cached answers don't expire. Answers are held while NetInfo reports offline and sent on reconnect; if the server is unreachable while the phone looks online, the user gets Try again. Practice-test use lands with Slice 5. The mini-quiz part is dropped: mini-quizzes are not stored for force-quit resume, see Implementation notes (Slice 4b))
+**Status:** In Progress (baseline use complete 2026-09-28, Slice 2; practice-test use complete and device-tested 2026-11-20, Slice 5a. Mini-quiz part dropped in Slice 4b. Timed-test `startedAt` waits for Slice 5b, ph-3-us-9)
 
 ## Story
 As a teen user,
@@ -83,3 +83,10 @@ Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/202
 
 ## Questions
 - Should an unsubmitted test be kept indefinitely after a force-quit, or expire after some time?
+
+## Implementation notes (Slice 5a)
+Built in Slice 5a on `feat/practice-tests`; plan `docs/superpowers/plans/2026-11-20-slice-5a-practice-tests.md`, design `docs/superpowers/specs/2026-11-20-slice-5a-practice-tests-design.md`. Device-tested on the Android emulator against dev 2026-11-20.
+- **One saved session per kind (decision 1):** `quizSession` keeps a baseline slot and a practice slot (`dmv-app:active-test:{uid}:{kind}`), so neither can drop the other; the old single key migrates to the baseline slot on first read.
+- **Resume vs discard (decision 5):** an unfinished practice test shows as a "Resume your test" card on the Practice tab (Resume / Discard), not a launch prompt. Starting a new test while one is saved asks first. Leaving mid-test keeps the answers.
+- Leaving while the test is still loading saves nothing; a submit the server permanently rejects clears the saved test and points back to the Practice tab.
+- Still open: stale-test expiry (Questions).

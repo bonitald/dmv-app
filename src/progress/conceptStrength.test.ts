@@ -13,9 +13,11 @@ test('mini-quiz wins over practice and baseline', () => {
   });
 });
 
-test('practice needs at least 3 answers', () => {
-  expect(conceptStrength({ practice: { correct: 2, total: 2 }, baseline: 'missed-it' })).toMatchObject({ strength: 'missed-it', source: 'baseline' });
-  expect(conceptStrength({ practice: { correct: 2, total: 3 } })).toMatchObject({ strength: 'shaky', source: 'practice', correct: 2, total: 3 });
+test('practice needs at least 2 answers', () => {
+  expect(conceptStrength({ practice: { correct: 1, total: 1 }, baseline: 'missed-it' })).toMatchObject({ strength: 'missed-it', source: 'baseline' });
+  expect(conceptStrength({ practice: { correct: 2, total: 2 } })).toMatchObject({ strength: 'strong', source: 'practice', correct: 2, total: 2 });
+  expect(conceptStrength({ practice: { correct: 1, total: 2 } })).toMatchObject({ strength: 'shaky', source: 'practice' });
+  expect(conceptStrength({ practice: { correct: 0, total: 2 } })).toMatchObject({ strength: 'likely-gap', source: 'practice' });
 });
 
 test('baseline only is got it / missed it; nothing is not tested', () => {
@@ -60,4 +62,12 @@ test('needs work first: gap and missed, shaky, not tested, strong and got it; ha
 test('hasEvidence is false only when every topic is not tested', () => {
   expect(hasEvidence(toReportRows(topics, {}, new Map()))).toBe(false);
   expect(hasEvidence(toReportRows(topics, progress, new Map()))).toBe(true);
+});
+
+test('a practice map sets that topic source to practice; the mini-quiz still wins', () => {
+  const practice = new Map([['a', { correct: 2, total: 2 }], ['d', { correct: 1, total: 2 }]]);
+  const rows = toReportRows(topics, progress, baseline, practice);
+  expect(rows.map((r) => [r.chunkId, r.result.source])).toEqual([
+    ['a', 'mini-quiz'], ['b', 'baseline'], ['c', 'mini-quiz'], ['d', 'practice'], ['e', 'none'],
+  ]);
 });

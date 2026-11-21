@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-1
 **Layer:** Parent
-**Status:** Not Started
+**Status:** In Progress (Slice 5a complete and device-tested 2026-11-20: score, pass / not-yet against 20 of 25, left-out note, Review answers, Take another test, Recent tests. The timed-out note and the baseline comparison wait for Slice 5b, ph-3-us-9 / ph-4-us-7)
 
 ## Story
 As a teen user,
@@ -70,3 +70,8 @@ So that I know straight away if I'm ready or need more practice.
 
 ## Questions
 None outstanding.
+
+## Implementation notes (Slice 5a)
+Built in Slice 5a on `feat/practice-tests`; plan `docs/superpowers/plans/2026-11-20-slice-5a-practice-tests.md`, design `docs/superpowers/specs/2026-11-20-slice-5a-practice-tests-design.md`. Device-tested on the Android emulator against dev 2026-11-20.
+- Pass is counted in whole answers: `needed = ceil(0.8 × total)`, pass when `correct >= needed`, so a 24-question test needs 20.
+- Recent tests is a live Firestore query (last 10 practice attempts, `type` + `createdAt` composite index). A failed or offline read shows the empty state.

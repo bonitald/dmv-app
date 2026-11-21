@@ -1,4 +1,6 @@
 import { useMemo } from 'react';
+import { usePracticeAttempts } from '../practice/usePracticeAttempts';
+import { sumPracticeEvidence } from '../practice/practiceData';
 import { useBaselineProgress } from '../baseline/useBaselineProgress';
 import { finalBaselineTestId, summarizeBaseline } from '../results/baselineResultsData';
 import { toReviewItems } from '../review/reviewData';
@@ -8,8 +10,8 @@ import { useTopics } from '../topics/useTopics';
 import { toReportRows, type ReportRow } from './conceptStrength';
 
 // ph-4-us-6: everything the concept report needs, combined: topics (titles, order), live
-// Concept Progress (mini-quiz scores) and the final baseline attempt (one question per topic).
-// Practice-test evidence joins in Slice 5a. A baseline that can't be read leaves its rows
+// Concept Progress (mini-quiz scores), recent practice tests and the final baseline attempt (one
+// question per topic). A practice read that fails just leaves practice evidence out. A baseline that can't be read leaves its rows
 // "not tested" with a flag for the screen to say so, rather than blocking the report.
 export type EvidenceState =
   | { status: 'loading' }
@@ -20,6 +22,7 @@ export function useConceptEvidence(): EvidenceState {
   const topics = useTopics();
   const progress = useConceptProgress();
   const baseline = useBaselineProgress();
+  const practice = usePracticeAttempts();
   const attempt = useTestAttempt(baseline.status === 'complete' ? finalBaselineTestId(baseline.version) : null);
 
   const baselineLoading = baseline.status === 'loading' || (baseline.status === 'complete' && attempt.status === 'loading');
@@ -35,11 +38,12 @@ export function useConceptEvidence(): EvidenceState {
         if (row.result !== 'not-tested') results.set(row.chunkId, row.result);
       }
     }
-    return toReportRows(topics.topics, progress.status === 'ready' ? progress.byChunk : {}, results);
-  }, [topics, progress, baseline.status, attemptData]);
+    const practiceEvidence = practice.status === 'ready' ? sumPracticeEvidence(practice.attempts) : undefined;
+    return toReportRows(topics.topics, progress.status === 'ready' ? progress.byChunk : {}, results, practiceEvidence);
+  }, [topics, progress, baseline.status, attemptData, practice]);
 
   if (topics.status === 'error') return { status: 'topics-error', retry: topics.retry };
-  if (topics.status === 'loading' || progress.status === 'loading' || baselineLoading) return { status: 'loading' };
+  if (topics.status === 'loading' || progress.status === 'loading' || practice.status === 'loading' || baselineLoading) return { status: 'loading' };
   // Try again only helps when the attempt read failed; a failed baseline-progress listener is
   // permanent, so offering a retry there would do nothing.
   const retryBaseline = baseline.status === 'complete' && attempt.status === 'error' ? attempt.retry : null;

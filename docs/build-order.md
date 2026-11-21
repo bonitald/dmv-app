@@ -202,6 +202,22 @@ more than 2 per topic → submit → score, PASS / NOT YET against 20 of 25, "To
 
 Parents closed: ph-3-us-2.
 
+**Status: Complete (2026-11-20).** Plan: `docs/superpowers/plans/2026-11-20-slice-5a-practice-tests.md`;
+design: `docs/superpowers/specs/2026-11-20-slice-5a-practice-tests-design.md`. `assembleTest` and the
+new `testAttempts` (`type` + `createdAt`) composite index deployed to `dmv-app-dev` (smoke check
+401). Device-tested on the Android emulator: everything passed. Functions 96, app 207, components
+210, tsc clean. Approved bank: 1415 questions, 514 scenario (36%); all 45 topics have at least 2
+scenario questions, so `MIN_SCENARIO_COUNT = 8` / `MAX_PER_TOPIC = 2` stay. Decisions: the
+baseline and a practice test each keep their own saved session; Recent tests and the concept
+report read the last 10 practice attempts; `MIN_PRACTICE_ANSWERS` is 2; an unfinished test
+resumes from a card on the Practice tab. Stories: ph-3-us-2, ph-3-us-3, ph-4-us-6 Complete;
+ph-4-us-1, ph-3-us-1, ph-3-us-4 have their 5a parts done (timed parts are 5b).
+
+**Carry-forwards.** Slice 5b: the timed-out note on results (ph-4-us-1), timing on the saved
+session (ph-3-us-1 / ph-3-us-9), repeat-avoidance in the same `selectPracticeQuestions` code
+(ph-3-us-6), practice results feeding card performance (ph-4-us-5), the Home practice card.
+Slice 6: clear the saved practice session on sign-out.
+
 ### 5b — Timed tests, fresh questions, progress over time
 
 **Test:** start a timed test → 60-minute countdown keeps going with the app in the background
@@ -258,6 +274,7 @@ Parents closed: ph-9-us-8, and ph-9-us-6 in full.
 
 - Phases 5 (test outcome), 6 (driving logger), 7 (export) and 8 (beta) have no stories yet. Where
   they fit in the journey is decided when they're written.
-- About 900 questions still await review. Slice 4a's "coming soon" state and Slice 5's
-  scenario minimum depend on how much is approved by then.
-- Cloud Functions Node.js 20 runtime is decommissioned 2026-10-30: `functions/` must move to Node 22 (and upgrade `firebase-functions`, which has breaking changes) before then or deploys stop.
+- ~~About 900 questions still await review~~ — resolved 2026-09-25: all 1415 questions approved
+  across 45 topics.
+- ~~Cloud Functions Node.js 20 runtime is decommissioned 2026-10-30~~ — `functions/` is on Node 22
+  (7343149). `firebase-functions` is still 6.x; the 7.x upgrade (breaking changes) is open.

@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-6
 **Layer:** Parent
-**Status:** In Progress (baseline results part complete, Slice 3, device-tested on the Android emulator against dev 2026-09-29. Concept report complete in Slice 4b, device-tested on the Android emulator 2026-10-11; practice "Topics to work on" is Slice 5a)
+**Status:** Complete (baseline results Slice 3, 2026-09-29; concept report Slice 4b, 2026-10-11; practice "Topics to work on" and practice evidence Slice 5a, device-tested 2026-11-20)
 
 ## Story
 As a teen user,
@@ -58,7 +58,7 @@ Every label is shown as indicative ("based on N answers").
   and how many answers it's based on.
 - [x] Given the concept report, when the user sorts by "Needs work first", then likely gap topics
   come first, then shaky, then not tested, then strong.
-- [ ] Given a practice test is graded, when its results show (ph-4-us-1), then a "Topics to work
+- [x] Given a practice test is graded, when its results show (ph-4-us-1), then a "Topics to work
   on" section lists that test's weakest topics (from its `perTopic`), each linking to its
   flashcards.
 - [x] Given a user who hasn't done the baseline or any test, when they open the report, then it
@@ -102,7 +102,7 @@ Every label is shown as indicative ("based on N answers").
   and let ph-4-us-1 reuse it.
 - [x] Build the concept report on the Progress tab (replacing its `PlaceholderScreen`), with sort
   and links into the Study tab.
-- [ ] Add the "Topics to work on" section to practice results (ph-4-us-1).
+- [x] Add the "Topics to work on" section to practice results (ph-4-us-1).
 
 ## Implementation notes (Slice 4b)
 Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
@@ -115,3 +115,9 @@ Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/202
   real test's pass mark.
 - Should the concept list (ph-2-us-7) also show a small strength marker next to each status? Not
   assumed. Two labels on one row may confuse. Revisit after using it.
+
+## Implementation notes (Slice 5a)
+Built in Slice 5a on `feat/practice-tests`; plan `docs/superpowers/plans/2026-11-20-slice-5a-practice-tests.md`, design `docs/superpowers/specs/2026-11-20-slice-5a-practice-tests-design.md`. Device-tested on the Android emulator against dev 2026-11-20.
+- **Decision 7:** `MIN_PRACTICE_ANSWERS` is 2 (was proposed 3), so one practice test (at most 2 per topic) rates the topics it covered.
+- Practice evidence is the last 10 practice tests' `perTopic` totals (decision 3).
+- Topics to work on: topics with a miss, most misses first, up to 5, then "and N more". A topic missing from the catalog shows with its chunkId rather than being dropped.
