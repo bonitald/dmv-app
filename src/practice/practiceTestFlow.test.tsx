@@ -343,6 +343,23 @@ describe('timed tests', () => {
     expect(scoreTest).toHaveBeenCalledTimes(1);
   });
 
+  test('a stale Submit dialog pressed after the auto-submit finished sends nothing more', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await renderFlow({ timed: true });
+    await fireEvent.press(await screen.findByText('A1'));
+    await fireEvent.press(screen.getByText('Next'));
+    await fireEvent.press(await screen.findByText('A2'));
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await fireEvent.press(screen.getByText('Submit'));
+    const confirm = alert.mock.calls.at(-1)![2]!.find((b) => b.text === 'Submit')!;
+    await clockAt(HOUR_MS);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    await act(async () => confirm.onPress!());
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('1 of 2 correct')).toBeTruthy();
+  });
+
   test('time up while offline holds the answers and sends once on reconnect', async () => {
     (scoreTest as jest.Mock).mockResolvedValue(graded());
     await renderFlow({ timed: true });

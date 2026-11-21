@@ -59,6 +59,8 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
   // The timing for scoreTest, captured at the first submit attempt (null = not yet) and reused
   // on retries and the reconnect resend.
   const pendingTimingRef = useRef<TimingSubmission | undefined | null>(null);
+  // Set once the test is graded or rejected, so a stale confirm dialog can't submit it again.
+  const doneRef = useRef(false);
   // Set when the screen unmounts, so an assembleTest still in flight can't save a test nobody saw.
   const cancelledRef = useRef(false);
 
@@ -68,6 +70,7 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
     setSubmitState('idle');
     setTimeUp(false);
     pendingTimingRef.current = null;
+    doneRef.current = false;
     try {
       if (resume) {
         const active = await getActiveSession(uid, 'practice');
@@ -115,9 +118,16 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
     };
   }, [load]);
 
+  /** The session is over: drop held answers and the captured timing, and refuse further submits. */
+  const finish = useCallback(() => {
+    heldAnswersRef.current = null;
+    pendingTimingRef.current = null;
+    doneRef.current = true;
+  }, []);
+
   const submit = useCallback(
     async (answers: Answers, timedOut = false) => {
-      if (phase.kind !== 'running' || !uid) return;
+      if (phase.kind !== 'running' || !uid || doneRef.current) return;
       // First attempt fixes the elapsed time; later attempts (retry, reconnect, time-up) reuse it.
       if (pendingTimingRef.current === null) {
         pendingTimingRef.current = timingPayload(phase.timing, Date.now(), timedOut);
@@ -137,20 +147,20 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
           answers: toAnswerList(phase.questions, answers),
           ...(timing ? { timing } : {}),
         });
-        heldAnswersRef.current = null;
+        finish();
         await endSession(uid, 'practice', phase.testId);
         setPhase({ kind: 'results', outcome: fromPracticeScore(result) });
       } catch (raw) {
         const error = toCallableError(raw);
         if (error.kind === 'already-exists') {
           // Graded already (an earlier response was lost): show what was saved.
-          heldAnswersRef.current = null;
+          finish();
           await endSession(uid, 'practice', phase.testId);
           setPhase({ kind: 'recovering', testId: phase.testId });
         } else if (error.kind === 'not-found' || error.kind === 'permission-denied') {
           // Retrying can never work: drop the saved test and send the teen back to start fresh.
           console.warn('[practice] submit rejected', error);
-          heldAnswersRef.current = null;
+          finish();
           await endSession(uid, 'practice', phase.testId);
           setPhase({ kind: 'rejected' });
         } else {
@@ -161,7 +171,7 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
         submittingRef.current = false;
       }
     },
-    [phase, uid, isOnline]
+    [phase, uid, isOnline, finish]
   );
 
   useEffect(() => {
