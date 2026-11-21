@@ -44,7 +44,14 @@ question under the cap until 25; any question ignoring the cap until 25; then a 
 scenario questions are spread out. Fallbacks: the scenario minimum beats the topic cap; if the bank
 has fewer than 8 scenario questions, all of them are used; if the cap can't be met (few topics) it
 is relaxed to fill the test; a pool smaller than 25 returns everything. A missing or unknown
-`type` counts as fact. Repeats across a user's tests are allowed.
+`type` counts as fact.
+
+**Repeat avoidance** (ph-3-us-6): questions that appeared in the caller's last
+`RECENT_TESTS_TO_AVOID` (3) graded practice tests (`users/{uid}/testAttempts`, `type ==
+'practice'`, read from `perQuestion[].questionId`) are used only after unseen ones. This is a
+preference, not a guarantee: if the bank is too small, seen questions top up the test. Priority
+when rules clash: scenario minimum > repeat avoidance > topic cap. A user with no practice
+history gets the same selection as before.
 
 **Persistence**: also writes `users/{uid}/testAssignments/{testId}` — `{ type: 'practice',
 questionIds: string[], createdAt: FieldValue, scored: false }` — recording exactly which question
