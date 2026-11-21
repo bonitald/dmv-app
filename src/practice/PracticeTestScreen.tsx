@@ -31,7 +31,7 @@ import { TIMED_TEST_LIMIT_SEC, timedLimitSec, timingPayload, type SessionTiming 
 // answers by itself. The elapsed time is captured once, at the first submit attempt, and reused.
 
 const TIME_UP_NOTICE = "Time's up. Submitting your answers…";
-const TIME_UP_RETRY_NOTICE = "Time's up. Your answers are saved � tap Try again to send them.";
+export const TIME_UP_RETRY_NOTICE = "Time's up. Your answers are saved — tap Try again to send them.";
 const TIME_UP_OFFLINE_NOTICE = "Time's up. Your answers are saved and will be sent when you're back online.";
 
 type Phase =
@@ -172,11 +172,12 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
           await endSession(uid, 'practice', phase.testId);
           setPhase({ kind: 'rejected' });
         } else if (error.kind === 'offline') {
-          // The connection dropped mid-send before the app noticed: hold the answers like an
-          // offline submit, so they go out on reconnect.
+          // The connection dropped mid-send before the app noticed. NetInfo may keep saying
+          // online (captive portal, dead upstream), so show "Try again" rather than a dead-end
+          // waiting state, and keep the answers to resend on a real offline-to-online change.
           heldAnswersRef.current = answers;
           offlineSeenRef.current = false;
-          setSubmitState('waiting-for-connection');
+          setSubmitState('error');
         } else {
           console.warn('[practice] submit failed', error);
           setSubmitState('error');
@@ -191,7 +192,11 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
   useEffect(() => {
     if (!isOnline) {
       offlineSeenRef.current = true;
-    } else if (submitState === 'waiting-for-connection' && heldAnswersRef.current && offlineSeenRef.current) {
+    } else if (
+      (submitState === 'waiting-for-connection' || submitState === 'error') &&
+      heldAnswersRef.current &&
+      offlineSeenRef.current
+    ) {
       const answers = heldAnswersRef.current;
       heldAnswersRef.current = null;
       offlineSeenRef.current = false;

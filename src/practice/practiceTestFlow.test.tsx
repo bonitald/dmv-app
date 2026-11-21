@@ -9,7 +9,7 @@ import type { QuizQuestion, ScoreTestResult } from '../api/types';
 import { setPracticeMode } from '../profile/localFlags';
 import { TIMED_TEST_LIMIT_SEC } from './timing';
 import { PRACTICE_CACHE_WARNING, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
-import { PracticeTestScreen } from './PracticeTestScreen';
+import { PracticeTestScreen, TIME_UP_RETRY_NOTICE } from './PracticeTestScreen';
 import { startPracticeTest } from './startPracticeTest';
 
 jest.mock('@react-native-firebase/app', () => ({ getApp: jest.fn() }));
@@ -405,15 +405,26 @@ describe('timed tests', () => {
     expect(scoreTest).toHaveBeenCalledWith(expect.objectContaining({ timing: { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 } }));
   });
 
-  test('an offline rejection while the connection flag is still online holds the answers and resends on reconnect', async () => {
+  test('an offline rejection while the connection flag is still online offers Try again, and resends once on a real reconnect', async () => {
+    (scoreTest as jest.Mock).mockRejectedValueOnce(new CallableError('offline', 'unavailable', 'x')).mockResolvedValue(graded());
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    await renderFlow();
+    await screen.findByText('Question 1');
+    await submitAll(2);
+    expect(await screen.findByText('Try again')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    await setOnline(false);
+    await setOnline(true);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(2);
+  });
+
+  test('an offline rejection with no connectivity change leaves Try again working', async () => {
     (scoreTest as jest.Mock).mockRejectedValueOnce(new CallableError('offline', 'unavailable', 'x')).mockResolvedValue(graded());
     await renderFlow();
     await screen.findByText('Question 1');
     await submitAll(2);
-    expect(await screen.findByText("Your answers are saved. We'll submit as soon as you're back online.")).toBeTruthy();
-    expect(scoreTest).toHaveBeenCalledTimes(1);
-    await setOnline(false);
-    await setOnline(true);
+    await fireEvent.press(await screen.findByText('Try again'));
     expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
     expect(scoreTest).toHaveBeenCalledTimes(2);
   });
@@ -426,7 +437,8 @@ describe('timed tests', () => {
     await submitAll(2);
     await screen.findByText('Try again');
     await clockAt(HOUR_MS);
-    expect(await screen.findByText("Time's up. Your answers are saved — tap Try again to send them.")).toBeTruthy();
+    expect(TIME_UP_RETRY_NOTICE).toContain('â€”');
+    expect(await screen.findByText(TIME_UP_RETRY_NOTICE)).toBeTruthy();
     expect(screen.queryByText(TIME_UP)).toBeNull();
   });
 
