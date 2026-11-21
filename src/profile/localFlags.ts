@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { TestMode } from '../api/types';
 import { parseSavedPass, type SavedPass } from '../study/deckOrder';
 
 // Small per-user flags kept on the device (ph-9-us-3, ph-9-us-5). Keyed by uid so a different
@@ -87,5 +88,31 @@ export async function setDeckPass(uid: string, chunkId: string, pass: SavedPass 
     else await AsyncStorage.removeItem(deckPositionKey(uid, chunkId));
   } catch (error) {
     console.warn('[localFlags] deck-pass write failed', error);
+  }
+}
+
+// ph-3-us-9: the mode the user last chose for a practice test, so the next one starts the same way.
+// Anything other than 'timed' (including nothing stored) reads as 'untimed'.
+const PRACTICE_MODE = 'practice-mode';
+
+function practiceModeKey(uid: string): string {
+  return `${PREFIX}${PRACTICE_MODE}:${uid}`;
+}
+
+/** A storage failure reads as untimed, the mode a user gets without choosing. */
+export async function getPracticeMode(uid: string): Promise<TestMode> {
+  try {
+    return (await AsyncStorage.getItem(practiceModeKey(uid))) === 'timed' ? 'timed' : 'untimed';
+  } catch (error) {
+    console.warn('[localFlags] practice-mode read failed', error);
+    return 'untimed';
+  }
+}
+
+export async function setPracticeMode(uid: string, mode: TestMode): Promise<void> {
+  try {
+    await AsyncStorage.setItem(practiceModeKey(uid), mode);
+  } catch (error) {
+    console.warn('[localFlags] practice-mode write failed', error);
   }
 }
