@@ -31,8 +31,9 @@ export type RootStackParamList = {
   Flashcards: { chunkId: string };
   /** The topic's mini-quiz (ph-2-us-8). */
   MiniQuiz: { chunkId: string };
-  /** A 25-question practice test; `resume` continues the one saved on the phone (ph-3-us-4). */
-  PracticeTest: { resume?: boolean } | undefined;
+  /** A 25-question practice test; `resume` continues the one saved on the phone (ph-3-us-4),
+   * `timed` starts a new one against the 60-minute clock (ph-3-us-9). */
+  PracticeTest: { resume?: boolean; timed?: boolean } | undefined;
   /** A finished practice test's results (screen added with the Practice tab). */
   PracticeResults: { testId: string };
   TestDateEditor: undefined;
