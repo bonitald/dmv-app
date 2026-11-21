@@ -36,7 +36,15 @@ export async function startPracticeTest(
     {
       text: 'Start new',
       onPress: () => {
-        void endSession(uid, 'practice', saved.testId).then(goFresh);
+        // The prompt may have sat open past the deadline: re-read, and open an expired test
+        // instead of deleting it.
+        void getActiveSession(uid, 'practice').then((current) => {
+          if (current && isExpired(current.timing, Date.now())) {
+            go({ resume: true });
+            return;
+          }
+          return endSession(uid, 'practice', saved.testId).then(goFresh);
+        });
       },
     },
   ]);

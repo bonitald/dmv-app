@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, AppState, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useNavigation, type NavigationProp } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthProvider';
 import { Button } from '../components/Button';
@@ -11,7 +11,7 @@ import { endSession, getActiveSession, type ActiveSession } from '../quiz/quizSe
 import { colors, radius, spacing, typography } from '../theme/tokens';
 import { attemptDateLabel, passed, type PracticeOutcome } from './practiceData';
 import { startPracticeTest } from './startPracticeTest';
-import { remainingSeconds, TIMED_TEST_LIMIT_SEC } from './timing';
+import { isExpired, remainingSeconds, TIMED_TEST_LIMIT_SEC } from './timing';
 import { usePracticeAttempts } from './usePracticeAttempts';
 
 // ph-3-us-4 / ph-4-us-1: the Practice tab. Start a test, resume or discard the one saved on the
@@ -54,6 +54,14 @@ export function PracticeHomeScreen() {
     }, [uid])
   );
 
+  // Coming back to the app after a while: refresh the clock so the card can flip to expired.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') setReadAt(Date.now());
+    });
+    return () => subscription.remove();
+  }, []);
+
   // Time left on a timed saved test, worked out when the saved test is read (on focus).
   const timeLeftSec =
     saved?.timing?.mode === 'timed'
@@ -66,14 +74,24 @@ export function PracticeHomeScreen() {
     if (uid) void setPracticeMode(uid, next);
   };
 
+  // The card can be on screen while time runs out, so Discard re-checks at tap time and at
+  // confirm time: an expired test is opened (and graded), never deleted.
+  const openIfExpired = () => {
+    if (!saved || !isExpired(saved.timing, Date.now())) return false;
+    setReadAt(Date.now());
+    navigation.navigate('PracticeTest', { resume: true });
+    return true;
+  };
+
   const discard = () => {
+    if (openIfExpired()) return;
     Alert.alert('Discard this test?', 'Your answers will be lost.', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Discard',
         style: 'destructive',
         onPress: () => {
-          if (!uid || !saved) return;
+          if (!uid || !saved || openIfExpired()) return;
           void endSession(uid, 'practice', saved.testId).then(() => setSaved(null));
         },
       },

@@ -1,5 +1,5 @@
 import { Alert } from 'react-native';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { endSession, getActiveSession } from '../quiz/quizSession';
 import { getPracticeMode, setPracticeMode } from '../profile/localFlags';
 import { startPracticeTest } from './startPracticeTest';
@@ -117,6 +117,44 @@ test('expired resume card has Open to submit and no Discard', async () => {
   expect(screen.queryByText('Resume')).toBeNull();
   await fireEvent.press(screen.getByText('Open to submit'));
   expect(mockNavigate).toHaveBeenCalledWith('PracticeTest', { resume: true });
+});
+
+describe('a test that runs out while the card is on screen', () => {
+  const realNow = Date.now();
+  afterEach(() => jest.restoreAllMocks());
+  const laterBy = (ms: number) => jest.spyOn(Date, 'now').mockReturnValue(realNow + ms);
+
+  beforeEach(() => {
+    (getActiveSession as jest.Mock).mockResolvedValue({
+      ...saved,
+      timing: { mode: 'timed', timeLimitSec: 3600, startedAt: realNow - 59 * 60 * 1000 },
+    });
+  });
+
+  test('tapping Discard opens the expired test instead of asking', async () => {
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await render(<PracticeHomeScreen />);
+    await fireEvent.press(await screen.findByText('Discard'));
+    expect(alert).toHaveBeenCalled();
+    alert.mockClear();
+    laterBy(2 * 60 * 1000);
+    await fireEvent.press(screen.getByText('Discard'));
+    expect(alert).not.toHaveBeenCalled();
+    expect(endSession).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith('PracticeTest', { resume: true });
+    expect(await screen.findByText('Open to submit')).toBeTruthy();
+  });
+
+  test('confirming Discard after expiry opens the test and keeps it', async () => {
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await render(<PracticeHomeScreen />);
+    await fireEvent.press(await screen.findByText('Discard'));
+    const buttons = alert.mock.calls[0][2] as { text: string; onPress?: () => void }[];
+    laterBy(2 * 60 * 1000);
+    await act(async () => buttons[1].onPress?.());
+    expect(endSession).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith('PracticeTest', { resume: true });
+  });
 });
 
 test('untimed and 5a sessions keep Resume and Discard', async () => {

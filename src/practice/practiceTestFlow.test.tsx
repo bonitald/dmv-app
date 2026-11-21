@@ -509,6 +509,24 @@ describe('startPracticeTest', () => {
     expect(alert).toHaveBeenCalledWith('Start a new test?', expect.any(String), expect.any(Array));
   });
 
+  test('confirming Start new after the test ran out opens it instead of deleting it', async () => {
+    const realNow = Date.now();
+    await startSession('u1', 'saved', 'practice', [q(1)], {
+      mode: 'timed',
+      timeLimitSec: TIMED_TEST_LIMIT_SEC,
+      startedAt: realNow - 60 * 1000,
+    });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'navigate'));
+    const start = alert.mock.calls.at(-1)![2]!.find((b) => b.text === 'Start new')!;
+    const now = jest.spyOn(Date, 'now').mockReturnValue(realNow + TIMED_TEST_LIMIT_SEC * 1000);
+    await act(async () => start.onPress!());
+    now.mockRestore();
+    expect(await screen.findByText('PracticeTest {"resume":true}')).toBeTruthy();
+    expect(await getActiveSession('u1', 'practice')).not.toBeNull();
+  });
+
   test('Cancel neither clears the session nor navigates', async () => {
     await startSession('u1', 'saved', 'practice', [q(1)]);
     const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
