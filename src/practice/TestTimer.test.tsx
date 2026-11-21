@@ -114,3 +114,8 @@ test('cleans up the interval and listener on unmount', async () => {
   await advance(5000);
   expect(clock).not.toHaveBeenCalled();
 });
+
+test('labels exactly one minute in the singular', async () => {
+  await setup(nowMs - (LIMIT - 60) * 1000);
+  expect(screen.getByLabelText('1 minute left')).toBeTruthy();
+});

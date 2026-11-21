@@ -140,7 +140,7 @@ interface ScoreTestInput {
  * Validates the client-reported timing of a practice test. Never throws.
  *
  * Returns null (no timing saved) for a non-object or unknown `mode`, and for a timed record
- * without a finite `timeLimitSec` in (0, MAX_ELAPSED_SEC] — without a valid limit we couldn't
+ * without a finite `timeLimitSec` whose floor is in [1, MAX_ELAPSED_SEC] — without a valid limit (at least 1 s once floored) we couldn't
  * tell whether time ran out. A bad `elapsedSec` (not a finite number in [0, MAX_ELAPSED_SEC])
  * keeps the mode but saves `elapsedSec: null`. Seconds are floored; `timeLimitSec` is dropped
  * for untimed tests.
@@ -157,10 +157,10 @@ export function parseTiming(raw: unknown): AttemptTiming | null {
 
   if (mode === 'untimed') return { mode, elapsedSec: elapsed };
 
-  if (typeof timeLimitSec !== 'number' || !Number.isFinite(timeLimitSec) || timeLimitSec <= 0 || timeLimitSec > MAX_ELAPSED_SEC) {
-    return null;
-  }
-  return { mode, timeLimitSec: Math.floor(timeLimitSec), elapsedSec: elapsed };
+  // Floor first, so a fractional limit like 0.5 (which floors to 0) is rejected as well.
+  const limit = typeof timeLimitSec === 'number' && Number.isFinite(timeLimitSec) ? Math.floor(timeLimitSec) : NaN;
+  if (!(limit >= 1 && limit <= MAX_ELAPSED_SEC)) return null;
+  return { mode, timeLimitSec: limit, elapsedSec: elapsed };
 }
 
 /**

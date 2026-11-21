@@ -693,6 +693,9 @@ describe('parseTiming', () => {
   test.each([90000, -1, 'x', NaN, Infinity, undefined])('bad elapsedSec %p keeps mode, elapsedSec null', (e) => {
     expect(parseTiming({ mode: 'untimed', elapsedSec: e })).toEqual({ mode: 'untimed', elapsedSec: null });
   });
+  test('timed with a fractional limit that floors to 0 -> null', () => {
+    expect(parseTiming({ mode: 'timed', timeLimitSec: 0.5, elapsedSec: 10 })).toBeNull();
+  });
   test.each([undefined, 0, 90000, -5, NaN, 'x'])('timed with bad limit %p -> null', (limit) => {
     expect(parseTiming({ mode: 'timed', timeLimitSec: limit, elapsedSec: 10 })).toBeNull();
   });

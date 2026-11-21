@@ -13,6 +13,16 @@ export const TIMED_TEST_LIMIT_SEC = 3600;
 // Node Jest config, which does not load React Native types.
 declare const __DEV__: boolean | undefined;
 
+/** The longest limit the server accepts (scoreTest): 24 hours. */
+const MAX_LIMIT_SEC = 86400;
+
+/** A dev limit override as whole seconds in 1..86400, or null when missing or not valid. */
+export function parseLimitOverride(raw: string | undefined): number | null {
+  if (raw === undefined || raw.trim() === '') return null;
+  const value = Number(raw);
+  return Number.isInteger(value) && value > 0 && value <= MAX_LIMIT_SEC ? value : null;
+}
+
 /**
  * The countdown length for a timed test. Only a development build may override it, via
  * EXPO_PUBLIC_TIMED_LIMIT_SEC, so developers can try the timeout without waiting an hour.
@@ -20,8 +30,8 @@ declare const __DEV__: boolean | undefined;
  */
 export function timedLimitSec(): number {
   if (typeof __DEV__ !== 'undefined' && __DEV__) {
-    const override = Number(process.env.EXPO_PUBLIC_TIMED_LIMIT_SEC);
-    if (override > 0) return override;
+    const override = parseLimitOverride(process.env.EXPO_PUBLIC_TIMED_LIMIT_SEC);
+    if (override !== null) return override;
   }
   return TIMED_TEST_LIMIT_SEC;
 }

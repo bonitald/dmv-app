@@ -183,7 +183,8 @@ interface AssembleTestOptions {
  *           assigned, so `scoreTest` (ph-1-us-11) can grade only what this call actually handed
  *           out rather than trusting arbitrary question IDs submitted by the client (which would
  *           let a caller submit IDs for questions they were never shown, revealing answers).
- * Errors:   HttpsError('unauthenticated') when `auth` is missing
+ * Errors:   HttpsError('unauthenticated') when `auth` is missing. A failure reading recent attempts
+ *           is logged (console.warn) and ignored: the test is assembled without repeat-avoidance.
  */
 export async function assembleTestForUser(
   db: Firestore,
@@ -206,7 +207,12 @@ export async function assembleTestForUser(
   // user saw in their last few practice tests (ph-3-us-6).
   const [snapshot, seen] = await Promise.all([
     db.collection('questions').where('status', '==', 'approved').get(),
-    recentlySeenQuestionIds(db, auth.uid),
+    // Repeat-avoidance is only a preference, so a failed history read must not block the test:
+    // warn and carry on as if the user had no history.
+    recentlySeenQuestionIds(db, auth.uid).catch((error) => {
+      console.warn('[assembleTest] could not read recent attempts; skipping repeat-avoidance', error);
+      return new Set<string>();
+    }),
   ]);
 
   // Pick a random, duplicate-free set with a realistic mix (scenario minimum, per-topic cap),

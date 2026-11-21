@@ -390,6 +390,54 @@ describe('timed tests', () => {
     expect(scoreTest).toHaveBeenCalledWith(expect.objectContaining({ timing: { mode: 'timed', timeLimitSec: 3600, elapsedSec: 600 } }));
   });
 
+  test('time running out overrides an earlier captured timing when the submit was held offline', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await renderFlow({ timed: true });
+    await screen.findByText('Question 1');
+    await setOnline(false);
+    await clockAt(600_000, false);
+    await submitAll(2);
+    await screen.findByText("Your answers are saved. We'll submit as soon as you're back online.");
+    await clockAt(HOUR_MS);
+    await setOnline(true);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(scoreTest).toHaveBeenCalledWith(expect.objectContaining({ timing: { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 } }));
+  });
+
+  test('an offline rejection while the connection flag is still online holds the answers and resends on reconnect', async () => {
+    (scoreTest as jest.Mock).mockRejectedValueOnce(new CallableError('offline', 'unavailable', 'x')).mockResolvedValue(graded());
+    await renderFlow();
+    await screen.findByText('Question 1');
+    await submitAll(2);
+    expect(await screen.findByText("Your answers are saved. We'll submit as soon as you're back online.")).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    await setOnline(false);
+    await setOnline(true);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(2);
+  });
+
+  test('time up after a failed submit tells the teen to tap Try again', async () => {
+    (scoreTest as jest.Mock).mockRejectedValue(new CallableError('unknown', 'internal', 'boom'));
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    await renderFlow({ timed: true });
+    await screen.findByText('Question 1');
+    await submitAll(2);
+    await screen.findByText('Try again');
+    await clockAt(HOUR_MS);
+    expect(await screen.findByText("Time's up. Your answers are saved — tap Try again to send them.")).toBeTruthy();
+    expect(screen.queryByText(TIME_UP)).toBeNull();
+  });
+
+  test('resume with no saved session falls back to a fresh test in the saved practice mode', async () => {
+    await setPracticeMode('u1', 'timed');
+    await renderFlow({ resume: true });
+    await screen.findByText('Question 1');
+    expect((await getActiveSession('u1', 'practice'))!.timing).toEqual({ mode: 'timed', timeLimitSec: 3600, startedAt: expect.any(Number) });
+    expect(screen.getByText('60:00')).toBeTruthy();
+  });
+
   test('resuming an expired timed test submits straight away', async () => {
     (scoreTest as jest.Mock).mockResolvedValue(graded());
     await startSession('u1', 'saved', 'practice', [q(1), q(2)], { mode: 'timed', timeLimitSec: 3600, startedAt: Date.now() - 2 * HOUR_MS });

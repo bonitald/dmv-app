@@ -14,6 +14,7 @@ import { QuizRunner, type SubmitState } from '../quiz/QuizRunner';
 import { PRACTICE_CACHE_WARNING, endSession, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
 import { useTestAttempt } from '../review/useTestAttempt';
 import { colors } from '../theme/tokens';
+import { getPracticeMode } from '../profile/localFlags';
 import { useTopics } from '../topics/useTopics';
 import { fromPracticeAttempt, fromPracticeScore, type PracticeOutcome } from './practiceData';
 import { PracticeResults } from './PracticeResults';
@@ -30,6 +31,7 @@ import { TIMED_TEST_LIMIT_SEC, timedLimitSec, timingPayload, type SessionTiming 
 // answers by itself. The elapsed time is captured once, at the first submit attempt, and reused.
 
 const TIME_UP_NOTICE = "Time's up. Submitting your answersâ€¦";
+const TIME_UP_RETRY_NOTICE = "Time's up. Your answers are saved — tap Try again to send them.";
 const TIME_UP_OFFLINE_NOTICE = "Time's up. Your answers are saved and will be sent when you're back online.";
 
 type Phase =
@@ -53,6 +55,9 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const submittingRef = useRef(false);
   const heldAnswersRef = useRef<Answers | null>(null);
+  // True once the connection has been seen down while answers are held, so the resend waits for
+  // a real reconnect (a held send after an offline-looking failure must not retry in a loop).
+  const offlineSeenRef = useRef(false);
   const [timeUp, setTimeUp] = useState(false);
   // The latest answers, so the auto-submit at zero doesn't depend on a re-read of storage.
   const answersRef = useRef<Answers>({});
@@ -86,12 +91,14 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
           return;
         }
       }
+      // A resume with nothing saved starts a fresh test, in the mode the Practice tab has selected.
+      const startTimed = resume ? (await getPracticeMode(uid)) === 'timed' : timed;
       const { testId, questions } = await assembleTest();
       if (cancelledRef.current) return;
       let notice: string | undefined;
       const timing: SessionTiming = {
-        mode: timed ? 'timed' : 'untimed',
-        timeLimitSec: timed ? timedLimitSec() : undefined,
+        mode: startTimed ? 'timed' : 'untimed',
+        timeLimitSec: startTimed ? timedLimitSec() : undefined,
         startedAt: Date.now(),
       };
       try {
@@ -128,8 +135,9 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
   const submit = useCallback(
     async (answers: Answers, timedOut = false) => {
       if (phase.kind !== 'running' || !uid || doneRef.current) return;
-      // First attempt fixes the elapsed time; later attempts (retry, reconnect, time-up) reuse it.
-      if (pendingTimingRef.current === null) {
+      // First attempt fixes the elapsed time; later attempts (retry, reconnect) reuse it. Running
+      // out of time overrides it: a timed-out test is recorded as exactly the limit.
+      if (pendingTimingRef.current === null || timedOut) {
         pendingTimingRef.current = timingPayload(phase.timing, Date.now(), timedOut);
       }
       if (submittingRef.current) return;
@@ -163,6 +171,12 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
           finish();
           await endSession(uid, 'practice', phase.testId);
           setPhase({ kind: 'rejected' });
+        } else if (error.kind === 'offline') {
+          // The connection dropped mid-send before the app noticed: hold the answers like an
+          // offline submit, so they go out on reconnect.
+          heldAnswersRef.current = answers;
+          offlineSeenRef.current = false;
+          setSubmitState('waiting-for-connection');
         } else {
           console.warn('[practice] submit failed', error);
           setSubmitState('error');
@@ -175,9 +189,12 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
   );
 
   useEffect(() => {
-    if (isOnline && submitState === 'waiting-for-connection' && heldAnswersRef.current) {
+    if (!isOnline) {
+      offlineSeenRef.current = true;
+    } else if (submitState === 'waiting-for-connection' && heldAnswersRef.current && offlineSeenRef.current) {
       const answers = heldAnswersRef.current;
       heldAnswersRef.current = null;
+      offlineSeenRef.current = false;
       void submit(answers);
     }
   }, [isOnline, submitState, submit]);
@@ -221,6 +238,8 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
       );
     case 'running': {
       const timing = phase.timing;
+      const timeUpNotice = () =>
+        !isOnline ? TIME_UP_OFFLINE_NOTICE : submitState === 'error' ? TIME_UP_RETRY_NOTICE : TIME_UP_NOTICE;
       return (
         <QuizRunner
           key={phase.testId}
@@ -234,7 +253,7 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
           onSubmit={(answers) => void submit(answers)}
           submitState={submitState}
           isOnline={isOnline}
-          notice={timeUp ? (isOnline ? TIME_UP_NOTICE : TIME_UP_OFFLINE_NOTICE) : phase.notice}
+          notice={timeUp ? timeUpNotice() : phase.notice}
           locked={timeUp}
           headerAccessory={
             timing?.mode === 'timed' ? (

@@ -62,8 +62,13 @@ export function TestTimer({
     };
   }, [recompute]);
 
+  const minutes = Math.ceil(remaining / 60);
   const label =
-    remaining >= 60 ? `${Math.ceil(remaining / 60)} minutes left` : `${remaining} seconds left`;
+    remaining < 60
+      ? `${remaining} seconds left`
+      : minutes === 1
+        ? '1 minute left'
+        : `${minutes} minutes left`;
   const last = remaining <= 60;
 
   return (

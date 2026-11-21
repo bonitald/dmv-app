@@ -221,6 +221,35 @@ describe('assembleTestForUser', () => {
       });
   }
 
+  test('still assembles the test (warning) when reading recent attempts fails', async () => {
+    await seedQuestion('q1');
+    await seedQuestion('q2');
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const failingAttempts = {
+      where: () => failingAttempts,
+      orderBy: () => failingAttempts,
+      limit: () => failingAttempts,
+      get: () => Promise.reject(new Error('attempts unavailable')),
+    };
+    const stubDb = {
+      collection: (name: string) =>
+        name !== 'users'
+          ? db.collection(name)
+          : {
+              doc: (uid: string) => ({
+                collection: (sub: string) =>
+                  sub === 'testAttempts' ? failingAttempts : db.collection('users').doc(uid).collection(sub),
+              }),
+            },
+    } as unknown as FirebaseFirestore.Firestore;
+
+    const result = await assembleTestForUser(stubDb, { uid: 'u-attempts-fail' }, { count: 2 });
+
+    expect(result.questions).toHaveLength(2);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
+
   test('rejects a call with no authenticated user', async () => {
     await seedQuestion('q1');
 

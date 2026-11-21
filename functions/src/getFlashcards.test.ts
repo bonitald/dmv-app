@@ -13,6 +13,9 @@ describe('getFlashcardsForUser', () => {
     for (const userRef of userRefs) {
       const rateLimits = await userRef.collection('rateLimits').get();
       await Promise.all(rateLimits.docs.map((d) => d.ref.delete()));
+      // Other test files (assembleTest) leave assignments behind; this file asserts none appear.
+      const assignments = await userRef.collection('testAssignments').get();
+      await Promise.all(assignments.docs.map((d) => d.ref.delete()));
     }
   });
 

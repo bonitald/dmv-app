@@ -4,6 +4,7 @@ import {
   isExpired,
   isTimedOut,
   remainingSeconds,
+  parseLimitOverride,
   timedLimitSec,
   timingPayload,
   warningFor,
@@ -123,5 +124,14 @@ describe('warningFor', () => {
 describe('timedLimitSec', () => {
   it('is 3600 under Jest (no dev override)', () => {
     expect(timedLimitSec()).toBe(3600);
+  });
+});
+
+describe('parseLimitOverride', () => {
+  it.each([['30', 30], ['86400', 86400], ['1', 1]])('accepts %s', (raw, expected) => {
+    expect(parseLimitOverride(raw)).toBe(expected);
+  });
+  it.each([undefined, '', '0', '-5', '1.5', '0.5', 'abc', '86401', 'Infinity', 'NaN'])('rejects %p', (raw) => {
+    expect(parseLimitOverride(raw)).toBeNull();
   });
 });
