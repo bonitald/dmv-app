@@ -1,4 +1,4 @@
-import { Alert, ScrollView } from 'react-native';
+import { Alert, ScrollView, Text } from 'react-native';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { QuizQuestion } from '../api/types';
 import { QuizRunner, stripScrollX, type QuizRunnerProps } from './QuizRunner';
@@ -205,5 +205,35 @@ describe('question strip follows the current question', () => {
     for (let i = 0; i < 8; i++) await fireEvent.press(screen.getByText('Next'));
 
     expect(scrollTo).toHaveBeenLastCalledWith({ x: stripScrollX(8, 15, 300), animated: true });
+  });
+});
+
+describe('header accessory and locked state (ph-3-us-9)', () => {
+  test('renders the header accessory', async () => {
+    await setup({ headerAccessory: <Text>12:00</Text> });
+    expect(screen.getByText('12:00')).toBeTruthy();
+  });
+
+  test('locked: choices do not change the answer', async () => {
+    const { onAnswersChange } = await setup({ locked: true });
+    await fireEvent.press(screen.getByText('Yes'));
+    expect(onAnswersChange).not.toHaveBeenCalled();
+    expect(isSelected('Yes')).toBe(false);
+  });
+
+  test('locked: no Submit or Next button, Back still works', async () => {
+    await setup({ locked: true });
+    expect(screen.queryByText('Next')).toBeNull();
+    expect(screen.queryByText('Submit')).toBeNull();
+    await fireEvent.press(screen.getByLabelText('Question 2'));
+    expect(screen.queryByText('Submit')).toBeNull();
+    await fireEvent.press(screen.getByText('Back'));
+    expect(screen.getByText('Question 1 of 2')).toBeTruthy();
+  });
+
+  test('locked: Try again still shows on a submit error', async () => {
+    const { onSubmit } = await setup({ locked: true, submitState: 'error' });
+    await fireEvent.press(screen.getByText('Try again'));
+    expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 });
