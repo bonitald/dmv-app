@@ -76,3 +76,4 @@
 
 ### 2026-11-20
 - Resumed after a 6-week gap: gap analysis done; checks all good (Firebase reauth, dev functions on nodejs22 with 401 smoke check, all test suites, functions build, emulator/app run). Next: Slice 5a, starting with ph-3-us-3 (`assembleTest` fact/scenario mix and per-topic cap).
+- **Slice 5a (practice tests) complete** on `feat/practice-tests` via subagent-driven development: `assembleTest` guarantees 8+ scenario questions and caps 2 per topic (bank is 36% scenario across all 45 topics), one saved session per kind so a practice test cannot drop the baseline, Practice tab with resume card and Recent tests (new Firestore index), practice results with pass line against 20 of 25 and topics to work on, practice tests feed the concept report (2 answers is enough). Deployed `assembleTest` and the index to dev; device-tested on the emulator. Functions 96, app 207, components 210, tsc clean. Next: merge, then Slice 5b.
