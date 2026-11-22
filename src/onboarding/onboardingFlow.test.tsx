@@ -36,6 +36,7 @@ jest.mock('../review/useTestAttempt', () => ({
   useTestAttempt: () => ({ status: 'loading', retry: jest.fn() }),
 }));
 jest.mock('../practice/usePracticeAttempts', () => ({ usePracticeAttempts: () => ({ status: 'ready', attempts: [] }) }));
+jest.mock('../review/useRecentAttempts', () => ({ useRecentAttempts: () => ({ status: 'ready', attempts: [] }) }));
 jest.mock('../study/conceptProgress', () => ({ markOpened: jest.fn() }));
 jest.mock('../study/useConceptProgress', () => ({
   useConceptProgress: () => ({ status: 'ready', byChunk: {}, cachedEmpty: false }),

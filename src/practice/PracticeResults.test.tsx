@@ -89,3 +89,12 @@ test('a test that was not timed out shows no time line', async () => {
   await render(<PracticeResults outcome={outcome(17)} topics={[]} {...handlers()} />);
   expect(screen.queryByText(/Time ran out/)).toBeNull();
 });
+
+test('Go over missed questions shows only when wired, and opens the list (ph-4-us-5)', async () => {
+  await render(<PracticeResults outcome={outcome(20)} topics={[]} {...handlers()} />);
+  expect(screen.queryByText('Go over missed questions')).toBeNull();
+  const onOpenMissed = jest.fn();
+  await render(<PracticeResults outcome={outcome(20)} topics={[]} {...handlers()} onOpenMissed={onOpenMissed} />);
+  await fireEvent.press(screen.getByText('Go over missed questions'));
+  expect(onOpenMissed).toHaveBeenCalled();
+});

@@ -22,6 +22,8 @@ jest.mock('../profile/localFlags', () => ({ getPracticeMode: jest.fn(), setPract
 jest.mock('./startPracticeTest', () => ({ startPracticeTest: jest.fn() }));
 let mockAttempts: unknown = { status: 'ready', attempts: [] };
 jest.mock('./usePracticeAttempts', () => ({ usePracticeAttempts: () => mockAttempts }));
+let mockRecent: unknown = { status: 'ready', attempts: [] };
+jest.mock('../review/useRecentAttempts', () => ({ useRecentAttempts: () => mockRecent }));
 
 const outcome = (testId: string, correctCount: number): PracticeOutcome => ({
   testId,
@@ -44,6 +46,7 @@ const saved = {
 beforeEach(() => {
   jest.clearAllMocks();
   mockAttempts = { status: 'ready', attempts: [] };
+  mockRecent = { status: 'ready', attempts: [] };
   (getActiveSession as jest.Mock).mockResolvedValue(null);
   (endSession as jest.Mock).mockResolvedValue(undefined);
   (getPracticeMode as jest.Mock).mockResolvedValue('untimed');
@@ -191,4 +194,33 @@ test('loading shows a spinner in the list area, with the rest of the screen stil
   await render(<PracticeHomeScreen />);
   expect(screen.getByLabelText('Loading your tests')).toBeTruthy();
   expect(screen.getByText('Start a practice test')).toBeTruthy();
+});
+
+describe('missed questions row (ph-4-us-5)', () => {
+  const doc = (testId: string, at: number, results: [string, boolean][]) => ({
+    testId,
+    createdAtMs: at,
+    data: { type: 'practice', perQuestion: results.map(([questionId, correct]) => ({ questionId, chunkId: 'row', choice: 'x', correctAnswer: 'y', correct })) },
+  });
+
+  test('hidden with no graded attempts or while loading', async () => {
+    await render(<PracticeHomeScreen />);
+    expect(screen.queryByText(/Missed questions/)).toBeNull();
+    mockRecent = { status: 'loading' };
+    await render(<PracticeHomeScreen />);
+    expect(screen.queryByText(/Missed questions/)).toBeNull();
+  });
+
+  test('shows the count of latest misses and opens the list', async () => {
+    mockRecent = { status: 'ready', attempts: [doc('a', 1, [['q1', false], ['q2', false], ['q3', true]])] };
+    await render(<PracticeHomeScreen />);
+    await fireEvent.press(screen.getByText('Missed questions · 2'));
+    expect(mockNavigate).toHaveBeenCalledWith('MissedQuestions');
+  });
+
+  test('none right now once everything missed has been got right', async () => {
+    mockRecent = { status: 'ready', attempts: [doc('a', 1, [['q1', false]]), doc('b', 2, [['q1', true]])] };
+    await render(<PracticeHomeScreen />);
+    expect(screen.getByText('Missed questions · none right now')).toBeTruthy();
+  });
 });

@@ -111,6 +111,11 @@ export function BaselineResults({
           variant="secondary"
           onPress={() => navigation.navigate('Review', { testId })}
         />
+        <Button
+          label="Go over missed questions"
+          variant="secondary"
+          onPress={() => navigation.navigate('MissedQuestions')}
+        />
       </View>
 
       <View style={styles.topicsHeader}>

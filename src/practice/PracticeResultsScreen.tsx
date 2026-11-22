@@ -55,6 +55,7 @@ export function PracticeResultsScreen() {
         if (uid) void startPracticeTest(navigation, uid, 'replace');
       }}
       onBack={() => navigation.goBack()}
+      onOpenMissed={() => navigation.navigate('MissedQuestions')}
     />
   );
 }

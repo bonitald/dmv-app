@@ -234,6 +234,7 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
         if (uid) void startPracticeTest(navigation, uid, 'replace');
       }}
       onBack={() => navigation.popTo('Main', { screen: 'PracticeTests' })}
+      onOpenMissed={() => navigation.navigate('MissedQuestions')}
     />
     );
 

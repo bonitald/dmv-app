@@ -25,6 +25,7 @@ export function PracticeResults({
   onReview,
   onTakeAnother,
   onBack,
+  onOpenMissed,
 }: {
   outcome: PracticeOutcome;
   topics: Topic[];
@@ -32,6 +33,8 @@ export function PracticeResults({
   onReview: () => void;
   onTakeAnother: () => void;
   onBack: () => void;
+  /** ph-4-us-5: opens the missed questions list. */
+  onOpenMissed?: () => void;
 }) {
   const { shown, moreCount } = topicsToWorkOn(outcome.perTopic, topics);
   const leftOut = leftOutLine(outcome);
@@ -73,6 +76,7 @@ export function PracticeResults({
       <View style={styles.actions}>
         <Button label="Take another test" variant="primary" onPress={onTakeAnother} />
         <Button label="Review answers" variant="secondary" onPress={onReview} />
+        {onOpenMissed ? <Button label="Go over missed questions" variant="secondary" onPress={onOpenMissed} /> : null}
         <Button label="Back to Practice" variant="text" onPress={onBack} />
       </View>
     </ScrollView>
