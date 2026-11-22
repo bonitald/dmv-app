@@ -8,6 +8,7 @@ const topic = (chunkId: string, order: number): Topic => ({
 } as Topic);
 const outcome = (correct: number, perTopic: PracticeOutcome['perTopic'] = [], unavailableCount = 0, totalCount = 25): PracticeOutcome => ({
   testId: 't1', createdAt: null, correctCount: correct, totalCount, perTopic, unavailableCount,
+  timing: null, unansweredCount: 0,
 });
 const handlers = () => ({ onOpenTopic: jest.fn(), onReview: jest.fn(), onTakeAnother: jest.fn(), onBack: jest.fn() });
 
@@ -74,4 +75,17 @@ test('with no topic titles, missed topics still show by chunkId and not the none
   expect(screen.getByText('row')).toBeTruthy();
   expect(screen.getByText('2 missed')).toBeTruthy();
   expect(screen.queryByText("You didn't miss a single topic.")).toBeNull();
+});
+
+test('a timed-out test shows the time-ran-out line under the score', async () => {
+  const timing = { mode: 'timed' as const, timeLimitSec: 3600, elapsedSec: 3600 };
+  await render(
+    <PracticeResults outcome={{ ...outcome(17), timing, unansweredCount: 3 }} topics={[]} {...handlers()} />,
+  );
+  expect(screen.getByText('Time ran out — 3 questions unanswered.')).toBeTruthy();
+});
+
+test('a test that was not timed out shows no time line', async () => {
+  await render(<PracticeResults outcome={outcome(17)} topics={[]} {...handlers()} />);
+  expect(screen.queryByText(/Time ran out/)).toBeNull();
 });

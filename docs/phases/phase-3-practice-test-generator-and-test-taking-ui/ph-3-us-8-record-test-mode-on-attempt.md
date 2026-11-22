@@ -3,7 +3,7 @@
 **ID:** ph-3-us-8
 **Layer:** Backend
 **Parent:** ph-3-us-7
-**Status:** Not Started
+**Status:** Complete (device-tested 2026-11-22, Slice 5b-1)
 
 ## Story
 As a product owner,
@@ -22,24 +22,28 @@ practice apart from relaxed practice.
 - Follows the `cloud-function-documentation` skill.
 
 ## Acceptance Criteria
-- [ ] Given a practice test is submitted with `timing: { mode: 'timed', timeLimitSec, elapsedSec }`
+- [x] Given a practice test is submitted with `timing: { mode: 'timed', timeLimitSec, elapsedSec }`
   or `{ mode: 'untimed', elapsedSec }`, when `scoreTest` saves the attempt, then those values are
   stored on it as `timing`.
-- [ ] Given `timing` is missing, when a practice test is scored, then the attempt is saved with
+- [x] Given `timing` is missing, when a practice test is scored, then the attempt is saved with
   `timing: null` — old clients keep working.
-- [ ] Given `timing` is malformed (unknown mode, negative or non-numeric seconds, `elapsedSec`
-  over 24 hours), when `scoreTest` runs, then `timing` is saved as `null` and grading still
-  succeeds. Bad analytics data must never fail a submission.
-- [ ] Given a mini-quiz or baseline section is submitted with `timing`, when it's scored, then
+- [x] Given `timing` is malformed (unknown mode or not an object), when `scoreTest` runs, then
+  `timing` is saved as `null` and grading still succeeds. A bad or out-of-range `elapsedSec`
+  (negative, non-numeric, over 24 hours) keeps the mode and saves `elapsedSec: null`. A timed
+  record without a valid `timeLimitSec` saves `timing: null`. Bad analytics data must never fail a submission.
+- [x] Given a mini-quiz or baseline section is submitted with `timing`, when it's scored, then
   `timing` is ignored (those are always untimed).
-- [ ] Given a timed test that ran out of time, when it's submitted with unanswered questions, then
+- [x] Given a practice test is scored, when `scoreTest` returns, then the result includes the
+  saved `timing`, so results can tell whether time ran out.
+- [x] Given a timed test that ran out of time, when it's submitted with unanswered questions, then
   grading is unchanged: unanswered questions count as wrong.
 
 ## Data and API
 - **Cloud Functions**: `scoreTest` input gains optional
-  `timing: { mode: 'timed' | 'untimed', timeLimitSec?: number, elapsedSec: number }`.
-- **Firestore schema**: `users/{uid}/testAttempts/{testId}.timing` — the validated object or
-  `null`. Practice attempts only.
+  `timing: { mode: 'timed' | 'untimed', timeLimitSec?: number, elapsedSec: number }`. The practice
+  `ScoreTestResult` returns the saved `timing`.
+- **Firestore schema**: `users/{uid}/testAttempts/{testId}.timing` — the validated object
+  (`elapsedSec` may be `null`) or `null`. Practice attempts only.
 - **Security rules**: no changes (attempts stay server-written, client-read-only).
 
 ## Dependencies
@@ -53,9 +57,14 @@ practice apart from relaxed practice.
 - **Failure modes**: malformed `timing` → null, and the score is still returned.
 
 ## Tasks
-- [ ] Add `timing` validation and storage to `scoreTest`.
-- [ ] Extend `functions/src/scoreTest.test.ts` (`npm run test:functions`).
-- [ ] Update the `scoreTest` input and persistence sections of `functions/README.md`.
+- [x] Add `timing` validation and storage to `scoreTest`.
+- [x] Extend `functions/src/scoreTest.test.ts` (`npm run test:functions`).
+- [x] Update the `scoreTest` input and persistence sections of `functions/README.md`.
 
 ## Questions
 None outstanding.
+
+## Implementation notes (Slice 5b-1)
+Built in Slice 5b-1 on `feat/timed-tests`; plan `docs/superpowers/plans/2026-11-20-slice-5b1-timed-tests.md`, design `docs/superpowers/specs/2026-11-20-slice-5b1-timed-tests-design.md`. Device-tested on the Android emulator against dev 2026-11-22: everything passed. `assembleTest` and `scoreTest` deployed to `dmv-app-dev` (smoke check 401); no rules or index changes.
+- **Decision 6, results know time ran out:** `scoreTest` returns the saved `timing` on practice results. The client computes `timedOut = timing.mode === 'timed' && timing.elapsedSec >= timing.timeLimitSec`, so in-memory results and results reopened from Recent tests use the same rule. No extra stored flag.
+- **Decision 10, what `elapsedSec` measures:** wall-clock time from `startedAt` to the submit, including time the app was closed. A bad or out-of-range `elapsedSec` (over 24 hours, negative, non-numeric) keeps the `mode` and saves `elapsedSec: null`, so an untimed test left open for days is still recorded as untimed. A timed record without a valid `timeLimitSec` (finite, above 0, at most 86400) saves `timing: null`. An unknown mode or a non-object saves `null`. Validation never throws.

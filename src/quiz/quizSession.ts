@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { QuizQuestion } from '../api/types';
 import { clearTestCache, getTestCache, saveTestCache } from '../study/testCache';
+import type { SessionTiming } from '../practice/timing';
 import type { Answers } from './answers';
 
 // ph-3-us-1: the one in-progress test on this device, so a force-quit or lost connection
@@ -21,12 +22,15 @@ export interface ActiveSession {
   kind: SessionKind;
   questions: QuizQuestion[];
   answers: Answers;
+  /** Practice tests only (ph-3-us-9): when the test started and its limit. Absent on older saves. */
+  timing?: SessionTiming;
 }
 
 interface StoredSession {
   testId: string;
   kind: SessionKind;
   answers: Answers;
+  timing?: SessionTiming;
 }
 
 const activeKey = (uid: string, kind: SessionKind) => `dmv-app:active-test:${uid}:${kind}`;
@@ -48,19 +52,23 @@ async function readStored(uid: string, kind: SessionKind): Promise<StoredSession
 
 /**
  * Caches the questions and marks this test active for its kind, replacing any earlier one of
- * that kind. Rejects if the write fails, so the caller can tell the user this test won't
- * survive going offline.
+ * that kind. `timing` is stored only when given, so a baseline session carries none. Rejects if
+ * the write fails, so the caller can tell the user this test won't survive going offline.
  */
 export async function startSession(
   uid: string,
   testId: string,
   kind: SessionKind,
-  questions: QuizQuestion[]
+  questions: QuizQuestion[],
+  timing?: SessionTiming
 ): Promise<void> {
   const previous = await readStored(uid, kind).catch(() => null);
   if (previous && previous.testId !== testId) await clearTestCache(previous.testId).catch(() => {});
   await saveTestCache(testId, questions);
-  await AsyncStorage.setItem(activeKey(uid, kind), JSON.stringify({ testId, kind, answers: {} }));
+  const stored: StoredSession = timing
+    ? { testId, kind, answers: {}, timing }
+    : { testId, kind, answers: {} };
+  await AsyncStorage.setItem(activeKey(uid, kind), JSON.stringify(stored));
 }
 
 /** Saves answers for the active test. A failed write is logged, not thrown: taking the test goes on. */

@@ -3,7 +3,7 @@
 **ID:** ph-3-us-7
 **Layer:** Parent
 **Children:** ph-3-us-8 (Backend), ph-3-us-9 (Frontend)
-**Status:** Not Started
+**Status:** Complete (device-tested 2026-11-22, Slice 5b-1)
 
 ## Story
 As a teen user,
@@ -23,10 +23,10 @@ I'm ready.
   Timed mode uses the same 60-minute limit, so practice matches exam conditions.
 
 ## Acceptance Criteria
-- [ ] Given the user starts a practice test, when they haven't chosen a mode, then it's untimed.
-- [ ] Given the user picks timed mode before starting, when the test runs, then a 60-minute
+- [x] Given the user starts a practice test, when they haven't chosen a mode, then it's untimed.
+- [x] Given the user picks timed mode before starting, when the test runs, then a 60-minute
   countdown is visible, and the test is submitted automatically when time runs out.
-- [ ] Given a practice test is graded, when its Test Attempt is saved, then the attempt records
+- [x] Given a practice test is graded, when its Test Attempt is saved, then the attempt records
   the mode and how long the test took.
 
 ## Dependencies

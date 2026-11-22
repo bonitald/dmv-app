@@ -6,8 +6,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { assembleTest, scoreTest } from '../api/callables';
 import { CallableError } from '../api/callableErrors';
 import type { QuizQuestion, ScoreTestResult } from '../api/types';
+import { setPracticeMode } from '../profile/localFlags';
+import { TIMED_TEST_LIMIT_SEC } from './timing';
 import { PRACTICE_CACHE_WARNING, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
-import { PracticeTestScreen } from './PracticeTestScreen';
+import { PracticeTestScreen, TIME_UP_RETRY_NOTICE } from './PracticeTestScreen';
 import { startPracticeTest } from './startPracticeTest';
 
 jest.mock('@react-native-firebase/app', () => ({ getApp: jest.fn() }));
@@ -63,7 +65,7 @@ function Named({ label }: { label: string }) {
 }
 const Stack = createNativeStackNavigator();
 const ref = createNavigationContainerRef();
-async function renderFlow(params?: { resume?: boolean }) {
+async function renderFlow(params?: { resume?: boolean; timed?: boolean }) {
   await render(
     <NavigationContainer ref={ref}>
       <Stack.Navigator initialRouteName="Main">
@@ -112,7 +114,11 @@ test('starts a test, caches it, answers save, submit shows results', async () =>
   const confirm = alert.mock.calls.at(-1)![2]!.find((b) => b.text === 'Submit')!;
   await act(async () => confirm.onPress!());
   expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
-  expect(scoreTest).toHaveBeenCalledWith({ testId: 't1', answers: [{ questionId: 'q1', choice: 'A1' }, { questionId: 'q2', choice: 'A2' }] });
+  expect(scoreTest).toHaveBeenCalledWith({
+    testId: 't1',
+    answers: [{ questionId: 'q1', choice: 'A1' }, { questionId: 'q2', choice: 'A2' }],
+    timing: { mode: 'untimed', elapsedSec: expect.any(Number) },
+  });
   expect(await getActiveSession('u1', 'practice')).toBeNull();
 });
 
@@ -256,6 +262,233 @@ test('results: Review answers opens the review for this test', async () => {
   expect(await screen.findByText('Review {"testId":"t1"}')).toBeTruthy();
 });
 
+const TIME_UP = "Time's up. Submitting your answers…";
+const TIME_UP_OFFLINE = "Time's up. Your answers are saved and will be sent when you're back online.";
+const HOUR_MS = TIMED_TEST_LIMIT_SEC * 1000;
+
+describe('timed tests', () => {
+  beforeEach(() => {
+    jest.useFakeTimers({ now: 1_700_000_000_000 });
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  async function startedAt() {
+    return (await getActiveSession('u1', 'practice'))!.timing!.startedAt;
+  }
+  // Moves the clock to `ms` after the test started and lets the timer's next tick see it.
+  async function clockAt(ms: number, tick = true) {
+    jest.setSystemTime((await startedAt()) + ms);
+    if (tick) await act(async () => { await jest.advanceTimersByTimeAsync(1000); });
+  }
+
+  test('untimed: no timer, submit sends untimed timing', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await renderFlow();
+    await screen.findByText('Question 1');
+    expect(screen.queryByText('60:00')).toBeNull();
+    await submitAll(2);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledWith(expect.objectContaining({ timing: { mode: 'untimed', elapsedSec: expect.any(Number) } }));
+  });
+
+  test('timed: saves timing on the session and shows the timer', async () => {
+    const before = Date.now();
+    await renderFlow({ timed: true });
+    await screen.findByText('Question 1');
+    const timing = (await getActiveSession('u1', 'practice'))!.timing!;
+    expect(timing).toEqual({ mode: 'timed', timeLimitSec: 3600, startedAt: expect.any(Number) });
+    expect(timing.startedAt).toBeGreaterThanOrEqual(before);
+    expect(timing.startedAt).toBeLessThan(before + 5000);
+    expect(screen.getByText('60:00')).toBeTruthy();
+  });
+
+  test('timed: time up locks answers and submits once with timedOut timing', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await renderFlow({ timed: true });
+    await fireEvent.press(await screen.findByText('A1'));
+    await clockAt(HOUR_MS);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(scoreTest).toHaveBeenCalledWith({
+      testId: 't1',
+      answers: [{ questionId: 'q1', choice: 'A1' }],
+      timing: { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 },
+    });
+  });
+
+  test('time up locks the runner and shows the notice while the submit is pending', async () => {
+    (scoreTest as jest.Mock).mockReturnValue(new Promise(() => {}));
+    await renderFlow({ timed: true });
+    await fireEvent.press(await screen.findByText('A1'));
+    await clockAt(HOUR_MS);
+    expect(await screen.findByText(TIME_UP)).toBeTruthy();
+    expect(screen.queryByText('Submit')).toBeNull();
+    expect(screen.queryByText('Next')).toBeNull();
+    await fireEvent.press(screen.getByText('B1'));
+    expect(screen.getByRole('radio', { name: 'A1', selected: true })).toBeTruthy();
+  });
+
+  test('auto-submit during an in-flight submit calls scoreTest once', async () => {
+    let resolve!: (v: unknown) => void;
+    (scoreTest as jest.Mock).mockReturnValue(new Promise((r) => (resolve = r)));
+    await renderFlow({ timed: true });
+    await screen.findByText('Question 1');
+    await submitAll(2);
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    await clockAt(HOUR_MS);
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    await act(async () => resolve(graded()));
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+  });
+
+  test('a stale Submit dialog pressed after the auto-submit finished sends nothing more', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await renderFlow({ timed: true });
+    await fireEvent.press(await screen.findByText('A1'));
+    await fireEvent.press(screen.getByText('Next'));
+    await fireEvent.press(await screen.findByText('A2'));
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await fireEvent.press(screen.getByText('Submit'));
+    const confirm = alert.mock.calls.at(-1)![2]!.find((b) => b.text === 'Submit')!;
+    await clockAt(HOUR_MS);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    await act(async () => confirm.onPress!());
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('1 of 2 correct')).toBeTruthy();
+  });
+
+  test('time up while offline holds the answers and sends once on reconnect', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await renderFlow({ timed: true });
+    await fireEvent.press(await screen.findByText('A1'));
+    await setOnline(false);
+    await clockAt(HOUR_MS);
+    expect(await screen.findByText(TIME_UP_OFFLINE)).toBeTruthy();
+    expect(scoreTest).not.toHaveBeenCalled();
+    await setOnline(true);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(scoreTest).toHaveBeenCalledWith(expect.objectContaining({ timing: { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 } }));
+  });
+
+  test('elapsed time is measured at the first submit attempt', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await renderFlow({ timed: true });
+    await screen.findByText('Question 1');
+    await setOnline(false);
+    await clockAt(600_000, false);
+    await submitAll(2);
+    await screen.findByText("Your answers are saved. We'll submit as soon as you're back online.");
+    await clockAt(1_200_000, false);
+    await setOnline(true);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(scoreTest).toHaveBeenCalledWith(expect.objectContaining({ timing: { mode: 'timed', timeLimitSec: 3600, elapsedSec: 600 } }));
+  });
+
+  test('time running out overrides an earlier captured timing when the submit was held offline', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await renderFlow({ timed: true });
+    await screen.findByText('Question 1');
+    await setOnline(false);
+    await clockAt(600_000, false);
+    await submitAll(2);
+    await screen.findByText("Your answers are saved. We'll submit as soon as you're back online.");
+    await clockAt(HOUR_MS);
+    await setOnline(true);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(scoreTest).toHaveBeenCalledWith(expect.objectContaining({ timing: { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 } }));
+  });
+
+  test('an offline rejection while the connection flag is still online offers Try again, and resends once on a real reconnect', async () => {
+    (scoreTest as jest.Mock).mockRejectedValueOnce(new CallableError('offline', 'unavailable', 'x')).mockResolvedValue(graded());
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    await renderFlow();
+    await screen.findByText('Question 1');
+    await submitAll(2);
+    expect(await screen.findByText('Try again')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    await setOnline(false);
+    await setOnline(true);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(2);
+  });
+
+  test('an offline rejection with no connectivity change leaves Try again working', async () => {
+    (scoreTest as jest.Mock).mockRejectedValueOnce(new CallableError('offline', 'unavailable', 'x')).mockResolvedValue(graded());
+    await renderFlow();
+    await screen.findByText('Question 1');
+    await submitAll(2);
+    await fireEvent.press(await screen.findByText('Try again'));
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(2);
+  });
+
+  test('time up after a failed submit tells the teen to tap Try again', async () => {
+    (scoreTest as jest.Mock).mockRejectedValue(new CallableError('unknown', 'internal', 'boom'));
+    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    await renderFlow({ timed: true });
+    await screen.findByText('Question 1');
+    await submitAll(2);
+    await screen.findByText('Try again');
+    await clockAt(HOUR_MS);
+    expect(TIME_UP_RETRY_NOTICE).toContain('—');
+    expect(await screen.findByText(TIME_UP_RETRY_NOTICE)).toBeTruthy();
+    expect(screen.queryByText(TIME_UP)).toBeNull();
+  });
+
+  test('resume with no saved session falls back to a fresh test in the saved practice mode', async () => {
+    await setPracticeMode('u1', 'timed');
+    await renderFlow({ resume: true });
+    await screen.findByText('Question 1');
+    expect((await getActiveSession('u1', 'practice'))!.timing).toEqual({ mode: 'timed', timeLimitSec: 3600, startedAt: expect.any(Number) });
+    expect(screen.getByText('60:00')).toBeTruthy();
+  });
+
+  test('resuming an expired timed test submits straight away', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await startSession('u1', 'saved', 'practice', [q(1), q(2)], { mode: 'timed', timeLimitSec: 3600, startedAt: Date.now() - 2 * HOUR_MS });
+    await saveAnswers('u1', 'practice', 'saved', { q1: 'B1' });
+    await renderFlow({ resume: true });
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(scoreTest).toHaveBeenCalledWith({
+      testId: 'saved',
+      answers: [{ questionId: 'q1', choice: 'B1' }],
+      timing: { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 },
+    });
+  });
+
+  test('resuming a 5a session without timing runs untimed and sends no timing', async () => {
+    (scoreTest as jest.Mock).mockResolvedValue(graded());
+    await startSession('u1', 'saved', 'practice', [q(1), q(2)]);
+    await renderFlow({ resume: true });
+    await screen.findByText('Question 1');
+    expect(screen.queryByText(/^\d+:\d\d$/)).toBeNull();
+    await submitAll(2);
+    expect(await screen.findByText('1 of 2 correct')).toBeTruthy();
+    expect(scoreTest).toHaveBeenCalledTimes(1);
+    expect(Object.keys((scoreTest as jest.Mock).mock.calls[0][0])).not.toContain('timing');
+  });
+
+  test('leaving a timed test mentions the timer', async () => {
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderFlow({ timed: true });
+    await screen.findByText('Question 1');
+    await act(() => ref.goBack());
+    expect(alert).toHaveBeenCalledWith(
+      'Leave the test?',
+      "Your answers are saved. The timer keeps going while you're away. You can resume it from the Practice tab.",
+      [expect.objectContaining({ text: 'Stay' }), expect.objectContaining({ text: 'Leave' })]
+    );
+  });
+});
+
 describe('startPracticeTest', () => {
   async function renderStack() {
     await render(
@@ -289,6 +522,69 @@ describe('startPracticeTest', () => {
     await act(async () => start.onPress!());
     expect(await screen.findByText(/^PracticeTest/)).toBeTruthy();
     expect(await getActiveSession('u1', 'practice')).toBeNull();
+  });
+
+  test('passes timed from the saved preference', async () => {
+    await setPracticeMode('u1', 'timed');
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'navigate'));
+    expect(await screen.findByText('PracticeTest {"timed":true}')).toBeTruthy();
+  });
+
+  test('expired saved test opens it instead of prompting', async () => {
+    await startSession('u1', 'saved', 'practice', [q(1)], {
+      mode: 'timed',
+      timeLimitSec: TIMED_TEST_LIMIT_SEC,
+      startedAt: Date.now() - (TIMED_TEST_LIMIT_SEC + 5) * 1000,
+    });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'navigate'));
+    expect(alert).not.toHaveBeenCalled();
+    expect(await screen.findByText('PracticeTest {"resume":true}')).toBeTruthy();
+    expect(await getActiveSession('u1', 'practice')).not.toBeNull();
+  });
+
+  test('expired saved test replaces the route in replace mode', async () => {
+    await startSession('u1', 'saved', 'practice', [q(1)], {
+      mode: 'timed',
+      startedAt: Date.now() - (TIMED_TEST_LIMIT_SEC + 5) * 1000,
+    });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'replace'));
+    expect(alert).not.toHaveBeenCalled();
+    expect(await screen.findByText('PracticeTest {"resume":true}')).toBeTruthy();
+  });
+
+  test('unexpired saved test still asks before discarding', async () => {
+    await startSession('u1', 'saved', 'practice', [q(1)], {
+      mode: 'timed',
+      timeLimitSec: TIMED_TEST_LIMIT_SEC,
+      startedAt: Date.now() - 60 * 1000,
+    });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'navigate'));
+    expect(alert).toHaveBeenCalledWith('Start a new test?', expect.any(String), expect.any(Array));
+  });
+
+  test('confirming Start new after the test ran out opens it instead of deleting it', async () => {
+    const realNow = Date.now();
+    await startSession('u1', 'saved', 'practice', [q(1)], {
+      mode: 'timed',
+      timeLimitSec: TIMED_TEST_LIMIT_SEC,
+      startedAt: realNow - 60 * 1000,
+    });
+    const alert = jest.spyOn(Alert, 'alert').mockImplementation(() => {});
+    await renderStack();
+    await act(() => startPracticeTest(ref as never, 'u1', 'navigate'));
+    const start = alert.mock.calls.at(-1)![2]!.find((b) => b.text === 'Start new')!;
+    const now = jest.spyOn(Date, 'now').mockReturnValue(realNow + TIMED_TEST_LIMIT_SEC * 1000);
+    await act(async () => start.onPress!());
+    now.mockRestore();
+    expect(await screen.findByText('PracticeTest {"resume":true}')).toBeTruthy();
+    expect(await getActiveSession('u1', 'practice')).not.toBeNull();
   });
 
   test('Cancel neither clears the session nor navigates', async () => {

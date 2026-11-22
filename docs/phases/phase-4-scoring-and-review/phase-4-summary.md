@@ -1,6 +1,6 @@
 # Phase 4: Scoring & Review — Summary
 
-## Status: In Progress (Slice 3 complete 2026-09-29; Slice 4b 2026-10-11; Slice 5a 2026-11-20: ph-4-us-1 practice results done except the 5b parts, ph-4-us-6 complete)
+## Status: In Progress (Slice 3 complete 2026-09-29; Slice 4b 2026-10-11; Slice 5a 2026-11-20: ph-4-us-1 practice results, ph-4-us-6 complete; Slice 5b-1 2026-11-22: ph-4-us-1 timed-out note done, only its baseline comparison is left for 5b-2)
 
 Depends on Phase 3 (test attempts exist to score and review). Grading and saved attempts already
 exist from Phase 1 (`scoreTest`, ph-1-us-11), so this phase is mostly results and review screens.
@@ -11,7 +11,7 @@ attempts, so past tests can be reviewed without reading the deny-all `questions`
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
-| ph-4-us-1 | See my score and pass/fail right after a practice test | Parent | — | In Progress (Slice 5a done; timed-out note and baseline comparison are Slice 5b) |
+| ph-4-us-1 | See my score and pass/fail right after a practice test | Parent | — | In Progress (Slice 5a and the 5b-1 timed-out note done; baseline comparison is Slice 5b-2, ph-4-us-7) |
 | ph-4-us-2 | Review every question from a completed test | Parent | — | Complete |
 | ph-4-us-3 | Save question text, choices and explanation on graded attempts | Backend | ph-4-us-2 | Complete |
 | ph-4-us-4 | Question review screen | Frontend | ph-4-us-2 | Complete |

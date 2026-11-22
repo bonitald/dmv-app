@@ -3,7 +3,7 @@
 **ID:** ph-3-us-6
 **Layer:** Backend
 **Parent:** ph-3-us-5
-**Status:** Not Started
+**Status:** Complete (device-tested 2026-11-22, Slice 5b-1)
 
 ## Story
 As a developer,
@@ -14,9 +14,9 @@ So that back-to-back practice tests feel distinct without the client having to t
 ## Context
 - **Product area**: Phase 3 (`docs/phases.md`, third bullet).
 - **Layer**: Backend (Cloud Functions).
-- The server already knows what each user was handed: every `assembleTest` call writes
-  `users/{uid}/testAssignments/{testId}` with `type: 'practice'` and `questionIds`. So
-  repeat-avoidance can be server-side, which works across devices and needs no client input.
+- Repeat-avoidance is server-side, which works across devices and needs no client input.
+  (Originally proposed: read `testAssignments`. Changed in Slice 5b-1, decision 1: read the last
+  graded practice attempts instead; see Implementation notes.)
   (`assembleMiniQuiz` takes a client `excludeIds` instead; that's fine for a single topic's
   retake, but practice tests should not rely on the client.)
 - Changes the same selection code as ph-3-us-3 (fact/scenario mix, topic cap). Repeat-avoidance
@@ -25,26 +25,26 @@ So that back-to-back practice tests feel distinct without the client having to t
 - Follows the `cloud-function-documentation` skill.
 
 ## Acceptance Criteria
-- [ ] Given a user's last `RECENT_TESTS_TO_AVOID` practice assignments, when a new test is
-  assembled, then questions from those assignments are excluded if enough unseen approved
+- [x] Given a user's last `RECENT_TESTS_TO_AVOID` practice attempts, when a new test is
+  assembled, then questions from those attempts are excluded if enough unseen approved
   questions remain to fill the test.
-- [ ] Given too few unseen questions remain, when a test is assembled, then it's topped up with
-  previously seen questions (oldest first where possible) — the test is never short because of
+- [x] Given too few unseen questions remain, when a test is assembled, then it's topped up with
+  previously seen questions (chosen at random) — the test is never short because of
   repeat-avoidance.
-- [ ] Given repeat-avoidance and ph-3-us-3's scenario minimum and topic cap conflict, when a test
+- [x] Given repeat-avoidance and ph-3-us-3's scenario minimum and topic cap conflict, when a test
   is assembled, then the scenario minimum wins over repeat-avoidance, and repeat-avoidance wins
-  over the topic cap. (Proposed order; see Questions.)
-- [ ] Given a user has no previous practice tests, when a test is assembled, then behavior is
+  over the topic cap.
+- [x] Given a user has no previous practice tests, when a test is assembled, then behavior is
   the same as before (no extra constraint).
-- [ ] Given mini-quiz and baseline assignments, when recent tests are looked up, then only
-  `type == 'practice'` assignments count.
+- [x] Given mini-quiz and baseline assignments, when recent tests are looked up, then only
+  `type == 'practice'` attempts count.
 
 ## Data and API
 - **Cloud Functions**: `assembleTest` — reads the caller's recent practice assignments before
   selecting. Contract unchanged.
-- **Firestore reads**: `users/{uid}/testAssignments` where `type == 'practice'`, ordered by
-  `createdAt` desc, limit `RECENT_TESTS_TO_AVOID` (proposed 3). May need a composite index
-  (`type` + `createdAt`) in `firestore.indexes.json`.
+- **Firestore reads**: `users/{uid}/testAttempts` where `type == 'practice'`, ordered by
+  `createdAt` desc, limit `RECENT_TESTS_TO_AVOID` (3), reading each `perQuestion[].questionId`.
+  Uses the existing `type` + `createdAt` index from Slice 5a: no new index.
 - **Security rules**: no changes (Admin SDK read; clients already read-only on
   `testAssignments`).
 
@@ -60,11 +60,17 @@ So that back-to-back practice tests feel distinct without the client having to t
 - **Failure modes**: assignment docs missing `questionIds` (ignored, no crash).
 
 ## Tasks
-- [ ] Read recent practice assignments and build the "recently seen" set.
-- [ ] Apply preference-then-top-up inside ph-3-us-3's selection function.
-- [ ] Add the composite index if the emulator/production requires it.
-- [ ] Extend `functions/src/assembleTest.test.ts`; document in `functions/README.md`.
+- [x] Read recent practice assignments and build the "recently seen" set.
+- [x] Apply preference-then-top-up inside ph-3-us-3's selection function.
+- [x] Add the composite index if the emulator/production requires it (not needed: the Slice 5a index is reused).
+- [x] Extend `functions/src/assembleTest.test.ts`; document in `functions/README.md`.
 
 ## Questions
-- Order when constraints conflict (scenario minimum > repeat-avoidance > topic cap) is a proposal.
-- `RECENT_TESTS_TO_AVOID = 3` is a starting value; tune with the reviewed bank's size.
+- `RECENT_TESTS_TO_AVOID = 3` is a starting value; tune with the reviewed bank's size (1415 approved questions, so at most 75 are avoided).
+
+## Implementation notes (Slice 5b-1)
+Built in Slice 5b-1 on `feat/timed-tests`; plan `docs/superpowers/plans/2026-11-20-slice-5b1-timed-tests.md`, design `docs/superpowers/specs/2026-11-20-slice-5b1-timed-tests-design.md`. Device-tested on the Android emulator against dev 2026-11-22: everything passed. `assembleTest` and `scoreTest` deployed to `dmv-app-dev` (smoke check 401); no rules or index changes.
+- **Decision 1, source of "recently seen":** the last 3 graded practice attempts (`users/{uid}/testAttempts`, `type == 'practice'`, `createdAt` desc), not `testAssignments`. Attempts are questions the teen actually saw; assignments also include tests handed out but never taken (for example a screen closed while `assembleTest` was in flight). It reuses the existing `type` + `createdAt` index, so there is no new index. Attempts without a usable `perQuestion` array, or entries without a string `questionId`, are skipped, not errors.
+- **Decision 2, priority:** scenario minimum > repeat-avoidance > topic cap. `selectPracticeQuestions` takes an optional `isSeen`, and its passes are ordered so an unseen question over the topic cap is taken before a seen one under it. With no practice history the result is exactly as before.
+- **Decision 3, top-up:** random among seen questions; "oldest first" is dropped because attempts give no cheap oldest order inside the 3, and with the real bank the top-up doesn't run.
+

@@ -2,7 +2,7 @@
 
 **ID:** ph-3-us-1
 **Layer:** Frontend
-**Status:** In Progress (baseline use complete 2026-09-28, Slice 2; practice-test use complete and device-tested 2026-11-20, Slice 5a. Mini-quiz part dropped in Slice 4b. Timed-test `startedAt` waits for Slice 5b, ph-3-us-9)
+**Status:** Complete (baseline use 2026-09-28, Slice 2; practice-test use device-tested 2026-11-20, Slice 5a; timed-test `startedAt` on the saved session device-tested 2026-11-22, Slice 5b-1. Mini-quiz part dropped in Slice 4b)
 
 ## Story
 As a teen user,
@@ -22,27 +22,27 @@ So that I'm not interrupted or lose progress partway through a test.
 
 ## Acceptance Criteria
 From ph-1-us-5:
-- [ ] Given a user starts a practice test, when `assembleTest` returns a question set, then it's
+- [x] Given a user starts a practice test, when `assembleTest` returns a question set, then it's
   written to the cache under its `testId` (via `saveTestCache`) before the test-taking screen
   shows the first question.
-- [ ] Given a cached test exists, when the device loses network connectivity, then moving between
+- [x] Given a cached test exists, when the device loses network connectivity, then moving between
   questions in that test reads from the cache, not a network call.
-- [ ] Given a test is completed (submitted to `scoreTest`) or explicitly abandoned, when that
+- [x] Given a test is completed (submitted to `scoreTest`) or explicitly abandoned, when that
   happens, then its cache entry is removed (`clearTestCache`).
-- [ ] Given the app is killed and reopened while a test's cache entry still exists, when the app
+- [x] Given the app is killed and reopened while a test's cache entry still exists, when the app
   restarts, then it detects the unfinished test and either resumes it or clears it.
 
 From ph-1-us-3:
-- [ ] Given a cached in-progress test, when the device goes offline mid-test, then the user can
+- [x] Given a cached in-progress test, when the device goes offline mid-test, then the user can
   keep answering from the cached set without interruption.
-- [ ] Given a test is completed or abandoned, when the session ends, then its cached question set
+- [x] Given a test is completed or abandoned, when the session ends, then its cached question set
   is cleared, so question content doesn't pile up on the device.
 
 Added when carrying over:
-- [ ] Given a test is in progress, when its questions are cached, then the app also stores which
+- [x] Given a test is in progress, when its questions are cached, then the app also stores which
   `testId` is active. `testCache.ts` has no "list cached tests" call, so without this a
   restarted app can't find the entry to resume or clear.
-- [ ] Given a baseline section is in progress, when the user pauses between sections or the local
+- [x] Given a baseline section is in progress, when the user pauses between sections or the local
   cache is cleared, then the baseline isn't treated as abandoned: the next section is fetched
   again from `startOrResumeBaseline`, which holds the real progress on the server.
 
@@ -90,3 +90,7 @@ Built in Slice 5a on `feat/practice-tests`; plan `docs/superpowers/plans/2026-11
 - **Resume vs discard (decision 5):** an unfinished practice test shows as a "Resume your test" card on the Practice tab (Resume / Discard), not a launch prompt. Starting a new test while one is saved asks first. Leaving mid-test keeps the answers.
 - Leaving while the test is still loading saves nothing; a submit the server permanently rejects clears the saved test and points back to the Practice tab.
 - Still open: stale-test expiry (Questions).
+
+## Implementation notes (Slice 5b-1)
+Built in Slice 5b-1 on `feat/timed-tests`; plan `docs/superpowers/plans/2026-11-20-slice-5b1-timed-tests.md`, design `docs/superpowers/specs/2026-11-20-slice-5b1-timed-tests-design.md`. Device-tested on the Android emulator against dev 2026-11-22: everything passed. `assembleTest` and `scoreTest` deployed to `dmv-app-dev` (smoke check 401); no rules or index changes.
+- **`startedAt` lives on the saved session (ph-3-us-9, decision 4):** the practice session now stores `timing: { mode, timeLimitSec?, startedAt }` next to its answers, written in `startSession` before the first question shows. `saveAnswers` keeps it. A session saved by a 5a install has no `timing` and resumes untimed.

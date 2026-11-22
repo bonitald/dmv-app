@@ -1,8 +1,10 @@
+import { Timestamp } from 'firebase-admin/firestore';
 import { getDb } from './adminApp';
 import {
   assembleTestForUser,
   MAX_PER_TOPIC,
   MIN_SCENARIO_COUNT,
+  recentlySeenQuestionIds,
   selectPracticeQuestions,
 } from './assembleTest';
 import { seededRandom } from './shuffle';
@@ -123,6 +125,70 @@ describe('selectPracticeQuestions', () => {
     expect(positions).not.toEqual(first);
     expect(positions).not.toEqual(last);
   });
+
+  test('no isSeen gives the same picks as before', () => {
+    const pool = buildPool(45, 2, 4);
+    for (let seed = 1; seed <= 50; seed++) {
+      const without = select(pool, seed);
+      const withSeen = selectPracticeQuestions(
+        pool, 25, seededRandom(`seed-${seed}`), { ...opts, isSeen: () => false }, (x) => x
+      );
+      expect(withSeen.map((x) => x.id)).toEqual(without.map((x) => x.id));
+    }
+  });
+
+  test('avoids seen questions when enough unseen remain', () => {
+    const pool = buildPool(45, 2, 4);
+    const seen = new Set(select(pool, 1).map((x) => x.id));
+    const second = selectPracticeQuestions(
+      pool, 25, seededRandom('seed-2'), { ...opts, isSeen: (x) => seen.has(x.id) }, (x) => x
+    );
+    expect(second.filter((x) => seen.has(x.id))).toHaveLength(0);
+    expect(second).toHaveLength(25);
+    expect(scenarioCount(second)).toBeGreaterThanOrEqual(8);
+    expect(maxTopic(second)).toBeLessThanOrEqual(2);
+  });
+
+  test('tops up from seen questions when the pool is small', () => {
+    const pool = buildPool(10, 1, 3); // 40 items
+    const seen = new Set(select(pool, 1).map((x) => x.id)); // 25 seen
+    const result = selectPracticeQuestions(
+      pool, 25, seededRandom('seed-2'), { ...opts, isSeen: (x) => seen.has(x.id) }, (x) => x
+    );
+    expect(result).toHaveLength(25);
+    const ids = new Set(result.map((x) => x.id));
+    for (const x of pool) if (!seen.has(x.id)) expect(ids.has(x.id)).toBe(true);
+  });
+
+  test('pool of exactly 25 repeats the whole test', () => {
+    const pool = buildPool(25, 0, 1);
+    const result = selectPracticeQuestions(
+      pool, 25, seededRandom('seed-1'), { ...opts, isSeen: () => true }, (x) => x
+    );
+    expect(result).toHaveLength(25);
+  });
+
+  test('scenario minimum is met from seen scenario questions', () => {
+    const pool = [...buildPool(10, 1, 0, 's'), ...buildPool(40, 0, 1, 'f')];
+    for (let seed = 1; seed <= 50; seed++) {
+      const result = selectPracticeQuestions(
+        pool, 25, seededRandom(`seed-${seed}`),
+        { ...opts, isSeen: (x) => x.type === 'scenario' }, (x) => x
+      );
+      expect(scenarioCount(result)).toBeGreaterThanOrEqual(MIN_SCENARIO_COUNT);
+    }
+  });
+
+  test('an unseen question over the cap beats a seen one under it', () => {
+    const pool: Item[] = [];
+    for (let i = 0; i < 5; i++) pool.push({ id: `a${i}`, type: 'fact', chunkId: 'a' });
+    for (let t = 0; t < 20; t++) pool.push({ id: `o${t}`, type: 'fact', chunkId: `o${t}` });
+    const result = selectPracticeQuestions(
+      pool, 5, seededRandom('x'),
+      { minScenario: 0, maxPerTopic: 2, isSeen: (x) => x.id.startsWith('o') }, (x) => x
+    );
+    expect(result.every((x) => x.chunkId === 'a')).toBe(true);
+  });
 });
 
 
@@ -154,6 +220,35 @@ describe('assembleTestForUser', () => {
         ...overrides,
       });
   }
+
+  test('still assembles the test (warning) when reading recent attempts fails', async () => {
+    await seedQuestion('q1');
+    await seedQuestion('q2');
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const failingAttempts = {
+      where: () => failingAttempts,
+      orderBy: () => failingAttempts,
+      limit: () => failingAttempts,
+      get: () => Promise.reject(new Error('attempts unavailable')),
+    };
+    const stubDb = {
+      collection: (name: string) =>
+        name !== 'users'
+          ? db.collection(name)
+          : {
+              doc: (uid: string) => ({
+                collection: (sub: string) =>
+                  sub === 'testAttempts' ? failingAttempts : db.collection('users').doc(uid).collection(sub),
+              }),
+            },
+    } as unknown as FirebaseFirestore.Firestore;
+
+    const result = await assembleTestForUser(stubDb, { uid: 'u-attempts-fail' }, { count: 2 });
+
+    expect(result.questions).toHaveLength(2);
+    expect(warn).toHaveBeenCalled();
+    warn.mockRestore();
+  });
 
   test('rejects a call with no authenticated user', async () => {
     await seedQuestion('q1');
@@ -293,5 +388,82 @@ describe('assembleTestForUser', () => {
     const perTopic = new Map<string, number>();
     for (const q of result.questions) perTopic.set(q.chunkId, (perTopic.get(q.chunkId) ?? 0) + 1);
     expect(Math.max(...perTopic.values())).toBeLessThanOrEqual(2);
+  });
+
+  // Each test below uses its own uid so attempts seeded by one never leak into another.
+  async function seedAttempt(uid: string, id: string, type: string, millis: number, perQuestion: unknown) {
+    await db
+      .collection('users').doc(uid).collection('testAttempts').doc(id)
+      .set({ type, createdAt: Timestamp.fromMillis(millis), perQuestion });
+  }
+  const pq = (...ids: string[]) => ids.map((questionId) => ({ questionId }));
+  async function seedMany(n: number) {
+    for (let i = 1; i <= n; i++) await seedQuestion(`q${i}`, { chunkId: `c${i}` });
+  }
+
+  test('excludes questions from the last 3 practice attempts', async () => {
+    await seedMany(30);
+    await seedAttempt('u-excl', 'a1', 'practice', 1000, pq('q1', 'q2'));
+    await seedAttempt('u-excl', 'a2', 'practice', 2000, pq('q3'));
+    await seedAttempt('u-excl', 'a3', 'practice', 3000, pq('q4', 'q5'));
+
+    const result = await assembleTestForUser(db, { uid: 'u-excl' }, { count: 25 });
+
+    const ids = result.questions.map((q) => q.id);
+    expect(ids).toHaveLength(25);
+    for (const x of ['q1', 'q2', 'q3', 'q4', 'q5']) expect(ids).not.toContain(x);
+  });
+
+  test('only the 3 most recent practice attempts count', async () => {
+    await seedAttempt('u-recent', 'a1', 'practice', 1000, pq('old'));
+    await seedAttempt('u-recent', 'a2', 'practice', 2000, pq('q2'));
+    await seedAttempt('u-recent', 'a3', 'practice', 3000, pq('q3'));
+    await seedAttempt('u-recent', 'a4', 'practice', 4000, pq('q4'));
+
+    const seen = await recentlySeenQuestionIds(db, 'u-recent');
+
+    expect([...seen].sort()).toEqual(['q2', 'q3', 'q4']);
+  });
+
+  test('mini-quiz and baseline attempts do not count', async () => {
+    await seedAttempt('u-types', 'a1', 'mini-quiz', 1000, pq('q1'));
+    await seedAttempt('u-types', 'a2', 'baseline', 2000, pq('q2'));
+    await seedAttempt('u-types', 'a3', 'practice', 3000, pq('q3'));
+
+    const seen = await recentlySeenQuestionIds(db, 'u-types');
+
+    expect([...seen]).toEqual(['q3']);
+  });
+
+  test('attempts with missing or malformed perQuestion are ignored', async () => {
+    await seedMany(30);
+    const uid = 'u-bad';
+    await db.collection('users').doc(uid).collection('testAttempts').doc('a0')
+      .set({ type: 'practice', createdAt: Timestamp.fromMillis(500) });
+    await seedAttempt(uid, 'a1', 'practice', 1000, 'x');
+    await seedAttempt(uid, 'a2', 'practice', 2000, [{}]);
+    await seedAttempt(uid, 'a3', 'practice', 3000, [{ questionId: 7 }]);
+
+    const result = await assembleTestForUser(db, { uid }, { count: 25 });
+
+    expect(result.questions).toHaveLength(25);
+  });
+
+  test('a user with no attempts behaves as before', async () => {
+    await seedMany(30);
+    const a = await assembleTestForUser(db, { uid: 'u-none' }, { count: 25, random: seededRandom('same') });
+    const b = await assembleTestForUser(db, { uid: 'u-none-2' }, { count: 25, random: seededRandom('same') });
+    expect(a.questions).toHaveLength(25);
+    expect(a.questions.map((q) => q.id)).toEqual(b.questions.map((q) => q.id));
+  });
+
+  test('does not touch freeTestUsedAt', async () => {
+    await seedMany(30);
+    await db.collection('users').doc('u-free').set({ freeTestUsedAt: null });
+
+    await assembleTestForUser(db, { uid: 'u-free' }, { count: 25 });
+
+    const snap = await db.collection('users').doc('u-free').get();
+    expect(snap.data()!.freeTestUsedAt).toBeNull();
   });
 });

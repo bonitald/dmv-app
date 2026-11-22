@@ -1,5 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getDeckPass, getLastOpenedTopic, setDeckPass, setLastOpenedTopic } from './localFlags';
+import {
+  getDeckPass,
+  getLastOpenedTopic,
+  getPracticeMode,
+  setDeckPass,
+  setLastOpenedTopic,
+  setPracticeMode,
+} from './localFlags';
 
 beforeEach(async () => {
   await AsyncStorage.clear();
@@ -35,4 +42,28 @@ test('deck pass is stored per uid and topic, and null clears it', async () => {
 test('a 4a plain card id reads as no saved pass', async () => {
   await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', 'q7');
   expect(await getDeckPass('u1', 'row')).toBeNull();
+});
+
+test('practice mode defaults to untimed and remembers the last choice per uid', async () => {
+  expect(await getPracticeMode('u1')).toBe('untimed');
+  await setPracticeMode('u1', 'timed');
+  expect(await getPracticeMode('u1')).toBe('timed');
+  expect(await getPracticeMode('u2')).toBe('untimed');
+  expect(await AsyncStorage.getItem('dmv-app:practice-mode:u1')).toBe('timed');
+  await setPracticeMode('u1', 'untimed');
+  expect(await getPracticeMode('u1')).toBe('untimed');
+});
+
+test('an unrecognised stored practice mode reads as untimed', async () => {
+  await AsyncStorage.setItem('dmv-app:practice-mode:u1', 'banana');
+  expect(await getPracticeMode('u1')).toBe('untimed');
+});
+
+test('practice mode storage failures never throw', async () => {
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  jest.spyOn(AsyncStorage, 'getItem').mockRejectedValueOnce(new Error('disk'));
+  jest.spyOn(AsyncStorage, 'setItem').mockRejectedValueOnce(new Error('disk'));
+  expect(await getPracticeMode('u1')).toBe('untimed');
+  await expect(setPracticeMode('u1', 'timed')).resolves.toBeUndefined();
+  warn.mockRestore();
 });

@@ -102,3 +102,28 @@ test('a legacy baseline session migrates', async () => {
   expect(await AsyncStorage.getItem('dmv-app:active-test:u1')).toBeNull();
   expect(await AsyncStorage.getItem('dmv-app:active-test:u1:baseline')).not.toBeNull();
 });
+
+test('timing round-trips through start, saveAnswers and getActiveSession', async () => {
+  const timing = { mode: 'timed' as const, timeLimitSec: 3600, startedAt: 123 };
+  await startSession('u1', 'p1', 'practice', questions, timing);
+  await saveAnswers('u1', 'practice', 'p1', { q1: 'b' });
+  expect((await getActiveSession('u1', 'practice'))?.timing).toEqual(timing);
+});
+
+test('a session saved without timing reads with timing undefined', async () => {
+  await saveTestCache('p1', questions);
+  await AsyncStorage.setItem(
+    'dmv-app:active-test:u1:practice',
+    JSON.stringify({ testId: 'p1', kind: 'practice', answers: { q1: 'a' } })
+  );
+  const session = await getActiveSession('u1', 'practice');
+  expect(session?.timing).toBeUndefined();
+  expect(session?.answers).toEqual({ q1: 'a' });
+});
+
+test('baseline sessions have no timing', async () => {
+  await startSession('u1', 'b1', 'baseline', questions);
+  const raw = JSON.parse((await AsyncStorage.getItem('dmv-app:active-test:u1:baseline')) ?? '{}');
+  expect('timing' in raw).toBe(false);
+  expect((await getActiveSession('u1', 'baseline'))?.timing).toBeUndefined();
+});

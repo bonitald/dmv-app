@@ -2,7 +2,7 @@ import { getDb } from './adminApp';
 import { assembleTestForUser } from './assembleTest';
 import { assembleMiniQuizForUser } from './assembleMiniQuiz';
 import { startOrResumeBaselineForUser, CURRENT_BASELINE_VERSION } from './startOrResumeBaseline';
-import { scoreTestForUser } from './scoreTest';
+import { scoreTestForUser, parseTiming } from './scoreTest';
 import { baselineChoices } from './shuffle';
 
 describe('scoreTestForUser', () => {
@@ -566,5 +566,137 @@ describe('scoreTestForUser', () => {
         type: 'fact',
       },
     ]);
+  });
+
+  describe('timing', () => {
+    const attemptData = async (testId: string) =>
+      (await db.collection('users').doc(uid).collection('testAttempts').doc(testId).get()).data()!;
+
+    test('saves timing on a practice attempt and returns it', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      const assembled = await assembleTestForUser(db, { uid }, { count: 1 });
+      const timing = { mode: 'timed', timeLimitSec: 3600, elapsedSec: 3600 };
+
+      const result = await scoreTestForUser(db, { uid }, {
+        testId: assembled.testId,
+        answers: [{ questionId: 'q1', choice: 'a' }],
+        timing,
+      });
+
+      expect((await attemptData(assembled.testId)).timing).toEqual(timing);
+      expect(result.timing).toEqual(timing);
+    });
+
+    test('missing timing saves null', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      const assembled = await assembleTestForUser(db, { uid }, { count: 1 });
+
+      const result = await scoreTestForUser(db, { uid }, { testId: assembled.testId, answers: [] });
+
+      expect((await attemptData(assembled.testId)).timing).toBeNull();
+      expect(result.timing).toBeNull();
+    });
+
+    test('malformed timing saves null and still grades', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      const assembled = await assembleTestForUser(db, { uid }, { count: 1 });
+
+      const result = await scoreTestForUser(db, { uid }, {
+        testId: assembled.testId,
+        answers: [{ questionId: 'q1', choice: 'a' }],
+        timing: { mode: 'x' },
+      });
+
+      expect(result.score).toBe(1);
+      expect(result.timing).toBeNull();
+      expect((await attemptData(assembled.testId)).timing).toBeNull();
+    });
+
+    test('mini-quiz ignores timing', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      const assembled = await assembleMiniQuizForUser(db, { uid }, { chunkId: 'row', count: 1 });
+
+      const result = await scoreTestForUser(db, { uid }, {
+        testId: assembled.testId,
+        answers: [{ questionId: 'q1', choice: 'a' }],
+        timing: { mode: 'untimed', elapsedSec: 5 },
+      });
+
+      expect(await attemptData(assembled.testId)).not.toHaveProperty('timing');
+      expect(result).not.toHaveProperty('timing');
+    });
+
+    test('baseline section ignores timing', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      await db
+        .collection('baselineTests')
+        .doc(CURRENT_BASELINE_VERSION)
+        .set({
+          sections: [
+            { section: 1, questionIds: ['q1'] },
+            { section: 2, questionIds: [] },
+            { section: 3, questionIds: [] },
+          ],
+          createdAt: new Date(),
+        });
+      const started = await startOrResumeBaselineForUser(db, { uid });
+
+      const result = await scoreTestForUser(db, { uid }, {
+        testId: started.testId,
+        answers: [{ questionId: 'q1', choice: 'a' }],
+        timing: { mode: 'untimed', elapsedSec: 5 },
+      });
+
+      expect(await attemptData(started.testId)).not.toHaveProperty('timing');
+      expect(result).not.toHaveProperty('timing');
+    });
+
+    test('unanswered questions still count as wrong with timing', async () => {
+      await seedQuestion('q1', 'row', 'a');
+      await seedQuestion('q2', 'row', 'a');
+      await seedQuestion('q3', 'row', 'a');
+      const assembled = await assembleTestForUser(db, { uid }, { count: 3 });
+
+      const result = await scoreTestForUser(db, { uid }, {
+        testId: assembled.testId,
+        answers: [
+          { questionId: 'q1', choice: 'a' },
+          { questionId: 'q2', choice: 'a' },
+        ],
+        timing: { mode: 'timed', timeLimitSec: 60, elapsedSec: 60 },
+      });
+
+      expect(result.totalCount).toBe(3);
+      expect(result.correctCount).toBe(2);
+    });
+  });
+});
+
+describe('parseTiming', () => {
+  test('keeps a valid timed record', () => {
+    const t = { mode: 'timed', timeLimitSec: 3600, elapsedSec: 1234 };
+    expect(parseTiming(t)).toEqual(t);
+  });
+  test('drops timeLimitSec for untimed', () => {
+    expect(parseTiming({ mode: 'untimed', elapsedSec: 90, timeLimitSec: 3600 })).toEqual({
+      mode: 'untimed',
+      elapsedSec: 90,
+    });
+  });
+  test('keeps 0 and floors fractions', () => {
+    expect(parseTiming({ mode: 'untimed', elapsedSec: 0 })?.elapsedSec).toBe(0);
+    expect(parseTiming({ mode: 'untimed', elapsedSec: 12.7 })?.elapsedSec).toBe(12);
+  });
+  test.each([undefined, null, 'timed', 5, { mode: 'fast', elapsedSec: 1 }])('%p -> null', (raw) => {
+    expect(parseTiming(raw)).toBeNull();
+  });
+  test.each([90000, -1, 'x', NaN, Infinity, undefined])('bad elapsedSec %p keeps mode, elapsedSec null', (e) => {
+    expect(parseTiming({ mode: 'untimed', elapsedSec: e })).toEqual({ mode: 'untimed', elapsedSec: null });
+  });
+  test('timed with a fractional limit that floors to 0 -> null', () => {
+    expect(parseTiming({ mode: 'timed', timeLimitSec: 0.5, elapsedSec: 10 })).toBeNull();
+  });
+  test.each([undefined, 0, 90000, -5, NaN, 'x'])('timed with bad limit %p -> null', (limit) => {
+    expect(parseTiming({ mode: 'timed', timeLimitSec: limit, elapsedSec: 10 })).toBeNull();
   });
 });

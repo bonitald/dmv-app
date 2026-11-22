@@ -13,6 +13,26 @@ const MINI_QUIZ_PASS_THRESHOLD = 0.8;
 /** Which kind of session was graded. Stored on the attempt so later phases can filter by it. */
 type AttemptType = 'practice' | 'mini-quiz' | 'baseline';
 
+/**
+ * Cap on a believable `elapsedSec` / `timeLimitSec` (24 hours). Anything larger is a clock bug or
+ * tampering; it is never worth failing a submission over, so it is dropped instead.
+ */
+const MAX_ELAPSED_SEC = 86400;
+
+/** Whether a practice test was taken against a countdown or not (Slice 5b-1, ph-3-us-8). */
+export type TestMode = 'timed' | 'untimed';
+
+/**
+ * Client-reported timing, saved on practice attempts only. It is informational: it never
+ * affects grading. `elapsedSec` is null when the client's number was missing or out of range;
+ * `timeLimitSec` is present only for timed tests.
+ */
+export interface AttemptTiming {
+  mode: TestMode;
+  timeLimitSec?: number;
+  elapsedSec: number | null;
+}
+
 /** One submitted answer: the choice text the student picked for a question. */
 interface AnswerInput {
   questionId: string;
@@ -101,12 +121,46 @@ export interface ScoreTestResult {
   baselineReview?: PerQuestionResult[];
   /** Mini-quizzes only; null for practice tests and baseline sections. */
   recommendation: 'move-on' | 'review-again' | null;
+  /**
+   * Practice tests only (ph-3-us-8): the validated client-reported timing, or null when none
+   * was sent or it was malformed. Absent for mini-quizzes and baseline sections.
+   */
+  timing?: AttemptTiming | null;
 }
 
 /** Raw request data. Typed `unknown` because it comes straight from the client. */
 interface ScoreTestInput {
   testId: unknown;
   answers: unknown;
+  /** Optional client-reported timing; validated by parseTiming. */
+  timing?: unknown;
+}
+
+/**
+ * Validates the client-reported timing of a practice test. Never throws.
+ *
+ * Returns null (no timing saved) for a non-object or unknown `mode`, and for a timed record
+ * without a finite `timeLimitSec` whose floor is in [1, MAX_ELAPSED_SEC] — without a valid limit (at least 1 s once floored) we couldn't
+ * tell whether time ran out. A bad `elapsedSec` (not a finite number in [0, MAX_ELAPSED_SEC])
+ * keeps the mode but saves `elapsedSec: null`. Seconds are floored; `timeLimitSec` is dropped
+ * for untimed tests.
+ */
+export function parseTiming(raw: unknown): AttemptTiming | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const { mode, timeLimitSec, elapsedSec } = raw as Record<string, unknown>;
+  if (mode !== 'timed' && mode !== 'untimed') return null;
+
+  const elapsed =
+    typeof elapsedSec === 'number' && Number.isFinite(elapsedSec) && elapsedSec >= 0 && elapsedSec <= MAX_ELAPSED_SEC
+      ? Math.floor(elapsedSec)
+      : null;
+
+  if (mode === 'untimed') return { mode, elapsedSec: elapsed };
+
+  // Floor first, so a fractional limit like 0.5 (which floors to 0) is rejected as well.
+  const limit = typeof timeLimitSec === 'number' && Number.isFinite(timeLimitSec) ? Math.floor(timeLimitSec) : NaN;
+  if (!(limit >= 1 && limit <= MAX_ELAPSED_SEC)) return null;
+  return { mode, timeLimitSec: limit, elapsedSec: elapsed };
 }
 
 /**
@@ -115,7 +169,11 @@ interface ScoreTestInput {
  * A malformed entry is ignored rather than rejected, so a single bad element can't block a
  * student from submitting the rest of their test — the skipped question just scores as wrong.
  */
-function validateInput(input: ScoreTestInput): { testId: string; answers: AnswerInput[] } {
+function validateInput(input: ScoreTestInput): {
+  testId: string;
+  answers: AnswerInput[];
+  timing: AttemptTiming | null;
+} {
   if (typeof input.testId !== 'string' || input.testId.length === 0) {
     throw new HttpsError('invalid-argument', 'testId must be a non-empty string.');
   }
@@ -126,7 +184,8 @@ function validateInput(input: ScoreTestInput): { testId: string; answers: Answer
     (a): a is AnswerInput =>
       typeof a === 'object' && a !== null && typeof a.questionId === 'string' && typeof a.choice === 'string'
   );
-  return { testId: input.testId, answers };
+  // Timing never rejects a submission: a bad value just becomes null.
+  return { testId: input.testId, answers, timing: parseTiming(input.timing) };
 }
 
 /**
@@ -235,7 +294,10 @@ async function gradeQuestions(
  *
  * Reads:    `users/{uid}/testAssignments/{testId}` (written by assembleTest/assembleMiniQuiz),
  *           `questions/{id}`
- * Writes:   `users/{uid}/testAttempts/{testId}`; sets the assignment's `scored: true`; for a
+ * Inputs:   timing — validated client timing; saved (and returned) for practice tests only,
+ *           ignored for mini-quizzes
+ * Writes:   `users/{uid}/testAttempts/{testId}` (practice: includes `timing`, possibly null);
+ *           sets the assignment's `scored: true`; for a
  *           mini-quiz, merges the latest score and its correct/total counts into `users/{uid}/conceptProgress/{chunkId}`
  *           and increments `miniQuizPassCount` (score >= MINI_QUIZ_PASS_THRESHOLD) or `miniQuizFailCount`
  *           (otherwise), exactly one of the two (ph-2-us-11), without touching the client-owned `status`
@@ -246,7 +308,8 @@ async function scoreAssignedTest(
   db: Firestore,
   uid: string,
   testId: string,
-  answers: AnswerInput[]
+  answers: AnswerInput[],
+  timing: AttemptTiming | null
 ): Promise<ScoreTestResult> {
   // Both docs live under the caller's own uid, so one user can never score another's test.
   const assignmentRef = db.collection('users').doc(uid).collection('testAssignments').doc(testId);
@@ -285,6 +348,8 @@ async function scoreAssignedTest(
       perTopic,
       perQuestion,
       recommendation,
+      // Practice tests only; mini-quizzes get no timing field at all.
+      ...(type === 'practice' ? { timing } : {}),
       createdAt: FieldValue.serverTimestamp(),
     });
     tx.update(assignmentRef, { scored: true });
@@ -322,7 +387,17 @@ async function scoreAssignedTest(
       );
     }
 
-    return { testId, type, score, correctCount, totalCount, perTopic, perQuestion, recommendation };
+    return {
+      testId,
+      type,
+      score,
+      correctCount,
+      totalCount,
+      perTopic,
+      perQuestion,
+      recommendation,
+      ...(type === 'practice' ? { timing } : {}),
+    };
   });
 }
 
@@ -467,10 +542,13 @@ async function scoreBaselineSection(
  * Inputs:   db; auth — request.auth; rawInput.testId — as returned by assembleTest,
  *           assembleMiniQuiz, or startOrResumeBaseline; rawInput.answers —
  *           [{ questionId, choice }]. Unanswered or unknown questions count as wrong.
+ *           rawInput.timing — optional { mode, timeLimitSec?, elapsedSec }, kept for practice
+ *           tests only (see parseTiming); never affects grading or fails a submission
  * Returns:  ScoreTestResult — score, per-topic and per-question results (question text, choices,
  *           type, and correct answer + explanation except for baseline sections before the
  *           last), and for mini-quizzes a
- *           move-on/review-again recommendation (see MINI_QUIZ_PASS_THRESHOLD)
+ *           move-on/review-again recommendation (see MINI_QUIZ_PASS_THRESHOLD); for practice
+ *           tests also `timing` (validated client-reported timing, or null)
  * Reads:    the session's server-side record (testAssignments, or baseline progress +
  *           baselineTests) and `questions/{id}` for each graded question
  * Writes:   `users/{uid}/testAttempts/{testId}`; plus either the assignment's `scored: true`
@@ -490,18 +568,19 @@ export async function scoreTestForUser(
   if (!auth) {
     throw new HttpsError('unauthenticated', 'scoreTest requires a signed-in caller.');
   }
-  const { testId, answers } = validateInput(rawInput);
+  const { testId, answers, timing } = validateInput(rawInput);
 
   // Baseline testIds have a fixed prefix; practice/mini-quiz testIds are UUIDs, which never do.
   if (testId.startsWith('baseline-')) {
     return scoreBaselineSection(db, auth.uid, testId, answers);
   }
-  return scoreAssignedTest(db, auth.uid, testId, answers);
+  // Timing is passed to the assigned-test path only; baseline sections never record it.
+  return scoreAssignedTest(db, auth.uid, testId, answers, timing);
 }
 
 /**
  * The deployed Cloud Function. `onCall` verifies the caller's Firebase ID token and fills in
- * `request.auth` before this runs. Expects request data `{ testId, answers }`.
+ * `request.auth` before this runs. Expects request data `{ testId, answers, timing? }`.
  * See `scoreTestForUser` for the logic.
  */
 export const scoreTest = onCall((request) =>

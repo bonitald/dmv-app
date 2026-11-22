@@ -44,7 +44,14 @@ question under the cap until 25; any question ignoring the cap until 25; then a 
 scenario questions are spread out. Fallbacks: the scenario minimum beats the topic cap; if the bank
 has fewer than 8 scenario questions, all of them are used; if the cap can't be met (few topics) it
 is relaxed to fill the test; a pool smaller than 25 returns everything. A missing or unknown
-`type` counts as fact. Repeats across a user's tests are allowed.
+`type` counts as fact.
+
+**Repeat avoidance** (ph-3-us-6): questions that appeared in the caller's last
+`RECENT_TESTS_TO_AVOID` (3) graded practice tests (`users/{uid}/testAttempts`, `type ==
+'practice'`, read from `perQuestion[].questionId`) are used only after unseen ones. This is a
+preference, not a guarantee: if the bank is too small, seen questions top up the test. Priority
+when rules clash: scenario minimum > repeat avoidance > topic cap. A user with no practice
+history gets the same selection as before.
 
 **Persistence**: also writes `users/{uid}/testAssignments/{testId}` — `{ type: 'practice',
 questionIds: string[], createdAt: FieldValue, scored: false }` — recording exactly which question
@@ -181,9 +188,15 @@ place correct answers are compared with a student's choices — answers never le
 ```json
 {
   "testId": "string — as returned by assembleTest, assembleMiniQuiz, or startOrResumeBaseline",
-  "answers": [{ "questionId": "string", "choice": "string — the choice text picked" }]
+  "answers": [{ "questionId": "string", "choice": "string — the choice text picked" }],
+  "timing": { "mode": "timed | untimed", "timeLimitSec": 3600, "elapsedSec": 1234 }
 }
 ```
+`timing` is optional and used for practice tests only (ph-3-us-8); mini-quizzes and baseline
+sections ignore it. It never affects grading or fails a submission. Rules: a non-object or
+unknown `mode` saves `null`; a `timed` record needs a finite `timeLimitSec` in (0, 86400] or the
+whole timing saves `null`; `timeLimitSec` is dropped for `untimed`; an `elapsedSec` that isn't a
+finite number in [0, 86400] keeps the mode and saves `elapsedSec: null`. Seconds are floored.
 Unanswered questions, and answers for questions that weren't assigned, count as wrong rather than
 causing an error. Malformed answer entries are ignored.
 
@@ -197,7 +210,8 @@ causing an error. Malformed answer entries are ignored.
   "totalCount": 15,
   "perTopic": [{ "chunkId": "right-of-way", "correct": 3, "total": 4 }],
   "perQuestion": [{ "questionId": "...", "chunkId": "...", "choice": "... | null if skipped", "correctAnswer": "...", "correct": false, "text": "...", "choices": ["..."], "type": "fact | scenario", "explanation": "... (only when present)" }],
-  "recommendation": "move-on | review-again | null"
+  "recommendation": "move-on | review-again | null",
+  "timing": "practice tests only: { mode, timeLimitSec?, elapsedSec: number | null } or null"
 }
 ```
 `perQuestion` lists every assigned question in the order it was handed out, with the correct
@@ -246,7 +260,8 @@ product decision.** `null` for practice tests and baseline sections.
 
 **Persistence**: writes `users/{uid}/testAttempts/{testId}` — `{ type, chunkId (topic for a
 mini-quiz, or for a practice test whose questions all share one; otherwise null), score,
-correctCount, totalCount, perTopic, perQuestion, recommendation, createdAt }`, plus
+correctCount, totalCount, perTopic, perQuestion, recommendation, createdAt }` (practice
+attempts also get `timing`, `null` when none/invalid; other types have no `timing` field), plus
 `baselineReview` on the final baseline section's attempt. `perQuestion` and `baselineReview`
 entries include the question content described above. Clients can read attempts but
 never write them.

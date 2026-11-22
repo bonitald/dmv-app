@@ -19,6 +19,8 @@ const attempt = {
   totalCount: 25,
   perTopic: [],
   unavailableCount: 0,
+  timing: null,
+  unansweredCount: 0,
 };
 
 beforeEach(() => {

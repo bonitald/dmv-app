@@ -1,6 +1,7 @@
-import type { PerTopicResult, ScoreTestResult } from '../api/types';
+import type { AttemptTiming, PerTopicResult, ScoreTestResult } from '../api/types';
 import { PASS_MARK } from '../results/passMark';
 import type { Topic } from '../topics/topicsData';
+import { isTimedOut } from './timing';
 
 // ph-4-us-1 / ph-4-us-6 (practice part): a finished practice test as one shape (fresh from
 // scoreTest or read back from a saved attempt), the pass line against the real test's mark,
@@ -19,12 +20,36 @@ export interface PracticeOutcome {
   perTopic: PerTopicResult[];
   /** Questions removed from the bank since the test was built; they aren't scored. */
   unavailableCount: number;
+  /** The saved timing, or null for a test saved without one (or before timing existed). */
+  timing: AttemptTiming | null;
+  /** Questions the taker left without a choice (removed questions don't count). */
+  unansweredCount: number;
 }
 
 function countUnavailable(perQuestion: unknown): number {
   if (!Array.isArray(perQuestion)) return 0;
   return perQuestion.filter((q) => (q as { unavailable?: unknown } | null)?.unavailable === true)
     .length;
+}
+
+function countUnanswered(perQuestion: unknown): number {
+  if (!Array.isArray(perQuestion)) return 0;
+  return perQuestion.filter((q) => {
+    const item = q as { choice?: unknown; unavailable?: unknown } | null;
+    return item?.choice === null && item?.unavailable !== true;
+  }).length;
+}
+
+/** A saved timing is read only when it has a valid mode; anything else reads as no timing. */
+function readTiming(raw: unknown): AttemptTiming | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const t = raw as { mode?: unknown; timeLimitSec?: unknown; elapsedSec?: unknown };
+  if (t.mode !== 'timed' && t.mode !== 'untimed') return null;
+  return {
+    mode: t.mode,
+    ...(typeof t.timeLimitSec === 'number' ? { timeLimitSec: t.timeLimitSec } : {}),
+    elapsedSec: typeof t.elapsedSec === 'number' ? t.elapsedSec : null,
+  };
 }
 
 export function fromPracticeScore(result: ScoreTestResult): PracticeOutcome {
@@ -35,6 +60,8 @@ export function fromPracticeScore(result: ScoreTestResult): PracticeOutcome {
     totalCount: result.totalCount,
     perTopic: result.perTopic,
     unavailableCount: countUnavailable(result.perQuestion),
+    timing: result.timing ?? null,
+    unansweredCount: countUnanswered(result.perQuestion),
   };
 }
 
@@ -54,6 +81,8 @@ export function fromPracticeAttempt(
     totalCount,
     perTopic: perTopic as PerTopicResult[],
     unavailableCount: countUnavailable(data.perQuestion),
+    timing: readTiming(data.timing),
+    unansweredCount: countUnanswered(data.perQuestion),
   };
 }
 
@@ -86,6 +115,14 @@ export function leftOutLine(o: PracticeOutcome): string | null {
   const n = o.unavailableCount;
   if (n <= 0) return null;
   return `${n} ${n === 1 ? 'question was' : 'questions were'} removed from the bank, so this test is scored out of ${o.totalCount}.`;
+}
+
+/** Shown only for a timed test that used its whole limit; null otherwise. */
+export function timedOutLine(o: PracticeOutcome): string | null {
+  if (!isTimedOut(o.timing)) return null;
+  const n = o.unansweredCount;
+  if (n === 0) return 'Time ran out — you answered every question.';
+  return `Time ran out — ${n} ${n === 1 ? 'question' : 'questions'} unanswered.`;
 }
 
 export interface TopicToWorkOn {

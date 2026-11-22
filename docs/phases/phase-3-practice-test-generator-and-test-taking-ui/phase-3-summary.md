@@ -1,6 +1,6 @@
 # Phase 3: Practice Test Generator & Test-Taking UI — Summary
 
-## Status: In Progress (Slice 2 baseline complete 2026-09-28; Slice 5a practice tests complete 2026-11-20)
+## Status: In Progress (Slice 2 baseline complete 2026-09-28; Slice 5a practice tests complete 2026-11-20; Slice 5b-1 timed tests and fresh questions complete 2026-11-22. Only ph-3-us-11 is still open)
 
 Depends on Phase 1 (question bank), which is Complete. Phase 1 already built every server
 function the test flows call (`assembleTest`, `startOrResumeBaseline`, `scoreTest`), so Phase 3
@@ -11,15 +11,15 @@ mix and repeat-avoidance in `assembleTest`, and recording `timing` in `scoreTest
 
 | ID | Title | Layer | Parent | Status |
 |----|-------|-------|--------|--------|
-| ph-3-us-1 | Use the on-device test cache in the test-taking flow | Frontend | — | In Progress (baseline and practice use complete; mini-quiz part dropped in Slice 4b; timed `startedAt` is Slice 5b) |
+| ph-3-us-1 | Use the on-device test cache in the test-taking flow | Frontend | — | Complete (2026-11-22; mini-quiz part dropped in Slice 4b) |
 | ph-3-us-2 | Start a practice test that mixes fact and scenario questions | Parent | — | Complete |
 | ph-3-us-3 | `assembleTest` guarantees a fact/scenario mix and topic spread | Backend | ph-3-us-2 | Complete |
-| ph-3-us-4 | Test-taking screen (shared quiz runner) | Frontend | ph-3-us-2 | In Progress (baseline, mini-quiz and practice use complete; timed mode is Slice 5b) |
-| ph-3-us-5 | Unlimited, distinct practice tests | Parent | — | Not Started |
-| ph-3-us-6 | `assembleTest` avoids repeating a user's recent questions | Backend | ph-3-us-5 | Not Started |
-| ph-3-us-7 | Timed or untimed practice test mode | Parent | — | Not Started |
-| ph-3-us-8 | Record test mode and duration on the Test Attempt | Backend | ph-3-us-7 | Not Started |
-| ph-3-us-9 | Timed mode picker and countdown | Frontend | ph-3-us-7 | Not Started |
+| ph-3-us-4 | Test-taking screen (shared quiz runner) | Frontend | ph-3-us-2 | Complete (2026-11-22) |
+| ph-3-us-5 | Unlimited, distinct practice tests | Parent | — | Complete (2026-11-22) |
+| ph-3-us-6 | `assembleTest` avoids repeating a user's recent questions | Backend | ph-3-us-5 | Complete (2026-11-22) |
+| ph-3-us-7 | Timed or untimed practice test mode | Parent | — | Complete (2026-11-22) |
+| ph-3-us-8 | Record test mode and duration on the Test Attempt | Backend | ph-3-us-7 | Complete (2026-11-22) |
+| ph-3-us-9 | Timed mode picker and countdown | Frontend | ph-3-us-7 | Complete (2026-11-22) |
 | ph-3-us-10 | Every Test Attempt is recorded | Parent | — | Complete (delivered by ph-1-us-11) |
 | ph-3-us-11 | Colorado-only content, no state selector | Parent | — | In Progress (Slice 1 and baseline intro complete) |
 | ph-3-us-12 | Take the baseline diagnostic, with pauses between sections | Parent | — | Complete (2026-09-28) |
@@ -40,9 +40,10 @@ mix and repeat-avoidance in `assembleTest`, and recording `timing` in `scoreTest
   covers all three session kinds.
 - **Every practice test gets a guaranteed mix** (ph-3-us-3): a scenario minimum and a per-topic
   cap, as tunable constants (proposed 8 of 25 scenario, max 2 per topic).
-- **Repeat-avoidance is server-side** (ph-3-us-6), using the user's recent `testAssignments`, so
-  it works across devices with no client state. Conflict order (proposed): scenario minimum >
-  repeat-avoidance > topic cap.
+- **Repeat-avoidance is server-side** (ph-3-us-6), using the user's last 3 graded practice
+  attempts (changed from `testAssignments` in Slice 5b-1: attempts are what the teen actually
+  saw; no new index), so it works across devices with no client state. Conflict order: scenario
+  minimum > repeat-avoidance > topic cap; the top-up from seen questions is random.
 - **No rate limit or cap on practice tests**: `assembleTest` never returns answers, so there's
   nothing to scrape, and a cap would contradict "unlimited". Only the baseline sets
   `freeTestUsedAt`.
@@ -50,7 +51,7 @@ mix and repeat-avoidance in `assembleTest`, and recording `timing` in `scoreTest
   (80%) to pass (`prd.md` Section 9, confirmed 2026-09-23).
 - **Timed mode is practice-only, untimed by default, 60 minutes when on**, computed from a saved `startedAt` (the
   phase-0 persist-timestamps principle), keeps running in the background, auto-submits at zero
-  (ph-3-us-9). Mode and duration are recorded on the attempt for analytics only (ph-3-us-8).
+  (ph-3-us-9). An expired timed test is always graded: it can't be discarded (decided 2026-11-20). Mode and duration are recorded on the attempt for analytics only (ph-3-us-8).
 - **Baseline check-in shows no score between sections** (ph-3-us-13) — a low-pressure break
   point. Full results after section 3 are Phase 4.
 - **One `Baseline` route** serves both the Practice tab card and Phase 9's first-run "test what I
@@ -74,4 +75,4 @@ mix and repeat-avoidance in `assembleTest`, and recording `timing` in `scoreTest
   `MAX_PER_TOPIC`, `RECENT_TESTS_TO_AVOID`.
 - Results screens are Phase 4: practice results ph-4-us-1, baseline results ph-4-us-6, review
   ph-4-us-4. ph-3-us-4 and ph-3-us-13 ship minimal placeholders if they land first.
-- Stale-test expiry after a force-quit is still open (ph-3-us-1 Questions).
+- Stale-test expiry after a force-quit is still open (ph-3-us-1 Questions). Timed tests don't need it: an expired timed test is graded on resume.

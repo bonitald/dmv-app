@@ -26,23 +26,33 @@ export interface SelectableQuestion {
  * satisfy them. Generic over the item type so it can be unit-tested with plain objects;
  * `describe` maps an item to its `type` and `chunkId` (for Firestore docs: `(d) => d.data()`).
  *
- * Order of passes (each walks one shuffled copy of the pool, so results stay random):
- *   1. scenario questions under the topic cap, until `minScenario`
- *   2. scenario questions ignoring the cap, until `minScenario` (the minimum beats the cap)
- *   3. any question under the topic cap, until `count`
- *   4. any question ignoring the cap, until `count` (a small/lopsided pool still fills the test)
- * Finally the picks are shuffled again so the scenario questions are spread through the test
- * rather than grouped at the start. Returns fewer than `count` only if the pool is smaller.
+ * ph-3-us-6: when `opts.isSeen` is given, items it flags (questions from the user's recent tests)
+ * are used only after unseen ones. Repeat-avoidance is a preference, not a guarantee. Priority
+ * when rules clash: scenario minimum > repeat-avoidance > topic cap.
+ *
+ * Order of passes (each walks one shuffled copy of the pool, so results stay random). The scenario
+ * tier runs first, until `minScenario`; the any-question tier then runs, until `count`. Each tier
+ * does the same four passes:
+ *   a. unseen, under the topic cap
+ *   b. unseen, ignoring the cap (an unseen question over the cap beats a seen one under it)
+ *   c. seen, under the topic cap
+ *   d. seen, ignoring the cap (a small/lopsided pool still fills the test)
+ * With no `isSeen` nothing is seen, so passes c and d take nothing new and the result is the same
+ * as the original cap-only selection. Finally the picks are shuffled again so the scenario
+ * questions are spread through the test rather than grouped at the start. Returns fewer than
+ * `count` only if the pool is smaller.
  */
 export function selectPracticeQuestions<T>(
   pool: T[],
   count: number,
   random: () => number,
-  opts: { minScenario: number; maxPerTopic: number },
+  opts: { minScenario: number; maxPerTopic: number; isSeen?: (item: T) => boolean },
   describe: (item: T) => SelectableQuestion
 ): T[] {
   const shuffled = shuffle(pool, random);
   const isScenario = (item: T) => describe(item).type === 'scenario';
+  const isSeen = opts.isSeen ?? (() => false); // no history: everything counts as unseen
+  const isUnseen = (item: T) => !isSeen(item);
 
   // Picked items are tracked by position in `shuffled` (not by identity) so a pool containing
   // equal-looking items can never be confused, and so later passes skip what is already taken.
@@ -63,14 +73,62 @@ export function selectPracticeQuestions<T>(
 
   // The scenario target is bounded by `count` so a tiny test can't be forced over its size.
   const scenarioTarget = Math.min(opts.minScenario, count);
-  pass(scenarioTarget, isScenario, true); // 1
   // The scenario passes count only scenario picks toward the target, which is the same as the
   // total here because nothing else has been taken yet.
-  pass(scenarioTarget, isScenario, false); // 2
-  pass(count, () => true, true); // 3
-  pass(count, () => true, false); // 4
+  const bothUnseen = (item: T) => isScenario(item) && isUnseen(item);
+  pass(scenarioTarget, bothUnseen, true); // scenario: unseen, under cap
+  pass(scenarioTarget, bothUnseen, false); // scenario: unseen, ignoring cap
+  pass(scenarioTarget, isScenario, true); // scenario: seen allowed, under cap
+  pass(scenarioTarget, isScenario, false); // scenario: seen allowed, ignoring cap (minimum wins)
+  pass(count, isUnseen, true); // any: unseen, under cap
+  pass(count, isUnseen, false); // any: unseen, ignoring cap
+  pass(count, () => true, true); // any: seen allowed, under cap
+  pass(count, () => true, false); // any: seen allowed, ignoring cap
 
   return shuffle([...taken].map((i) => shuffled[i]), random);
+}
+
+// ph-3-us-6: how many of the user's most recent graded practice tests to steer away from, so
+// back-to-back tests feel fresh. Change here to widen or narrow the "recently seen" window.
+export const RECENT_TESTS_TO_AVOID = 3;
+
+/**
+ * Returns the IDs of questions in the user's last `RECENT_TESTS_TO_AVOID` practice attempts.
+ *
+ * Used by `assembleTestForUser` so a new test prefers questions the user hasn't just seen.
+ * Only graded attempts exist in `testAttempts`, and only `type == 'practice'` counts (mini-quizzes
+ * and baselines don't). Malformed attempt data is skipped rather than failing test assembly.
+ *
+ * Trigger:  helper called by `assembleTestForUser`
+ * Auth:     none of its own; the caller has already verified the user
+ * Inputs:   db — Firestore instance; uid — the user whose history to read
+ * Returns:  Set of question IDs (possibly empty)
+ * Reads:    `users/{uid}/testAttempts`, type == 'practice', newest first, limit 3
+ *           (served by the existing composite index on type asc, createdAt desc)
+ * Writes:   none
+ * Errors:   none thrown by this helper itself (Firestore errors propagate)
+ */
+export async function recentlySeenQuestionIds(db: Firestore, uid: string): Promise<Set<string>> {
+  const snapshot = await db
+    .collection('users')
+    .doc(uid)
+    .collection('testAttempts')
+    .where('type', '==', 'practice')
+    .orderBy('createdAt', 'desc')
+    .limit(RECENT_TESTS_TO_AVOID)
+    .get();
+
+  const seen = new Set<string>();
+  for (const doc of snapshot.docs) {
+    const perQuestion = doc.data().perQuestion;
+    // Defensive: the field is written by our own scorer, but never let odd data break a test.
+    if (!Array.isArray(perQuestion)) continue;
+    for (const entry of perQuestion) {
+      const id = entry?.questionId;
+      if (typeof id === 'string') seen.add(id);
+    }
+  }
+  return seen;
 }
 
 /**
@@ -116,13 +174,17 @@ interface AssembleTestOptions {
  *           only
  *           Selection: random, but at least MIN_SCENARIO_COUNT (8) scenario questions and at
  *           most MAX_PER_TOPIC (2) per chunkId; both relax if the bank can't satisfy them
- *           (the scenario minimum takes priority over the topic cap).
- * Reads:    `questions` collection, filtered to status == 'approved'
+ *           (the scenario minimum takes priority over the topic cap). Questions from the user's
+ *           last 3 practice attempts are avoided when enough others exist (a preference, not a
+ *           guarantee; priority: scenario minimum > repeat-avoidance > topic cap).
+ * Reads:    `questions` collection, filtered to status == 'approved'; and the user's most
+ *           recent practice attempts in `users/{uid}/testAttempts` (see recentlySeenQuestionIds)
  * Writes:   `users/{uid}/testAssignments/{testId}` — records exactly which question IDs were
  *           assigned, so `scoreTest` (ph-1-us-11) can grade only what this call actually handed
  *           out rather than trusting arbitrary question IDs submitted by the client (which would
  *           let a caller submit IDs for questions they were never shown, revealing answers).
- * Errors:   HttpsError('unauthenticated') when `auth` is missing
+ * Errors:   HttpsError('unauthenticated') when `auth` is missing. A failure reading recent attempts
+ *           is logged (console.warn) and ignored: the test is assembled without repeat-avoidance.
  */
 export async function assembleTestForUser(
   db: Firestore,
@@ -141,15 +203,26 @@ export async function assembleTestForUser(
 
   // Load every approved question. Only 'approved' content may reach students — drafts and
   // anything still awaiting review stay hidden.
-  const snapshot = await db.collection('questions').where('status', '==', 'approved').get();
+  // The two reads are independent, so run them in parallel: the approved bank and the IDs the
+  // user saw in their last few practice tests (ph-3-us-6).
+  const [snapshot, seen] = await Promise.all([
+    db.collection('questions').where('status', '==', 'approved').get(),
+    // Repeat-avoidance is only a preference, so a failed history read must not block the test:
+    // warn and carry on as if the user had no history.
+    recentlySeenQuestionIds(db, auth.uid).catch((error) => {
+      console.warn('[assembleTest] could not read recent attempts; skipping repeat-avoidance', error);
+      return new Set<string>();
+    }),
+  ]);
 
-  // Pick a random, duplicate-free set with a realistic mix (scenario minimum, per-topic cap);
-  // see selectPracticeQuestions for the rules and fallbacks. `d.data()` exposes type/chunkId.
+  // Pick a random, duplicate-free set with a realistic mix (scenario minimum, per-topic cap),
+  // preferring questions not recently seen; see selectPracticeQuestions for the rules and
+  // fallbacks. `d.data()` exposes type/chunkId.
   const selected = selectPracticeQuestions(
     snapshot.docs,
     count,
     random,
-    { minScenario: MIN_SCENARIO_COUNT, maxPerTopic: MAX_PER_TOPIC },
+    { minScenario: MIN_SCENARIO_COUNT, maxPerTopic: MAX_PER_TOPIC, isSeen: (d) => seen.has(d.id) },
     (d) => d.data()
   );
 

@@ -213,29 +213,61 @@ report read the last 10 practice attempts; `MIN_PRACTICE_ANSWERS` is 2; an unfin
 resumes from a card on the Practice tab. Stories: ph-3-us-2, ph-3-us-3, ph-4-us-6 Complete;
 ph-4-us-1, ph-3-us-1, ph-3-us-4 have their 5a parts done (timed parts are 5b).
 
-**Carry-forwards.** Slice 5b: the timed-out note on results (ph-4-us-1), timing on the saved
-session (ph-3-us-1 / ph-3-us-9), repeat-avoidance in the same `selectPracticeQuestions` code
-(ph-3-us-6), practice results feeding card performance (ph-4-us-5), the Home practice card.
-Slice 6: clear the saved practice session on sign-out.
+**Carry-forwards.** Slice 5b-1 (done 2026-11-22): the timed-out note on results (ph-4-us-1),
+timing on the saved session (ph-3-us-1 / ph-3-us-9), repeat-avoidance in the same
+`selectPracticeQuestions` code (ph-3-us-6). Slice 5b-2: practice results feeding card performance
+(ph-4-us-5), the Home practice card. Slice 6: clear the saved practice session and the
+`practice-mode` preference (`dmv-app:practice-mode:{uid}`) on sign-out.
 
-### 5b — Timed tests, fresh questions, progress over time
+### 5b-1 — Timed tests and fresh questions
 
 **Test:** start a timed test → 60-minute countdown keeps going with the app in the background
-→ it auto-submits at zero. Three tests in a row don't repeat questions (bank permitting). Missed
-questions list drops a question once answered right. Progress tab compares the latest score with
-the baseline.
+→ it auto-submits at zero and the results say time ran out. Three tests in a row don't repeat
+questions (bank permitting).
 
 | Order | Story | What it adds |
 |-------|-------|--------------|
-| 1 | ph-3-us-6 (Backend) | Repeat-avoidance in `assembleTest` (same code as ph-3-us-3: build right after it) |
-| 2 | ph-3-us-8 (Backend) | `timing` saved on attempts |
-| 3 | ph-3-us-9 (Frontend) | Timed/untimed picker and countdown |
-| 4 | ph-4-us-5 (Parent) | Missed questions list; practice and baseline results feed card performance |
-| 5 | ph-4-us-7 (Parent) | Latest score vs baseline |
+| 1 | ph-3-us-6 (Backend) | Repeat-avoidance in `assembleTest` (same code as ph-3-us-3) |
+| 2 | ph-3-us-8 (Backend) | `timing` saved on attempts and returned on practice results |
+| 3 | ph-3-us-9 (Frontend) | Timed/untimed switch, countdown, auto-submit |
+| 4 | ph-4-us-1, **timed-out note** | Practice results say when time ran out |
 
-Parents closed: ph-3-us-5, ph-3-us-7. (ph-3-us-10 was already delivered by Phase 1.)
+Parents closed: ph-3-us-5, ph-3-us-7. ph-3-us-1 and ph-3-us-4 are Complete (the timed parts were
+their last open parts). ph-4-us-1 stays In Progress: only the baseline comparison is left
+(5b-2, ph-4-us-7). (ph-3-us-10 was already delivered by Phase 1.)
+
+**Status: Complete (2026-11-22).** Plan: `docs/superpowers/plans/2026-11-20-slice-5b1-timed-tests.md`;
+design: `docs/superpowers/specs/2026-11-20-slice-5b1-timed-tests-design.md`. `assembleTest` and
+`scoreTest` deployed to `dmv-app-dev` (smoke check 401); no rules or index changes.
+Device-tested on the Android emulator: everything passed. Functions 136, rules 58, app 248,
+components 255, tsc clean. Decisions: repeat-avoidance reads the last 3 graded practice attempts
+(not assignments, so no new index), with priority scenario minimum > avoidance > topic cap and a
+random top-up; `timing` lives on the saved session and is returned on practice results; a bad
+`elapsedSec` keeps the mode and saves `elapsedSec: null`; open dialogs at zero aren't closed
+(their buttons become harmless); the mode preference is `dmv-app:practice-mode:{uid}`; 5a
+sessions resume untimed; an expired timed test is always graded (no Discard; decided by the user
+2026-11-20). A dev-only `EXPO_PUBLIC_TIMED_LIMIT_SEC` override (1-86400) shortens the limit for
+testing.
+
+### 5b-2 — Missed questions and progress over time
+
+**Test:** the missed-questions list drops a question once answered right. The Progress tab
+compares the latest score with the baseline. Home shows "Take a practice test" / the latest score.
+
+| Order | Story | What it adds |
+|-------|-------|--------------|
+| 1 | ph-4-us-5 (Parent) | Missed questions list; practice and baseline results feed card performance |
+| 2 | ph-4-us-7 (Parent) | Latest score vs baseline (also finishes ph-4-us-1) |
 
 Home card: "Take a practice test" / latest score.
+
+**Status:** not started.
+
+**Carry-forwards from the 5b review.**
+- Practice and baseline results that feed card performance must not overwrite a topic's
+  `lastQuizMissedIds` or clear its saved deck pass. Those stay mini-quiz-driven.
+- Recording must happen once per test (keep an "already recorded" set of test IDs): baseline
+  results can be reopened, and the practice "recovering" path re-reads an attempt.
 
 ---
 

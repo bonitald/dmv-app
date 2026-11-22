@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { QuizQuestion } from '../api/types';
 import { Button } from '../components/Button';
@@ -25,6 +25,10 @@ export interface QuizRunnerProps {
   isOnline: boolean;
   /** Optional line shown at the top, e.g. a cache-write warning. */
   notice?: string;
+  /** Rendered on the title row, right side (e.g. a countdown pill). */
+  headerAccessory?: ReactNode;
+  /** Freezes answers and hides Submit/Next (e.g. while a time-up auto-submit goes through). */
+  locked?: boolean;
 }
 
 export function QuizRunner({
@@ -36,6 +40,8 @@ export function QuizRunner({
   submitState,
   isOnline,
   notice,
+  headerAccessory,
+  locked,
 }: QuizRunnerProps) {
   const [answers, setAnswers] = useState<Answers>(() => initialAnswers ?? {});
   const [index, setIndex] = useState(0);
@@ -49,6 +55,7 @@ export function QuizRunner({
   const busy = submitState === 'submitting' || submitState === 'waiting-for-connection';
 
   function select(choice: string) {
+    if (locked) return;
     const next = { ...answers, [question.id]: choice };
     setAnswers(next);
     onAnswersChange?.(next);
@@ -87,7 +94,10 @@ export function QuizRunner({
       {notice && <Banner text={notice} />}
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={typography.caption}>{title}</Text>
+        <View style={styles.titleRow}>
+          <Text style={[typography.caption, styles.title]}>{title}</Text>
+          {headerAccessory}
+        </View>
         <Text style={typography.small}>
           Question {index + 1} of {questions.length}
         </Text>
@@ -112,7 +122,7 @@ export function QuizRunner({
             onPress={() => setIndex(index - 1)}
             style={styles.barButton}
           />
-          {isLast || allAnswered ? (
+          {locked ? null : isLast || allAnswered ? (
             <Button
               label={submitState === 'submitting' ? 'Submitting…' : 'Submit'}
               disabled={busy}
@@ -209,6 +219,8 @@ function Banner({ text }: { text: string }) {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.background },
   content: { padding: spacing.space5, gap: spacing.space3 },
+  titleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  title: { flex: 1 },
   strip: { gap: CHIP_GAP, paddingVertical: spacing.space1 },
   chip: {
     width: CHIP_SIZE,
