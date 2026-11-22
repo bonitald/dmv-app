@@ -251,6 +251,9 @@ testing.
 
 ### 5b-2 — Missed questions and progress over time
 
+Design (reviewed 2026-11-22): `docs/superpowers/specs/2026-11-22-slice-5b2-missed-questions-progress-design.md`.
+Plan: `docs/superpowers/plans/2026-11-22-slice-5b2-missed-questions-progress.md`.
+
 **Test:** the missed-questions list drops a question once answered right. The Progress tab
 compares the latest score with the baseline. Home shows "Take a practice test" / the latest score.
 
@@ -273,12 +276,16 @@ Home card: "Take a practice test" / latest score.
 
 ## Slice 6 — Save progress to an account
 
+Design (reviewed 2026-11-22): `docs/superpowers/specs/2026-11-22-slice-6-save-progress-account-design.md`.
+Plan: `docs/superpowers/plans/2026-11-22-slice-6-save-progress-account.md`.
+
 **Test:** after the baseline results, "Save your progress" → link Google (or Apple on iOS) → the
 uid and all progress stay the same → on a second device, "I already have an account" → progress
 appears. Sign out clears local data. Delete account removes everything.
 
 | Order | Story | What it adds |
 |-------|-------|--------------|
+| 0 | iOS bring-up | Apple Developer account, Firebase iOS app, EAS iOS dev client on an iPhone, Slices 1–5 smoke pass on iOS (the app has never run on iOS; iOS ships with this slice) |
 | 1 | ph-9-us-9 (Backend) | Google and Apple providers; `deleteAccount` callable |
 | 2 | ph-9-us-10 (Frontend) | Linking prompts, new-phone sign-in, Settings, `clearLocalData` |
 
