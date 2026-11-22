@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { PerQuestionResult } from '../api/types';
-import { readTopicHistory, recordQuizResults } from './cardPerformance';
+import { readTopicHistory, recordQuizResults, recordTestResults, RECORDED_TESTS_LIMIT } from './cardPerformance';
 
 const r = (questionId: string, chunkId: string, correct: boolean): PerQuestionResult => ({
   questionId, chunkId, choice: 'x', correctAnswer: 'y', correct,
@@ -43,6 +43,46 @@ test('a failed history write drops the old missed ids so Review Again cannot dri
   await recordQuizResults('u1', [r('q1', 'row', false)]);
   expect((await readTopicHistory('u1', 'row')).lastQuizMissedIds).toEqual([]);
   expect(warn).toHaveBeenCalled();
+});
+
+test('recordTestResults records a test once', async () => {
+  await recordTestResults('u1', 't1', [r('q1', 'row', false)]);
+  await recordTestResults('u1', 't1', [r('q1', 'row', false)]);
+  expect((await readTopicHistory('u1', 'row')).cards.q1.graded).toBe(1);
+});
+
+test('recordTestResults keeps the saved deck pass and the last quiz misses', async () => {
+  await recordQuizResults('u1', [r('q9', 'row', false)]);
+  await AsyncStorage.setItem('dmv-app:study:deck-position:u1:row', 'pass');
+  await recordTestResults('u1', 't1', [r('q1', 'row', false)]);
+  const row = await readTopicHistory('u1', 'row');
+  expect(row.lastQuizMissedIds).toEqual(['q9']);
+  expect(row.cards.q1).toMatchObject({ graded: 1, missed: 1 });
+  expect(await AsyncStorage.getItem('dmv-app:study:deck-position:u1:row')).toBe('pass');
+});
+
+test('recordTestResults skips recording when the recorded set cannot be read', async () => {
+  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+  jest.spyOn(AsyncStorage, 'getItem').mockRejectedValueOnce(new Error('disk'));
+  await recordTestResults('u1', 't1', [r('q1', 'row', false)]);
+  jest.restoreAllMocks();
+  expect(await AsyncStorage.getItem('dmv-app:card-perf:u1:row')).toBeNull();
+  warn.mockRestore();
+});
+
+test('recordTestResults keeps only the newest test IDs', async () => {
+  for (let i = 0; i <= RECORDED_TESTS_LIMIT; i++) await recordTestResults('u1', `t${i}`, []);
+  const ids = JSON.parse((await AsyncStorage.getItem('dmv-app:card-perf-recorded:u1')) as string);
+  expect(ids).toHaveLength(RECORDED_TESTS_LIMIT);
+  expect(ids[0]).toBe('t1');
+});
+
+test('recordTestResults ignores removed and ungraded questions', async () => {
+  await recordTestResults('u1', 't1', [
+    { ...r('q1', 'row', false), unavailable: true },
+    { ...r('q2', 'row', false), correct: null },
+  ]);
+  expect((await readTopicHistory('u1', 'row')).cards).toEqual({});
 });
 
 afterEach(() => jest.restoreAllMocks());
