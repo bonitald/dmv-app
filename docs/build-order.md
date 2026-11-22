@@ -276,7 +276,7 @@ Home card: "Take a practice test" / latest score.
 
 ## Slice 6 — Save progress to an account
 
-Design (reviewed 2026-11-22; a few points open): `docs/superpowers/specs/2026-11-22-slice-6-save-progress-account-design.md`.
+Design (reviewed 2026-11-22): `docs/superpowers/specs/2026-11-22-slice-6-save-progress-account-design.md`.
 Plan: `docs/superpowers/plans/2026-11-22-slice-6-save-progress-account.md`.
 
 **Test:** after the baseline results, "Save your progress" → link Google (or Apple on iOS) → the

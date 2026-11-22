@@ -28,13 +28,12 @@ Task 0 can start any time.
 
 ## Blocked on the user (do not guess)
 
-- **Task 0, steps 1–2:** Apple Developer Program enrollment (individual or organization: spec
-  question 2), the App ID and the test iPhone's registration need the account owner. Tasks 1–9
-  don't wait for it; Task 10 (device test) does.
-- **Spec questions 1, 4, 5** (checkbox placement, Analytics reset on delete, `setUserId` privacy
-  check): the plan builds the drafted answers (checkbox on the save / sign-in step only; reset on
-  delete; `setUserId(uid)`). Each sits behind one constant or call so a different answer is a
-  one-line change.
+- **Task 0, steps 1–2:** the App ID, the Sign in with Apple capability and the test iPhone's
+  registration are done by the user in the existing SlateStack organization Apple Developer
+  account (D-U-N-S in place, owned by the user). Tasks 1–9 don't wait for it; Task 10 (device
+  test) does.
+- **Privacy review** (outside engineering): supplies the real policy URL and confirms
+  `setUserId(uid)`. Until then the link points at a placeholder.
 - **Prod:** providers stay disabled in prod until the minors privacy review is done (D13).
 
 ## Decisions made while planning (flag to the user at review)
@@ -76,6 +75,8 @@ Task 0 can start any time.
     account instead? Progress on this phone since you installed won't carry over." (+ " Your
     unfinished test on this phone will be lost too." when one is saved), buttons "Use that
     account", "Cancel"
+  - Welcome notice: "By continuing, you agree to our Privacy Policy." ("Privacy Policy" is the
+    link)
   - Welcome link: "Already saved your progress? Sign in"; new account note: "No saved progress
     yet — it's now saved with {provider}."
   - Settings: section "YOUR PROGRESS"; "Not saved — your progress lives on this phone only";
@@ -108,7 +109,7 @@ Task 0 can start any time.
 - Modify: `app.config.ts` (nothing until Task 5 adds the sign-in plugins), `README.md`
   (iOS build and install section; update "Known gap"), `.gitignore` if EAS adds anything local
 
-- [ ] **Step 1 (user):** Enroll in the Apple Developer Program; create the App ID
+- [ ] **Step 1 (user):** In the SlateStack Apple Developer account, create the App ID
   `com.slatestack.dmv` with Sign in with Apple; register the test iPhone.
 - [ ] **Step 2 (user, with the builder):** In `dmv-app-dev`, add the iOS app for that bundle ID;
   save `GoogleService-Info.plist` to `firebase-config/dev/` (gitignored).
@@ -256,8 +257,7 @@ providers, release SHA fingerprints, prod iOS app, privacy policy URL)
 
 **Files:**
 - Create: `src/account/SaveProgressStep.tsx`, `src/account/SaveProgressCard.tsx`,
-  `src/account/InUseSheet.tsx`, `src/account/privacy.ts` (`PRIVACY_POLICY_URL` placeholder;
-  `PRIVACY_CHECKBOX_ON_ONBOARDING = false` for spec question 1)
+  `src/account/InUseSheet.tsx`, `src/account/privacy.ts` (`PRIVACY_POLICY_URL` placeholder)
 - Modify: `src/profile/localFlags.ts` (two dismissed flags), `src/results/BaselineResults.tsx`,
   `src/home/HomeScreen.tsx`
 - Test: `src/account/SaveProgressStep.test.tsx`, `src/account/SaveProgressCard.test.tsx`
@@ -280,7 +280,9 @@ providers, release SHA fingerprints, prod iOS app, privacy policy URL)
 
 **Files:** `src/onboarding/WelcomeScreen.tsx` (+ test)
 
-- [ ] **Step 1: Write the failing tests:** the link shows under "Get started"; it opens
+- [ ] **Step 1: Write the failing tests:** the privacy notice "By continuing, you agree to our
+  Privacy Policy." shows under "Get started" and its link opens `PRIVACY_POLICY_URL` (D14); the
+  sign-in link shows under it; it opens
   `SaveProgressStep` with `fromWelcome`; `signed-in` with a profile that has `onboarding` →
   lands on Main (the onboarding gate handles it); `linked` (new account) → the note, then the
   Choice step.

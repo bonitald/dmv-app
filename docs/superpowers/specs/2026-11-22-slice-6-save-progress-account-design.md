@@ -6,38 +6,25 @@
 > ph-9-us-6 in full (Home's "Save your progress" card is its last card that isn't in a later
 > phase). This doc records how they fit together and the decisions drafted on 2026-11-22.
 >
-> **Status: reviewed 2026-11-22.** Drafted by a scheduled run; the user answered the review
-> questions the same day. Their answers changed D6–D8 (local data is cleared only when a
-> different person signs in), D14 (privacy checkbox), D15 (analytics must tell new from
-> returning users), D16 and D17 (iOS ships with this slice). The few points still marked
-> **Open? = Yes** are listed below.
+> **Status: reviewed 2026-11-22.** Drafted by a scheduled run; the user answered every review
+> question the same day. Their answers changed D6–D8 (local data is cleared only when a
+> different person signs in), D14 (privacy notice and checkbox), D15 (analytics must tell new
+> from returning users), D16 and D17 (iOS ships with this slice). No decision is still open.
 
-## Questions for review
+## Review (2026-11-22)
 
-Still open after the 2026-11-22 review (numbers match the table):
+All review questions are answered. Providers Google + Apple (D1); switch after a warning (D3);
+lose this phone's progress on a switch, no merge (D4); only server data on a new phone (D5);
+keep local data on sign-out and clear it when someone else signs in (D6–D8); Home card after the
+first graded test or quiz, not shown again once dismissed (D9); no age question, privacy review
+confirms (D12); build on dev before the review (D13); a privacy notice in onboarding plus a
+checkbox before sign-in (D14); new vs returning users in Analytics, ID reset on delete only, and
+the privacy review confirms `setUserId` (D15); no cleanup needed (D16); iOS tested and shipped
+with this slice on the existing SlateStack organization Apple Developer account, including a
+Slices 1–5 pass on iOS (D17); 5b-2 first.
 
-1. **Privacy checkbox placement** (D14): only on the save / sign-in step (where an email is
-   first held), or also once in onboarding for everyone (Analytics runs for anonymous users
-   too)? Drafted: save / sign-in step only.
-2. **Apple Developer account** (D17): individual or organization enrollment, and who owns it?
-   An organization (e.g. matching the `com.slatestack.dmv` bundle ID) needs a D-U-N-S number
-   and takes longer to approve. Also needed: a physical iPhone for testing, since there's no Mac
-   for the simulator.
-3. **Earlier slices on iOS** (D17): run Slices 1–5's device tests on the first iOS build as part
-   of the bring-up? Drafted: yes, a short pass, because the app has never run on iOS.
-4. **Analytics on delete** (D15): reset the Analytics instance ID after "Delete my data", so a
-   deleted user comes back as new? Drafted: yes (only on delete, not on sign-out).
-5. **Analytics user ID** (D15): telling a returning user from a new one across phones needs
-   `setUserId` with the Firebase uid (pseudonymous, never the email). The privacy review should
-   confirm it.
-
-Answered 2026-11-22: providers Google + Apple (D1); switch after a warning (D3); lose this
-phone's progress on a switch, no merge (D4); only server data on a new phone (D5); keep local
-data on sign-out and clear it when someone else signs in (D6–D8); Home card after the first
-graded test or quiz, not shown again once dismissed (D9); no age question, privacy review
-confirms, plus a privacy checkbox (D12/D14); build on dev before the review (D13); new vs
-returning users in Analytics (D15); no cleanup needed (D16); iOS tested and shipped with this
-slice (D17); 5b-2 first.
+The only item left outside engineering is the **minors privacy review** (D13), which also
+supplies the real privacy policy URL (D14) and checks `setUserId` (D15).
 
 ## Goal
 
@@ -81,7 +68,8 @@ is a Must (`prd.md` Section 5), and Apple requires in-app account deletion once 
    revoke) → app restarts at onboarding. Firestore has no
    `users/{oldUid}` and no subcollections; the Auth user is gone. Repeat as an anonymous user
    (never linked): same result.
-9. The save step's Google/Apple buttons stay disabled until the privacy checkbox is ticked; the
+9. The welcome step shows "By continuing, you agree to our Privacy Policy." with a working link.
+   The save step's Google/Apple buttons stay disabled until the privacy checkbox is ticked; the
    "Privacy Policy" link opens the placeholder page (D14).
 10. iPhone: "Continue with Apple" (with "Hide my email" on) → saved; on a second install, "Sign in"
    with Apple → progress appears (D17).
@@ -126,20 +114,20 @@ is a Must (`prd.md` Section 5), and Apple requires in-app account deletion once 
 | 11 | Who can sign out / delete | Sign-out: **linked users only** (an anonymous sign-out would just lose everything). "Delete my data": **everyone**, anonymous included (ph-9-us-9: a privacy right for minors). Delete confirms twice with "can't be undone" wording. | No (ph-9-us-9/10) |
 | 12 | Minors: age gate and consent | **No age question, no parent flow** (confirmed 2026-11-22). The audience is 15–16, linking is opt-in and holds only email + auth ID in Firebase Auth. The privacy review (D13) confirms this under federal and Colorado rules; this doc makes no legal claim. A privacy checkbox is added instead (D14). | No |
 | 13 | Building before the privacy review | **Build and device-test on `dmv-app-dev` now; ship to no beta tester until the review is done** (the `build-order.md` gate). Prod providers stay disabled until then. Confirmed 2026-11-22. | No |
-| 14 | Privacy checkbox and policy link | Decided 2026-11-22: on the save / sign-in step, an unticked **"I agree to the Privacy Policy" checkbox** with the link; the Google and Apple buttons stay disabled until it's ticked. Under it, one line: "We keep only your sign-in ID and email, to bring your progress back. Nothing else." The link is a **placeholder page until the privacy review produces the real policy**; adding the URL (in the app and in App Store Connect, which requires a privacy policy URL) is a launch task. Settings also links to the policy. Ticking isn't stored on the server; it's asked each time someone saves or signs in. Whether onboarding gets it too is still open. | Yes (placement) |
-| 15 | Analytics | Decided 2026-11-22: Analytics must **tell a new sign-in from a returning user**. Events (no email, name or provider profile in any parameter): `account_linked` (`{ provider }`: an anonymous user's progress saved to a new sign-in, a **new** account); `account_signed_in` (`{ provider, returning_device }`: an **existing** account signed in, `returning_device` true when it matches `dmv-app:device:last-account`, false on a new phone); `account_switched` (`{ provider }`: in-use account taken over from a phone with progress); `signed_out`; `account_deleted`; `save_prompt_shown` / `save_prompt_dismissed` (`{ moment }`). After a link or sign-in, **`setUserId(uid)`** (the pseudonymous Firebase uid) and user property `account_state = 'linked'`, so the same person is recognized across phones and visits; on sign-out `setUserId(null)` and `account_state = 'anonymous'`. The instance ID is **not** reset on sign-out (so a repeat user on the same phone isn't counted as new); it's reset with `resetAnalyticsData()` **only on delete**. The privacy review confirms `setUserId`. | Yes (reset on delete; review of `setUserId`) |
+| 14 | Privacy notice and checkbox | Decided 2026-11-22 (the user asked for onboarding or right before sign-in; Claude recommended both, as two layers). **Onboarding:** on the welcome step, under "Get started", the line "By continuing, you agree to our Privacy Policy." with the link. No checkbox there: onboarding stays three taps, and the notice covers what every user shares from first launch (an anonymous ID, progress, Analytics). **Before sign-in:** on the save / sign-in step (baseline results, Home, Settings and the welcome step's "Sign in"), an unticked **"I agree to the Privacy Policy" checkbox**; the Google and Apple buttons stay disabled until it's ticked, because that's the moment an email is first held (a just-in-time consent). Under it: "We keep only your sign-in ID and email, to bring your progress back. Nothing else." The checkbox isn't stored on the server; it's asked each time someone saves or signs in. Settings also links to the policy (Apple requires the policy to be reachable in the app as well as in App Store Connect). The link is a **placeholder page until the privacy review produces the real policy**; adding the URL in the app and App Store Connect is a launch task. | No |
+| 15 | Analytics | Decided 2026-11-22: Analytics must **tell a new sign-in from a returning user**. Events (no email, name or provider profile in any parameter): `account_linked` (`{ provider }`: an anonymous user's progress saved to a new sign-in, a **new** account); `account_signed_in` (`{ provider, returning_device }`: an **existing** account signed in, `returning_device` true when it matches `dmv-app:device:last-account`, false on a new phone); `account_switched` (`{ provider }`: in-use account taken over from a phone with progress); `signed_out`; `account_deleted`; `save_prompt_shown` / `save_prompt_dismissed` (`{ moment }`). After a link or sign-in, **`setUserId(uid)`** (the pseudonymous Firebase uid) and user property `account_state = 'linked'`, so the same person is recognized across phones and visits; on sign-out `setUserId(null)` and `account_state = 'anonymous'`. The instance ID is **not** reset on sign-out (so a repeat user on the same phone isn't counted as new); it's reset with `resetAnalyticsData()` **only on delete**. The privacy review confirms `setUserId`. | No (the privacy review still confirms `setUserId`) |
 | 16 | Orphaned anonymous users | **No cleanup now** (confirmed 2026-11-22): dev holds only the developer's own test users, and there's no prod use yet. Every install does sign in anonymously (`AuthProvider`), so prod will create anonymous users; with D3 only an account switch from a phone with progress leaves one behind. A policy for those stays a Phase 8 item. | No |
-| 17 | Platforms for this slice | **iOS is tested and shipped with this slice** (decided 2026-11-22: most teens use iPhones, and the App Store is the publishing priority). The repo has never built for iOS (`ios/` isn't generated; development is on Windows with no Mac), so the slice starts with an **iOS bring-up** (below): Apple Developer Program membership, EAS Build for a dev client on a physical iPhone, the Firebase iOS app, and Sign in with Apple. Done means the device test passes on both an iPhone and Android. | Yes (account owner, earlier slices on iOS) |
+| 17 | Platforms for this slice | **iOS is tested and shipped with this slice** (decided 2026-11-22: most teens use iPhones, and the App Store is the publishing priority). The repo has never built for iOS (`ios/` isn't generated; development is on Windows with no Mac), so the slice starts with an **iOS bring-up** (below): the SlateStack Apple Developer account, EAS Build for a dev client on a physical iPhone, the Firebase iOS app, and Sign in with Apple. Done means the device test passes on both an iPhone and Android. | No |
 | 18 | Apple token revoke on delete | As ph-9-us-9/10: the client gets a fresh Apple authorization code and calls `revokeToken` **before** `deleteAccount`; if the revoke fails, nothing is deleted and the user is told to try again. | No |
-| 19 | `deleteAccount` retry after a lost response | **`auth/user-not-found` from `deleteUser` counts as success**, and the recursive delete of an empty path is a no-op, so a retry after a dropped response returns `{ deleted: true }` instead of `internal`. The caller's ID token stays valid for a short while after the Auth user is gone, so the retry still authenticates. Extends ph-9-us-9's idempotency criterion. | Yes |
+| 19 | `deleteAccount` retry after a lost response | **`auth/user-not-found` from `deleteUser` counts as success**, and the recursive delete of an empty path is a no-op, so a retry after a dropped response returns `{ deleted: true }` instead of `internal`. The caller's ID token stays valid for a short while after the Auth user is gone, so the retry still authenticates. Extends ph-9-us-9's idempotency criterion. | No (technical; not a product choice) |
 | 20 | Rules and data model | **No rule or index changes.** Nothing about the account is stored in Firestore; client deletes under `users/{uid}` stay denied; `deleteAccount` uses the Admin SDK. | No (ph-9-us-9) |
 
 ## iOS bring-up (first, D17)
 
 The app has only ever run on Android. Before ph-9-us-9/us-10 can be device-tested on an iPhone:
-1. **Apple Developer Program** membership (paid; individual or organization is still open), the
-   App ID `com.slatestack.dmv` with the **Sign in with Apple** capability, and the test iPhone
-   registered for development builds.
+1. **Apple Developer Program:** the existing **SlateStack organization account** (D-U-N-S in
+   place, owned by the user). In it: the App ID `com.slatestack.dmv` with the **Sign in with
+   Apple** capability, and the test iPhone registered for development builds.
 2. **Firebase iOS app** in `dmv-app-dev` for that bundle ID; `GoogleService-Info.plist` into
    `firebase-config/dev/` (gitignored, like the Android file; `app.config.ts` already points at
    it).
@@ -147,7 +135,7 @@ The app has only ever run on Android. Before ph-9-us-9/us-10 can be device-teste
    profile with `expo-dev-client`, building the iOS dev client in the cloud and installing it
    on the iPhone through internal distribution. `ios/` stays ungenerated in the repo (CNG; README
    "Known gap"), unless a Mac becomes available.
-4. **Smoke pass of Slices 1–5 on the iPhone** (drafted, still open): onboarding, a baseline
+4. **Smoke pass of Slices 1–5 on the iPhone** (confirmed 2026-11-22): onboarding, a baseline
    section with force-quit and resume, flashcards, a mini-quiz, a timed practice test with the
    app backgrounded. Anything that breaks is fixed in this slice before the sign-in work, since
    it would otherwise block the Slice 6 device test.
@@ -233,8 +221,9 @@ account instead? Progress on this phone since you installed won't carry over." �
 account" / "Cancel". If an unfinished test is saved on this phone, the warning says so too.
 Skipped on the welcome step.
 
-**Welcome step** (`src/onboarding/WelcomeScreen.tsx`, ph-9-us-3): a text link under "Get
-started": "Already saved your progress? Sign in" → provider choice → link-first flow. Existing
+**Welcome step** (`src/onboarding/WelcomeScreen.tsx`, ph-9-us-3): under "Get started", the
+privacy notice "By continuing, you agree to our Privacy Policy." (D14), then a text link
+"Already saved your progress? Sign in" → provider choice → link-first flow. Existing
 account → switch (no warning) → the onboarding gate sends a user whose profile has `onboarding`
 to Home. New account → linked to this uid, note from device test step 9, onboarding continues.
 
