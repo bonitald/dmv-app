@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-1
 **Layer:** Parent
-**Status:** In Progress (Slice 5a complete and device-tested 2026-11-20: score, pass / not-yet against 20 of 25, left-out note, Review answers, Take another test, Recent tests. The timed-out note done and device-tested 2026-11-22, Slice 5b-1; the baseline comparison is code complete 2026-11-22 in Slice 5b-2, device test pending)
+**Status:** Complete (Slice 5a 2026-11-20; timed-out note Slice 5b-1 2026-11-22; baseline comparison Slice 5b-2, device-tested 2026-11-22)
 
 ## Story
 As a teen user,

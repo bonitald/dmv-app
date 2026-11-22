@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-5
 **Layer:** Parent
-**Status:** In Progress (code complete 2026-11-22 (Slice 5b-2), device test pending)
+**Status:** Complete (Slice 5b-2, device-tested on the Android emulator 2026-11-22; the offline step was not run on device, covered by component tests)
 
 ## Story
 As a teen user,
@@ -27,22 +27,22 @@ them too.
   in that topic's flashcards. Flashcards and test questions share the same `id`.
 
 ## Acceptance Criteria
-- [ ] Given the user has graded attempts, when they open "Missed questions", then they see every
+- [x] Given the user has graded attempts, when they open "Missed questions", then they see every
   question whose latest result is a miss, grouped by handbook topic in handbook order, with a
   count per topic.
-- [ ] Given a question was missed and later answered correctly, when the list loads, then it's
+- [x] Given a question was missed and later answered correctly, when the list loads, then it's
   not on the list.
-- [ ] Given the user taps a missed question, when it opens, then it shows in the review layout
+- [x] Given the user taps a missed question, when it opens, then it shows in the review layout
   (ph-4-us-4): text, choices, their last answer, the correct answer, explanation or topic
   fallback.
-- [ ] Given a topic group, when the user taps "Study this concept", then that topic's flashcards
+- [x] Given a topic group, when the user taps "Study this concept", then that topic's flashcards
   open (ph-2-us-3).
-- [ ] Given a practice test is graded, or the baseline completes, when results arrive, then their
+- [x] Given a practice test is graded, or the baseline completes, when results arrive, then their
   per-question results are recorded in local card performance (ph-2-us-6), the same way
   mini-quiz results are.
-- [ ] Given the user has no misses (or no attempts yet), when the list opens, then it shows a
+- [x] Given the user has no misses (or no attempts yet), when the list opens, then it shows a
   friendly empty state that points to a practice test or the concept list.
-- [ ] Given a baseline in progress, when the list is built, then its held-back sections aren't
+- [x] Given a baseline in progress, when the list is built, then its held-back sections aren't
   used (no answers to show yet).
 
 ## UI/UX Notes
@@ -65,12 +65,12 @@ them too.
   text (shown with "question text unavailable").
 
 ## Tasks
-- [ ] Add a pure `latestMisses(attempts)` function (latest result per question, misses only),
+- [x] Add a pure `latestMisses(attempts)` function (latest result per question, misses only),
   unit-tested with `npm run test:app`.
-- [ ] Read the user's recent attempts (newest first, bounded — proposed last 30) and build the
+- [x] Read the user's recent attempts (newest first, bounded — proposed last 30) and build the
   list.
-- [ ] Build the missed-questions screen with topic groups and links.
-- [ ] Call ph-2-us-6's `recordQuizResults` for practice tests and the completed baseline
+- [x] Build the missed-questions screen with topic groups and links.
+- [x] Call ph-2-us-6's `recordQuizResults` for practice tests and the completed baseline
   (`baselineReview`) when results arrive.
 
 ## Decisions (Slice 5b-2, 2026-11-22)

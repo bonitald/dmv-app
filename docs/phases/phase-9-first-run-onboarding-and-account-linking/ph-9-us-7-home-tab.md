@@ -3,7 +3,7 @@
 **ID:** ph-9-us-7
 **Layer:** Frontend
 **Parent:** ph-9-us-6
-**Status:** In Progress (Slice 1 part complete 2026-09-25; "Continue learning" card complete 2026-10-10 in Slice 4a; practice test card and weak spots code complete 2026-11-22 in Slice 5b-2, device test pending; save progress is Slice 6, driving summary Phase 6)
+**Status:** In Progress (Slice 1 part complete 2026-09-25; "Continue learning" card complete 2026-10-10 in Slice 4a; practice test card and weak spots complete and device-tested 2026-11-22 in Slice 5b-2; save progress is Slice 6, driving summary Phase 6)
 
 ## Story
 As a teen user,
@@ -34,14 +34,14 @@ So that every time I open the app I can get straight into studying or testing.
 
 ## Acceptance Criteria
 - [x] Given onboarding is done, when the app opens, then it lands on the Home tab, the first tab.
-- [ ] Given the baseline isn't finished, when Home renders, then the test card offers Start or
+- [x] Given the baseline isn't finished, when Home renders, then the test card offers Start or
   Resume. Given it's finished, then it offers a practice test with the latest score.
 - [x] Given concept progress, when Home renders, then "Continue learning" opens the right
   concept's flashcards, and "All concepts" opens the concept list.
 - [x] Given the user picked "Learn first" at onboarding, when Home renders, then the test card is
   still there. Given "Test what I know", the study card is still there. The route choice never
   hides either.
-- [ ] Given the concept report has likely gap / Missed it topics, when Home renders, then up to 3
+- [x] Given the concept report has likely gap / Missed it topics, when Home renders, then up to 3
   show as weak spots with links. Given none, the section is hidden.
 - [x] Given a feature a card depends on isn't built yet, when Home renders, then that card is
   absent (not an error or an empty box).

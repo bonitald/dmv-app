@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-7
 **Layer:** Parent
-**Status:** In Progress (code complete 2026-11-22 (Slice 5b-2), device test pending)
+**Status:** Complete (Slice 5b-2, device-tested on the Android emulator 2026-11-22; the offline step was not run on device, covered by component tests)
 
 ## Story
 As a teen user,
@@ -24,15 +24,15 @@ So that I can tell whether my studying is paying off.
   Show it as percentages, not raw counts.
 
 ## Acceptance Criteria
-- [ ] Given a completed baseline and at least one practice test, when the practice results screen
+- [x] Given a completed baseline and at least one practice test, when the practice results screen
   shows (ph-4-us-1), then it shows "Baseline X% → This test Y%" with the change in points.
-- [ ] Given the same data, when the user opens the Progress tab, then a summary shows the
+- [x] Given the same data, when the user opens the Progress tab, then a summary shows the
   baseline score, the latest practice score, and the change.
-- [ ] Given no completed baseline, when either place would show the comparison, then it instead
+- [x] Given no completed baseline, when either place would show the comparison, then it instead
   invites the user to take (or finish) the baseline, depending on `baseline/progress`.
-- [ ] Given a completed baseline but no practice test yet, when the Progress tab shows, then it
+- [x] Given a completed baseline but no practice test yet, when the Progress tab shows, then it
   shows the baseline score and invites them to take a practice test.
-- [ ] Given the latest score is lower than the baseline, when it's shown, then the wording stays
+- [x] Given the latest score is lower than the baseline, when it's shown, then the wording stays
   neutral and encouraging (no red "worse" framing).
 
 ## UI/UX Notes
@@ -52,9 +52,9 @@ So that I can tell whether my studying is paying off.
   show an error).
 
 ## Tasks
-- [ ] Add a pure `baselineScore(baselineReview)` helper, unit-tested.
-- [ ] Add the comparison line to practice results.
-- [ ] Add the summary card to the Progress tab with its empty and in-progress states.
+- [x] Add a pure `baselineScore(baselineReview)` helper, unit-tested.
+- [x] Add the comparison line to practice results.
+- [x] Add the summary card to the Progress tab with its empty and in-progress states.
 
 ## Decisions (Slice 5b-2, 2026-11-22)
 - Latest practice test vs baseline on the Progress tab and Home; practice results compare the
