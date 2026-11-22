@@ -224,15 +224,16 @@ to Home. New account → linked to this uid, note from device test step 9, onboa
 
 - **5b-1 is complete** (2026-11-22). Its carry-forward (`dmv-app:practice-mode:{uid}`) is covered
   by D6's prefix sweep.
-- **5b-2 is not started** (ph-4-us-5 missed questions and card-performance recording, ph-4-us-7
-  latest score vs baseline, Home practice card). Slice 6 doesn't depend on it, and 5b-2 doesn't
-  depend on Slice 6. Overlaps to watch:
-  - 5b-2's "already recorded" set of test IDs and any other new local keys must use the
-    `dmv-app:` prefix so D6 clears them.
-  - If 5b-2's missed-questions list is built from local card performance, it won't come back on
-    a new phone (D5); built from `testAttempts`, it will. That choice belongs to the 5b-2 spec,
-    but it should be made knowing D5.
-  - Both slices add a Home card; ph-9-us-7's order puts "Save your progress" last.
+- **5b-2 is not built; its draft spec is
+  `2026-11-22-slice-5b2-missed-questions-progress-design.md`** (ph-4-us-5 missed questions and
+  card-performance recording, ph-4-us-7 latest score vs baseline, Home test card). Slice 6
+  doesn't depend on it, and 5b-2 doesn't depend on Slice 6. How the overlaps are handled there:
+  - Its recorded set of test IDs is `dmv-app:card-perf-recorded:{uid}`, so D6 clears it.
+  - Its missed-questions list is built from `testAttempts`, so it comes back on a new phone; the
+    weighted flashcard order (local card performance) doesn't (D5).
+  - It proposes adding Home's weak-spots card (its D13). Without it, ph-9-us-6 can't close "in
+    full" in this slice as `build-order.md` says.
+  - Both slices add to Home; ph-9-us-7's order puts "Save your progress" last.
 - Recommendation: build 5b-2 first, as `build-order.md` implies, so Slice 6 protects the full
   set of progress and its device test covers it. Either order works.
 

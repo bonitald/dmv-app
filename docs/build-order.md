@@ -251,6 +251,8 @@ testing.
 
 ### 5b-2 — Missed questions and progress over time
 
+Design (draft, unreviewed): `docs/superpowers/specs/2026-11-22-slice-5b2-missed-questions-progress-design.md`.
+
 **Test:** the missed-questions list drops a question once answered right. The Progress tab
 compares the latest score with the baseline. Home shows "Take a practice test" / the latest score.
 
@@ -272,6 +274,8 @@ Home card: "Take a practice test" / latest score.
 ---
 
 ## Slice 6 — Save progress to an account
+
+Design (draft, unreviewed): `docs/superpowers/specs/2026-11-22-slice-6-save-progress-account-design.md`.
 
 **Test:** after the baseline results, "Save your progress" → link Google (or Apple on iOS) → the
 uid and all progress stay the same → on a second device, "I already have an account" → progress
