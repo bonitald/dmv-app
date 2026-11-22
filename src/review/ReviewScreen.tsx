@@ -31,7 +31,7 @@ const OUTCOME_LABEL: Record<ReviewItem['outcome'], string> = {
 
 export function ReviewScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const { testId } = useRoute<RouteProp<RootStackParamList, 'Review'>>().params;
+  const { testId, questionId } = useRoute<RouteProp<RootStackParamList, 'Review'>>().params;
   const attempt = useTestAttempt(testId);
   const topics = useTopics();
   const attemptData = attempt.status === 'ready' ? attempt.data : undefined;
@@ -71,16 +71,28 @@ export function ReviewScreen() {
     );
   }
 
+  if (questionId) {
+    const single = items.find((i) => i.questionId === questionId);
+    return single ? (
+      <SingleQuestion item={single} topicTitle={titleOf(topics, single.chunkId)} onBack={() => navigation.goBack()} />
+    ) : (
+      <View style={styles.centered}>
+        <Text style={typography.h1}>No review yet</Text>
+        <Text style={[typography.body, styles.soft, styles.centerText]}>
+          This question isn't in that test any more.
+        </Text>
+        <Button label="Back" onPress={() => navigation.goBack()} style={styles.stretch} />
+      </View>
+    );
+  }
+
   const missedCount = countMissed(items);
   const missedOnly = (missedChoice ?? missedCount > 0) && missedCount > 0;
   const shown = missedOnly ? items.filter(isMissed) : items;
   const current = Math.min(index, shown.length - 1);
   const item = shown[current];
   const isLast = current === shown.length - 1;
-  const topicTitle =
-    topics.status === 'ready'
-      ? topics.topics.find((t) => t.chunkId === item.chunkId)?.title
-      : undefined;
+  const topicTitle = titleOf(topics, item.chunkId);
 
   function toggleMissedOnly() {
     const next = !missedOnly;
@@ -117,27 +129,7 @@ export function ReviewScreen() {
         <ReviewStrip items={shown} current={current} onJump={setIndex} />
 
         <ReviewBody item={item} />
-
-        {item.outcome !== 'removed' &&
-          (item.explanation ? (
-            <Card>
-              <Text style={typography.caption}>WHY</Text>
-              <Text style={typography.body}>{item.explanation}</Text>
-            </Card>
-          ) : (
-            <View style={styles.fallback}>
-              <Text style={[typography.small, styles.soft]}>
-                From the handbook: {topicTitle ?? 'this topic'}
-              </Text>
-              {item.chunkId && (
-                <Button
-                  label="Study this concept"
-                  variant="text"
-                  onPress={() => openConcept(navigation, item.chunkId!)}
-                />
-              )}
-            </View>
-          ))}
+        <Explanation item={item} topicTitle={topicTitle} />
       </ScrollView>
 
       <View style={styles.bar}>
@@ -153,6 +145,45 @@ export function ReviewScreen() {
         ) : (
           <Button label="Next" onPress={() => setIndex(current + 1)} style={styles.barButton} />
         )}
+      </View>
+    </View>
+  );
+}
+
+function titleOf(topics: ReturnType<typeof useTopics>, chunkId: string | null): string | undefined {
+  return topics.status === 'ready' ? topics.topics.find((t) => t.chunkId === chunkId)?.title : undefined;
+}
+
+/** The explanation, or the handbook topic with a link to its flashcards. */
+function Explanation({ item, topicTitle }: { item: ReviewItem; topicTitle: string | undefined }) {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  if (item.outcome === 'removed') return null;
+  return item.explanation ? (
+    <Card>
+      <Text style={typography.caption}>WHY</Text>
+      <Text style={typography.body}>{item.explanation}</Text>
+    </Card>
+  ) : (
+    <View style={styles.fallback}>
+      <Text style={[typography.small, styles.soft]}>From the handbook: {topicTitle ?? 'this topic'}</Text>
+      {item.chunkId && (
+        <Button label="Study this concept" variant="text" onPress={() => openConcept(navigation, item.chunkId!)} />
+      )}
+    </View>
+  );
+}
+
+/** ph-4-us-5: one question from the missed list, with no pager or missed-only toggle. */
+function SingleQuestion({ item, topicTitle, onBack }: { item: ReviewItem; topicTitle: string | undefined; onBack: () => void }) {
+  return (
+    <View style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={typography.caption}>MISSED QUESTION</Text>
+        <ReviewBody item={item} />
+        <Explanation item={item} topicTitle={topicTitle} />
+      </ScrollView>
+      <View style={styles.bar}>
+        <Button label="Back" onPress={onBack} style={styles.barButton} />
       </View>
     </View>
   );
