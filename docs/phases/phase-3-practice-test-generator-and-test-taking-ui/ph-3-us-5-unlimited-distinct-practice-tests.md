@@ -3,7 +3,7 @@
 **ID:** ph-3-us-5
 **Layer:** Parent
 **Children:** ph-3-us-6 (Backend)
-**Status:** Not Started
+**Status:** Complete (device-tested 2026-11-22, Slice 5b-1)
 
 ## Story
 As a teen user,
@@ -28,11 +28,11 @@ took.
   (ph-1-us-8). Practice tests never touch it, and nothing is gated in MVP.
 
 ## Acceptance Criteria
-- [ ] Given a user has taken any number of practice tests, when they start another, then it's
+- [x] Given a user has taken any number of practice tests, when they start another, then it's
   assembled with no paywall, limit, or "come back later" message.
-- [ ] Given a user has recently taken practice tests, when a new one is assembled, then it avoids
+- [x] Given a user has recently taken practice tests, when a new one is assembled, then it avoids
   questions from their recent tests as far as the approved pool allows (ph-3-us-6).
-- [ ] Given a user starts a practice test, when it completes, then `freeTestUsedAt` is unchanged.
+- [x] Given a user starts a practice test, when it completes, then `freeTestUsedAt` is unchanged.
 
 ## Dependencies
 - **Children**: ph-3-us-6 (repeat-avoidance in `assembleTest`).

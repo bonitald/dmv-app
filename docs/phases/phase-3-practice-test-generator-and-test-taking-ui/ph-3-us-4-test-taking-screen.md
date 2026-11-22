@@ -3,7 +3,7 @@
 **ID:** ph-3-us-4
 **Layer:** Frontend
 **Parent:** ph-3-us-2
-**Status:** In Progress (baseline 2026-09-28, mini-quiz Slice 4b, practice tests on the Practice tab complete and device-tested 2026-11-20, Slice 5a. Timed mode waits for Slice 5b)
+**Status:** Complete (baseline 2026-09-28, mini-quiz Slice 4b, practice tests on the Practice tab 2026-11-20, Slice 5a; timed mode device-tested 2026-11-22, Slice 5b-1)
 
 ## Story
 As a teen user,
@@ -34,34 +34,34 @@ submit by accident.
   needs it, so it adds it, plus the typed callable client wrappers (`assembleTest`,
   `startOrResumeBaseline`, `assembleMiniQuiz`, `scoreTest`) with error codes mapped to UI states.
 - Offline and force-quit resilience for this screen is ph-3-us-1, which hooks into it. Timed mode
-  is ph-3-us-9.
+  is ph-3-us-9 (built in Slice 5b-1).
 - After grading, the runner hands the `scoreTest` result to a results screen. The practice
   results screen is ph-4-us-1 and answer review is ph-4-us-4. If this story ships first, a minimal
   "score + back" screen is enough until they land.
 
 ## Acceptance Criteria
-- [ ] Given the teen user opens the Practice tab, when it loads, then it shows "Start a practice
+- [x] Given the teen user opens the Practice tab, when it loads, then it shows "Start a practice
   test" (replacing the tab's `PlaceholderScreen`), plus the baseline entry from ph-3-us-13.
-- [ ] Given the user starts a practice test, when `assembleTest` returns, then the first
+- [x] Given the user starts a practice test, when `assembleTest` returns, then the first
   question shows with its choices and a progress indicator ("Question 1 of 25").
-- [ ] Given a question is showing, when the user taps a choice, then it's selected (and can be
+- [x] Given a question is showing, when the user taps a choice, then it's selected (and can be
   changed), with no right/wrong or correct answer shown.
-- [ ] Given a test is in progress, when the user moves forward or back, then they can go to any
+- [x] Given a test is in progress, when the user moves forward or back, then they can go to any
   question, and earlier answers are kept.
-- [ ] Given some questions are unanswered, when the user taps Submit, then they're warned how many
+- [x] Given some questions are unanswered, when the user taps Submit, then they're warned how many
   are unanswered and can go back or submit anyway (unanswered count as wrong, per `scoreTest`).
-- [ ] Given the user submits, when `scoreTest` returns, then the result is passed to the results
+- [x] Given the user submits, when `scoreTest` returns, then the result is passed to the results
   screen (Phase 4, or the minimal placeholder).
-- [ ] Given the user tries to leave mid-test (back button or tab switch), when that happens, then
+- [x] Given the user tries to leave mid-test (back button or tab switch), when that happens, then
   they're asked to confirm. Leaving keeps the test resumable (ph-3-us-1) instead of discarding it
   silently.
-- [ ] Given `assembleTest` fails (offline or error), when the user starts a test, then they see a
+- [x] Given `assembleTest` fails (offline or error), when the user starts a test, then they see a
   retry state, not a blank screen.
-- [ ] Given `scoreTest` fails because the device is offline, when the user submits, then the
+- [x] Given `scoreTest` fails because the device is offline, when the user submits, then the
   answers are kept and they can retry.
-- [ ] Given `scoreTest` returns `already-exists` (a double submit), when that happens, then the
+- [x] Given `scoreTest` returns `already-exists` (a double submit), when that happens, then the
   user is shown the saved attempt's result, not an error.
-- [ ] Given a `scenario` question, when it renders, then it gets the scenario treatment
+- [x] Given a `scenario` question, when it renders, then it gets the scenario treatment
   (ph-2-us-5), and long text scrolls without truncation.
 
 ## UI/UX Notes
@@ -100,6 +100,10 @@ submit by accident.
 Built in Slice 4b on `feat/mini-quiz-progress`; plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`, design `docs/superpowers/specs/2026-10-11-slice-4b-mini-quiz-progress-design.md` (including its Amendment A1-A7 from device testing). Device-tested on the Android emulator 2026-10-11.
 - **Submit when all answered, always confirm (Slice 4b):** Submit appears on any question once every question is answered, not only the last. Every submit asks for confirmation: "All questions have been answered. Are you ready to submit?" (Not yet / Submit); with skipped questions it says "N unanswered". This extends the unanswered-warning criterion above.
 - The runner now also carries the mini-quiz (ph-2-us-8). Plan `docs/superpowers/plans/2026-10-11-slice-4b-mini-quiz-progress.md`.
+
+## Implementation notes (Slice 5b-1)
+Built in Slice 5b-1 on `feat/timed-tests`; plan `docs/superpowers/plans/2026-11-20-slice-5b1-timed-tests.md`, design `docs/superpowers/specs/2026-11-20-slice-5b1-timed-tests-design.md`. Device-tested on the Android emulator against dev 2026-11-22: everything passed. `assembleTest` and `scoreTest` deployed to `dmv-app-dev` (smoke check 401); no rules or index changes.
+- The runner gained a `locked?: boolean` prop (ph-3-us-9): choices can't change and Submit is hidden, but the teen can still move between questions.
 
 ## Questions
 - Should a practice test show right/wrong after each question (study-style) as an option? Assumed
