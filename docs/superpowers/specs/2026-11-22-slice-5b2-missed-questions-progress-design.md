@@ -6,30 +6,16 @@
 > state (ph-9-us-7). This doc records how they fit together and the decisions drafted on
 > 2026-11-22.
 >
-> **Status: draft, not reviewed.** Written alongside the Slice 6 spec
-> (`2026-11-22-slice-6-save-progress-account-design.md`) without anyone available to answer
-> questions, so every decision Claude made on its own is marked **Open? = Yes**.
+> **Status: reviewed 2026-11-22.** Drafted alongside the Slice 6 spec
+> (`2026-11-22-slice-6-save-progress-account-design.md`); the user confirmed every decision
+> below the same day.
 
-## Questions for review
+## Review (2026-11-22)
 
-1. **Missed list source** (D1): built from the last 30 graded attempts in Firestore, not from
-   local card performance, so it survives a new phone (Slice 6).
-2. **"Missed"** (D2): a question whose latest graded result is wrong or skipped, across practice
-   tests, mini-quizzes and the completed baseline.
-3. **When results feed card performance** (D4): only when a test is graded in this app session
-   (fresh result, or the "already graded" recovery right after submitting). Reopening old results
-   never records. No backfill of tests graded before 5b-2 (D6).
-4. **Card-performance write for tests** (D5): a new `recordTestResults` that updates per-card
-   history only. It leaves `lastQuizMissedIds` and the saved deck pass alone (the 5b review
-   carry-forward).
-5. **Opening a missed question** (D8): the existing Review screen gains an optional
-   `questionId`, showing just that question from its attempt.
-6. **Comparison** (D10/D11): latest practice test vs baseline on the Progress tab and Home; each
-   practice result compares *that* test with the baseline. Percent points, no average.
-7. **Home test card** (D12): once the baseline is done, "Baseline done" becomes "Take a practice
-   test" with the latest score and the comparison.
-8. **Weak spots on Home** (D13): ph-9-us-7's weak-spots card isn't built yet, and Slice 6 expects
-   to close ph-9-us-6 in full. Proposed: add it here, since this slice already touches Home.
+All questions answered with the drafted defaults: missed list from Firestore (D1); a question
+leaves the list after one right answer (D2); results feed card performance only when first
+graded, no backfill (D4/D6); a missed question opens on its own (D8); latest test vs baseline
+(D10/D11); Home test card (D12); weak spots built here (D13). 5b-2 is built before Slice 6.
 
 ## Goal
 
@@ -79,23 +65,23 @@ secondary metric (baseline → later practice improvement). It's the last slice 
   framing, streaks or points; the missed list showing held-back baseline answers; a screen that
   blocks on a failed read.
 
-## Decisions (drafted 2026-11-22)
+## Decisions (drafted and confirmed 2026-11-22)
 
 | # | Question | Decision | Open? |
 |---|----------|----------|-------|
-| 1 | Missed list source | **Firestore `users/{uid}/testAttempts`, newest 30 by `createdAt`, all types** (single-field order, no new index; read through the offline cache). Not local card performance: attempts carry question text and choices (ph-4-us-3) and survive a new phone (Slice 6 D5). `MISSED_ATTEMPTS_LIMIT = 30`, as ph-4-us-5 proposed. | Yes |
+| 1 | Missed list source | **Firestore `users/{uid}/testAttempts`, newest 30 by `createdAt`, all types** (single-field order, no new index; read through the offline cache). Not local card performance: attempts carry question text and choices (ph-4-us-3) and survive a new phone (Slice 6 D5). `MISSED_ATTEMPTS_LIMIT = 30`, as ph-4-us-5 proposed. | No |
 | 2 | What counts as missed | ph-4-us-5's rule: a question's **most recent graded result** is wrong or skipped. Practice, mini-quiz, and the completed baseline. Removed (`unavailable`) questions and ungraded entries (`correct === null`, held-back baseline sections) are ignored, not misses. | No (ph-4-us-5) |
-| 3 | Baseline in the list | Only the **final section's attempt**, using its `baselineReview` (all 45). Earlier section attempts have `correct: null` and are skipped by D2 anyway. The final attempt's `createdAt` dates all 45, which is close enough. Ignore its `perQuestion` to avoid counting section 3 twice. | Yes |
-| 4 | When results feed card performance | **Only when a test is graded in this app session:** the practice `scoreTest` result, the practice "recovering" path right after an `already-exists`, and the baseline's final section completing (fresh `baselineReview`, or reading the final attempt after `already-exists`). Reopening results (Recent tests, Home's "Baseline done", Progress) never records. Mini-quizzes keep their existing `recordQuizResults` call. | Yes |
+| 3 | Baseline in the list | Only the **final section's attempt**, using its `baselineReview` (all 45). Earlier section attempts have `correct: null` and are skipped by D2 anyway. The final attempt's `createdAt` dates all 45, which is close enough. Ignore its `perQuestion` to avoid counting section 3 twice. | No |
+| 4 | When results feed card performance | **Only when a test is graded in this app session:** the practice `scoreTest` result, the practice "recovering" path right after an `already-exists`, and the baseline's final section completing (fresh `baselineReview`, or reading the final attempt after `already-exists`). Reopening results (Recent tests, Home's "Baseline done", Progress) never records. Mini-quizzes keep their existing `recordQuizResults` call. | No |
 | 5 | How tests are recorded | New **`recordTestResults(uid, testId, perQuestion)`** next to `recordQuizResults`: updates `cards` (graded, missed, streak, lastCorrect) through a new pure `applyTestResults`, and **does not** touch `lastQuizMissedIds` or call `setDeckPass`. The current pass keeps going; the new weights apply to the next pass. | No (5b review carry-forward) |
-| 6 | Once per test | A per-uid **recorded set** in AsyncStorage, `dmv-app:card-perf-recorded:{uid}` (JSON array of test IDs, newest 50 kept). `recordTestResults` checks and adds to it; a storage failure skips recording rather than risking a double count. **No backfill** of tests graded before 5b-2 or on another phone. Uses the `dmv-app:` prefix so Slice 6's `clearLocalData` sweep removes it. | Yes |
-| 7 | Where the list lives | A new root-stack screen **`MissedQuestions`**, opened from a row on the Practice tab home ("Missed questions · 12", or "Missed questions · none right now" once there's any graded attempt; hidden before) and from a link on practice and baseline results. Topic groups in handbook order with a count and "Study this concept" (opens flashcards via `openConcept`). Plain list, no scores. | Yes |
-| 8 | Opening one missed question | `Review` route gains optional **`questionId`**: `Review: { testId: string; questionId?: string }`. With it, the screen shows just that question from that attempt in the ph-4-us-4 layout (baseline attempts already resolve to `baselineReview`). Old attempts without text show "Question text unavailable" (existing fallback). | Yes |
-| 9 | Live or one-off read | **Live** (`onSnapshot`), like Recent tests, so the list and count update right after a test is graded. One shared subscription hook (`useRecentAttempts`) feeds the Practice row and the screen. | Yes |
-| 10 | Comparison basis | Baseline = `summarizeBaseline(...).percent` (correct / graded of 45, existing code). Practice = that test's `score` as a percent. **Change in whole percentage points.** Latest, not an average (ph-4-us-7's assumption). | Yes |
-| 11 | Which test is compared | Progress tab and Home: **the latest practice test**. Practice results: **the test being shown**, so reopening an old test from Recent tests shows its own comparison. | Yes |
-| 12 | Home test card | Baseline done → **"Take a practice test"**: no practice yet → "25 questions, like the real test"; with one → "Latest: 19 of 25 (76%) · +16 points since your baseline" (comparison omitted if the baseline attempt can't be read). Opens the Practice tab. Baseline results stay reachable from the Progress tab and Recent tests (the card no longer links to them). | Yes |
-| 13 | Home weak spots | **Add ph-9-us-7's weak-spots card here:** up to 3 "likely gap" / "Missed it" topics from `useConceptEvidence`, each opening flashcards; hidden with no evidence. Not in `build-order.md` for any slice; without it ph-9-us-6 can't close in Slice 6. | Yes |
+| 6 | Once per test | A per-uid **recorded set** in AsyncStorage, `dmv-app:card-perf-recorded:{uid}` (JSON array of test IDs, newest 50 kept). `recordTestResults` checks and adds to it; a storage failure skips recording rather than risking a double count. **No backfill** of tests graded before 5b-2 or on another phone. Uses the `dmv-app:` prefix so Slice 6's `clearLocalData` sweep removes it. | No |
+| 7 | Where the list lives | A new root-stack screen **`MissedQuestions`**, opened from a row on the Practice tab home ("Missed questions · 12", or "Missed questions · none right now" once there's any graded attempt; hidden before) and from a link on practice and baseline results. Topic groups in handbook order with a count and "Study this concept" (opens flashcards via `openConcept`). Plain list, no scores. | No |
+| 8 | Opening one missed question | `Review` route gains optional **`questionId`**: `Review: { testId: string; questionId?: string }`. With it, the screen shows just that question from that attempt in the ph-4-us-4 layout (baseline attempts already resolve to `baselineReview`). Old attempts without text show "Question text unavailable" (existing fallback). | No |
+| 9 | Live or one-off read | **Live** (`onSnapshot`), like Recent tests, so the list and count update right after a test is graded. One shared subscription hook (`useRecentAttempts`) feeds the Practice row and the screen. | No |
+| 10 | Comparison basis | Baseline = `summarizeBaseline(...).percent` (correct / graded of 45, existing code). Practice = that test's `score` as a percent. **Change in whole percentage points.** Latest, not an average (ph-4-us-7's assumption). | No |
+| 11 | Which test is compared | Progress tab and Home: **the latest practice test**. Practice results: **the test being shown**, so reopening an old test from Recent tests shows its own comparison. | No |
+| 12 | Home test card | Baseline done → **"Take a practice test"**: no practice yet → "25 questions, like the real test"; with one → "Latest: 19 of 25 (76%) · +16 points since your baseline" (comparison omitted if the baseline attempt can't be read). Opens the Practice tab. Baseline results stay reachable from the Progress tab and Recent tests (the card no longer links to them). | No |
+| 13 | Home weak spots | **Add ph-9-us-7's weak-spots card here:** up to 3 "likely gap" / "Missed it" topics from `useConceptEvidence`, each opening flashcards; hidden with no evidence. Not in `build-order.md` for any slice; without it ph-9-us-6 can't close in Slice 6. | No |
 | 14 | Empty and offline states | Missed list with attempts but no misses: "Nothing to go over right now" plus Practice and concept-list links. No attempts: points to the baseline or a practice test. Read error with no cache: the existing `NoConnection`-style state on the screen; the Practice row and comparisons simply hide. | No (ph-4-us-5/7) |
 
 ## Data (pure, `npm run test:app`)

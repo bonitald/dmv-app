@@ -6,47 +6,38 @@
 > ph-9-us-6 in full (Home's "Save your progress" card is its last card that isn't in a later
 > phase). This doc records how they fit together and the decisions drafted on 2026-11-22.
 >
-> **Status: draft, not reviewed.** It was written by a scheduled run with no one available to
-> answer questions, so every decision Claude made on its own is marked **Open? = Yes** and
-> listed below. Nothing here is settled until the user reviews it.
+> **Status: reviewed 2026-11-22.** Drafted by a scheduled run; the user answered the review
+> questions the same day. Their answers changed D6–D8 (local data is cleared only when a
+> different person signs in), D14 (privacy checkbox), D15 (analytics must tell new from
+> returning users), D16 and D17 (iOS ships with this slice). The few points still marked
+> **Open? = Yes** are listed below.
 
 ## Questions for review
 
-Decisions in the table below that need a yes/no before building (numbers match the table):
+Still open after the 2026-11-22 review (numbers match the table):
 
-1. **Providers** (D1): Google on both platforms, Apple on iOS only, email link deferred. The
-   PRD recommends this but still lists it as undecided (`prd.md` Section 9).
-2. **"Link first, then sign in"** (D3): every sign-in button tries to link the current
-   anonymous user first and only switches accounts if that Google/Apple account is already in
-   use. The welcome step's "Sign in" therefore never leaves an empty anonymous user behind.
-3. **No merging** (D4): when switching to an existing account, this phone's progress since
-   install is dropped (with a warning), not merged.
-4. **What carries to a new phone** (D5): only server data (profile, baseline, attempts, Concept
-   Progress). Local study history (card performance, saved deck passes, last-opened topic,
-   unfinished tests) stays on the old phone and is lost on switch, by design.
-5. **Clear local data by prefix** (D6): sign-out, switch and delete remove every AsyncStorage
-   key starting with `dmv-app:`, instead of a list of known keys. Also clears the flashcard
-   memory cache, Firestore's offline cache and the Analytics instance ID.
-6. **Firestore offline cache cleared** (D7) on sign-out, switch and delete, with the app tree
-   unmounted first. Falls back to "best effort" if the SDK refuses.
-7. **When Home shows the save card** (D9): only for anonymous users who have at least one graded
-   attempt (baseline, practice test or mini-quiz). Dismissed once, it doesn't come back; Settings
-   always has the option.
-8. **No age gate, no parental consent** (D12): the audience is 15–16; the app adds no age
-   question or parent flow. The privacy review must confirm this.
-9. **Building before the privacy review** (D13): Slice 6 can be built and device-tested on dev
-   before the minors privacy review, but nothing ships to a beta tester until it's done.
-10. **Disclosure line and privacy policy link** (D14) on the save prompt and in Settings, with
-    a placeholder link until the review produces a policy.
-11. **Analytics** (D15): new events with no personal data, no `setUserId`, and
-    `resetAnalyticsData()` on sign-out, switch and delete.
-12. **Orphaned anonymous users** (D16) are left in place (as on reinstall); cleanup stays a
-    Phase 8 item.
-13. **iOS / Apple testing** (D17): the repo has no iOS build yet (only `android/`), so Apple
-    sign-in and the Apple token revoke are built but device-tested only when an iOS build and
-    an Apple Developer account exist. The slice is "done" on Android + Google.
-14. **Order against 5b-2** (see "Relationship to Slice 5b"): Slice 6 doesn't depend on 5b-2;
-    recommend finishing 5b-2 first as `build-order.md` implies, but either order works.
+1. **Privacy checkbox placement** (D14): only on the save / sign-in step (where an email is
+   first held), or also once in onboarding for everyone (Analytics runs for anonymous users
+   too)? Drafted: save / sign-in step only.
+2. **Apple Developer account** (D17): individual or organization enrollment, and who owns it?
+   An organization (e.g. matching the `com.slatestack.dmv` bundle ID) needs a D-U-N-S number
+   and takes longer to approve. Also needed: a physical iPhone for testing, since there's no Mac
+   for the simulator.
+3. **Earlier slices on iOS** (D17): run Slices 1–5's device tests on the first iOS build as part
+   of the bring-up? Drafted: yes, a short pass, because the app has never run on iOS.
+4. **Analytics on delete** (D15): reset the Analytics instance ID after "Delete my data", so a
+   deleted user comes back as new? Drafted: yes (only on delete, not on sign-out).
+5. **Analytics user ID** (D15): telling a returning user from a new one across phones needs
+   `setUserId` with the Firebase uid (pseudonymous, never the email). The privacy review should
+   confirm it.
+
+Answered 2026-11-22: providers Google + Apple (D1); switch after a warning (D3); lose this
+phone's progress on a switch, no merge (D4); only server data on a new phone (D5); keep local
+data on sign-out and clear it when someone else signs in (D6–D8); Home card after the first
+graded test or quiz, not shown again once dismissed (D9); no age question, privacy review
+confirms, plus a privacy checkbox (D12/D14); build on dev before the review (D13); new vs
+returning users in Analytics (D15); no cleanup needed (D16); iOS tested and shipped with this
+slice (D17); 5b-2 first.
 
 ## Goal
 
@@ -54,15 +45,17 @@ A teen who has put real work into the app can **keep it**: one tap on "Save your
 Google (or Apple on iOS), and their baseline, study progress, practice tests and test date are
 tied to a sign-in instead of only to this install. On a new or reset phone, "I already have an
 account" brings it all back. Anyone, linked or not, can delete everything the app holds about
-them from Settings, and a linked user can sign out without leaving their history on a shared
-phone.
+them from Settings. A linked user can sign out and sign back in to find everything as they
+left it, and if someone else signs in on that phone, the first person's history is cleared.
+The slice ships on **iPhone first** (D17).
 
 **Why now:** every earlier slice built progress that lives under an anonymous uid; a reinstall
 or new phone loses it (`prd.md` Section 9, the auth residual risk). "Optional account linking"
 is a Must (`prd.md` Section 5), and Apple requires in-app account deletion once accounts exist
 (`prd.md` Section 8). `build-order.md` gates Phase 8 (beta) on this slice.
 
-**Device test** (from `build-order.md`, extended; Android + Google, D17):
+**Device test** (from `build-order.md`, extended). Run on **both** Android (Google) and an iPhone
+(Google and Apple), D17:
 1. Fresh install → onboarding → baseline → results → "Save your progress" card under the
    results → "Not now" → the card goes; reopening the results doesn't show it again → Home shows
    its own save card.
@@ -80,17 +73,27 @@ is a Must (`prd.md` Section 5), and Apple requires in-app account deletion once 
    the old account's data appears; this phone's local data is gone.
 7. Settings → "Sign out" → confirm → back at onboarding as a new anonymous user; nothing from the
    previous user shows anywhere (Home, Study, Practice, Progress, a saved unfinished test).
-8. Settings → "Delete my data" → confirm twice → app restarts at onboarding. Firestore has no
+   Sign back in with the **same** account → its progress is back, and so are its local extras
+   (flashcard order, last-opened topic, saved unfinished test): nothing was cleared (D6).
+7b. Sign out, then sign in with a **different** account → that account's progress shows; the
+   first account's local extras are gone from the phone and Firestore's cache was cleared (D6/D7).
+8. Settings → "Delete my data" → confirm twice (iPhone + Apple: the Apple sheet asks again for the
+   revoke) → app restarts at onboarding. Firestore has no
    `users/{oldUid}` and no subcollections; the Auth user is gone. Repeat as an anonymous user
    (never linked): same result.
-9. Welcome step "Sign in" with a Google account that has never been used → it's linked to this
+9. The save step's Google/Apple buttons stay disabled until the privacy checkbox is ticked; the
+   "Privacy Policy" link opens the placeholder page (D14).
+10. iPhone: "Continue with Apple" (with "Hide my email" on) → saved; on a second install, "Sign in"
+   with Apple → progress appears (D17).
+11. Welcome step "Sign in" with a Google account that has never been used → it's linked to this
    fresh install's uid, a short "No saved progress yet — it's now saved with Google" note, and
    onboarding continues (D3).
 
 ## Goals, non-goals, anti-goals
 
 - **Goals:** link keeps the uid, so no data moves; recovery on a new phone; deletion for every
-  user; sign-out that leaves nothing of the previous user on the phone; prompts only at moments
+  user; sign-out that keeps the user's own conveniences for when they sign back in, and a
+  phone that never shows one person's history to the next; prompts only at moments
   of value, never a wall; the least personal data possible (email and auth ID, held by Firebase
   Auth only).
 - **Non-goals:** email-link sign-in (D1); merging two users' progress (D4); syncing local study
@@ -100,35 +103,58 @@ is a Must (`prd.md` Section 5), and Apple requires in-app account deletion once 
   (monetization is deferred); account management beyond sign-out and delete (no "change provider",
   no "link a second provider").
 - **Anti-goals:** a sign-in wall or nag (a prompt that returns after "Not now"); any name, email,
-  photo or provider profile copied into Firestore, Analytics or logs; showing the user's email in
+  photo or provider profile copied into Firestore, Analytics or logs (the Analytics user ID is
+  the pseudonymous uid, never the email); showing the user's email in
   the UI; one user's local history visible to the next user on the same phone; "Deleted" shown
   before the server finished; an account switch that silently drops progress without a warning;
   account or profile language in the copy ("create an account", "your profile").
 
-## Decisions (drafted 2026-11-22)
+## Decisions (drafted and reviewed 2026-11-22)
 
 | # | Question | Decision | Open? |
 |---|----------|----------|-------|
-| 1 | Sign-in providers | **Google** (Android and iOS) and **Apple** (iOS only; Apple requires it if Google is offered on iOS). Email link deferred. Anonymous stays enabled. Matches ph-9-us-8/9/10's assumption and the `prd.md` recommendation, which still lists it as undecided. | Yes |
+| 1 | Sign-in providers | **Google** (Android and iOS) and **Apple** (iOS only; Apple requires it if Google is offered on iOS). Email link deferred. Anonymous stays enabled. Confirmed 2026-11-22. | No |
 | 2 | How linking keeps data | `linkWithCredential` on the anonymous user: **same uid, no data migration**, nothing about the account written to Firestore. From ph-9-us-8. | No |
-| 3 | Link vs sign in | **One flow everywhere: try `linkWithCredential` first; on `auth/credential-already-in-use`, offer to switch** with `signInWithCredential`. On the welcome step (nothing to lose yet) the switch happens without a warning; everywhere else the warning from ph-9-us-10 is shown first. A never-used Google/Apple account on the welcome step is simply linked to the fresh uid, so no empty anonymous users or empty duplicate accounts are created. Replaces ph-9-us-10's "path 3 leaves the anonymous user behind". | Yes |
-| 4 | Progress on this phone when switching | **Dropped, not merged.** The warning says so ("Progress on this phone since you installed won't carry over"). Merging server-owned attempts, baseline and Concept Progress across uids would need a new privileged function and conflict rules; not worth it for MVP. | Yes |
-| 5 | What a new phone gets back | **Server data only:** profile (`onboarding`, `testDate`), `baseline`, `testAttempts` (so Recent tests and the concept report), `conceptProgress`. **Not:** card performance, saved deck passes, last-opened topic, unfinished baseline/practice sessions, mode preference, dismissed cards. They are device conveniences (ph-9-us-10: "local data belongs to the device"). A paused baseline still resumes, because its progress is server-side (`baseline/progress`). | Yes |
-| 6 | `clearLocalData()` scope | Removes **every AsyncStorage key that starts with `dmv-app:`** (`getAllKeys` → filter → `multiRemove`), so keys added later (5b-2's "already recorded" set, Phase 6) are covered without a list to keep in sync. Plus `clearDeckCache()` and the steps in D7 and D15. Today that sweep covers: `onboarding-done`, `home:add-date-dismissed`, `study:last-opened`, `study:deck-position`, `card-perf`, `active-test` (per kind and the legacy key), `practice-mode`. Runs on sign-out, account switch and delete. A failed remove is logged, not shown: the keys are uid-scoped, so the next user can't read them anyway. | Yes |
-| 7 | Firestore's offline cache | **Cleared** on sign-out, switch and delete (`terminate` + `clearPersistence` in `@react-native-firebase/firestore`; check the v26 API), so the previous user's documents don't stay on a shared phone. It needs no active listeners, so AuthProvider first enters a `switching` state that unmounts the navigator (D8). If clearing fails, log it and continue: rules and uid-keyed paths still stop the new user reading it. | Yes |
-| 8 | Order of a sign-out / switch / delete | AuthProvider gets a **`switching` status** (a full-screen "One moment…" view, navigator unmounted, so no screen writes to the old uid mid-way). Sign-out: switching → `clearLocalData` → `signOut` → existing anonymous sign-in → onboarding. Switch: switching → `signInWithCredential` → on success `clearLocalData` (old data) → Home or onboarding by the profile; on failure, back to the old user with nothing cleared. Delete: see Backend/Frontend below. | Yes |
-| 9 | Prompt moments and dismissal | Two moments in this slice: **baseline results** (a card below the results, ph-4-us-6) and **Home** (ph-9-us-7, last in the card order). Each has its own per-uid "dismissed" flag; "Not now" hides that moment for good. **Home's card shows only for anonymous users with at least one graded attempt** (baseline, practice or mini-quiz), so a brand-new user isn't asked to save nothing. Settings always offers it. No re-prompting. | Yes |
+| 3 | Link vs sign in | **One flow everywhere: try `linkWithCredential` first; on `auth/credential-already-in-use`, switch with `signInWithCredential` after a warning.** On the welcome step (nothing to lose yet) there's no warning. A never-used Google/Apple account on the welcome step is simply linked to the fresh uid, so no empty anonymous users or empty duplicate accounts are created. Replaces ph-9-us-10's "path 3 leaves the anonymous user behind". Confirmed 2026-11-22. | No |
+| 4 | Progress on this phone when switching | **Dropped, not merged.** The warning says so ("Progress on this phone since you installed won't carry over"). Confirmed 2026-11-22. | No |
+| 5 | What a new phone gets back | **Server data only:** profile (`onboarding`, `testDate`), `baseline`, `testAttempts` (so Recent tests, the concept report and 5b-2's missed list), `conceptProgress`. **Not:** card performance, saved deck passes, last-opened topic, unfinished baseline/practice sessions, mode preference, dismissed cards. A paused baseline still resumes, because its progress is server-side (`baseline/progress`). Confirmed 2026-11-22. | No |
+| 6 | When local data is cleared | **Not on sign-out** (decided 2026-11-22: people rarely switch phones, and a teen who signs out and back in should find their flashcard order, last-opened topic and unfinished test still there). **When a different person signs in**: on any sign-in or switch that lands on a uid, every AsyncStorage key under `dmv-app:` that doesn't belong to that uid is removed (keys are uid-scoped today, e.g. `card-perf:{uid}:{chunkId}`; matched on the `:{uid}` segment, so later keys such as 5b-2's `card-perf-recorded:{uid}` are covered as long as they include the uid). The same person signing back in keeps their keys; the throwaway anonymous user's keys from in between are removed. **On delete**: every `dmv-app:` key goes. A device-level `dmv-app:device:last-account` holds the last linked uid for D7 and D15 (removed on delete). Failures are logged, not shown. Until someone else signs in, a signed-out user's local extras stay on the phone; the app only reads the current uid's keys, so the next anonymous user never sees them. | No |
+| 7 | Firestore's offline cache | **Cleared when a different linked account signs in than the one in `dmv-app:device:last-account`, and on delete** (`terminate` + `clearPersistence` in `@react-native-firebase/firestore`; check the v26 API). Not on sign-out, and not when the same account signs back in. Needs no active listeners, so it runs inside D8's `switching` state. If clearing fails, log it and continue: rules and uid-keyed paths still stop the new user reading it. | No |
+| 8 | Order of a sign-out / switch / delete | AuthProvider gets a **`switching` status** (a full-screen "One moment…" view, navigator unmounted, so no screen writes to the old uid mid-way). Sign-out: switching → `signOut` → existing anonymous sign-in → onboarding (nothing cleared). Switch / sign-in: switching → `signInWithCredential` → on success the D6 sweep and, for a different person, the D7 cache clear → Home or onboarding by the profile; on failure, back to the old user with nothing cleared. Delete: see Backend/Frontend below. | No |
+| 9 | Prompt moments and dismissal | Two moments in this slice: **baseline results** (a card below the results, ph-4-us-6) and **Home** (ph-9-us-7, last in the card order). Each has its own per-uid "dismissed" flag; "Not now" hides that moment for good. **Home's card shows only for anonymous users with at least one graded attempt** (baseline, practice or mini-quiz). Settings always offers it. Confirmed 2026-11-22. | No |
 | 10 | Account state in the UI | `AuthProvider` exposes `account: { kind: 'anonymous' } \| { kind: 'linked'; provider: 'google' \| 'apple' }`, derived from `user.providerData`, refreshed after a link (`onUserChanged`, since `onAuthStateChanged` doesn't fire when the uid stays the same). Screens read it, never re-derive it (ph-0-us-7). The UI shows **the provider, never the email** ("Saved with Google"). | No (ph-9-us-10) |
 | 11 | Who can sign out / delete | Sign-out: **linked users only** (an anonymous sign-out would just lose everything). "Delete my data": **everyone**, anonymous included (ph-9-us-9: a privacy right for minors). Delete confirms twice with "can't be undone" wording. | No (ph-9-us-9/10) |
-| 12 | Minors: age gate and consent | **No age question, no parent flow.** The audience is 15–16 (permit age in Colorado), above COPPA's under-13 threshold, and the PRD has no parent role. Linking is opt-in and holds only email + auth ID in Firebase Auth. The privacy review (D13) must confirm this is enough under federal rules and Colorado's (including any minors' amendments to the Colorado Privacy Act and whether the app meets its thresholds); this doc makes no legal claim. Store age ratings and listing wording are part of that review. | Yes |
-| 13 | Building before the privacy review | **Build and device-test on `dmv-app-dev` now; ship to no beta tester until the review is done** (the `build-order.md` gate, `docs/phases.md` Phase 8, `Prod-Launch-Plan.md`). The review may change copy (D14) but is unlikely to change the architecture, since the design already minimizes data. Prod providers stay disabled until then. | Yes |
-| 14 | Disclosure on the prompt | One line under the provider buttons: "We keep only your sign-in ID and email, to bring your progress back. Nothing else." plus a "Privacy" link. **Until a privacy policy exists, the link is a placeholder** (dev builds only) and adding the real URL is a launch task in `Prod-Launch-Plan.md`. Same line in Settings. | Yes |
-| 15 | Analytics | New events, **no personal data in any parameter and no `setUserId`**: `save_prompt_shown` / `save_prompt_dismissed` (`{ moment: 'baseline_results' \| 'home' \| 'settings' }`), `account_linked` (`{ provider }`), `account_switched` (`{ provider }`), `signed_out`, `account_deleted`. On sign-out, switch and delete, **`resetAnalyticsData()`** so the next user on the phone gets a new instance ID. Deleting an account doesn't delete past Analytics events (they're keyed to the app instance, not the uid); the privacy policy should say so. | Yes |
-| 16 | Orphaned anonymous users | **Left in place**, as after any reinstall. With D3 the welcome step no longer creates them; only an account switch from a phone with progress does, and the user was warned. Deleting it before switching would risk losing everything if the sign-in then fails. Cleanup policy stays a Phase 8 item (ph-9-us-9 Questions). | Yes |
-| 17 | Platforms for this slice | **Android + Google is the done bar.** The repo has no iOS build (`android/` only) and no Apple Developer setup is recorded, so Apple sign-in, the Apple button and the token revoke are built behind `Platform.OS === 'ios'` with unit/component tests, and device-tested when iOS builds start (before Phase 8 if iOS ships in the beta). Recorded as an open item in `build-order.md`. | Yes |
+| 12 | Minors: age gate and consent | **No age question, no parent flow** (confirmed 2026-11-22). The audience is 15–16, linking is opt-in and holds only email + auth ID in Firebase Auth. The privacy review (D13) confirms this under federal and Colorado rules; this doc makes no legal claim. A privacy checkbox is added instead (D14). | No |
+| 13 | Building before the privacy review | **Build and device-test on `dmv-app-dev` now; ship to no beta tester until the review is done** (the `build-order.md` gate). Prod providers stay disabled until then. Confirmed 2026-11-22. | No |
+| 14 | Privacy checkbox and policy link | Decided 2026-11-22: on the save / sign-in step, an unticked **"I agree to the Privacy Policy" checkbox** with the link; the Google and Apple buttons stay disabled until it's ticked. Under it, one line: "We keep only your sign-in ID and email, to bring your progress back. Nothing else." The link is a **placeholder page until the privacy review produces the real policy**; adding the URL (in the app and in App Store Connect, which requires a privacy policy URL) is a launch task. Settings also links to the policy. Ticking isn't stored on the server; it's asked each time someone saves or signs in. Whether onboarding gets it too is still open. | Yes (placement) |
+| 15 | Analytics | Decided 2026-11-22: Analytics must **tell a new sign-in from a returning user**. Events (no email, name or provider profile in any parameter): `account_linked` (`{ provider }`: an anonymous user's progress saved to a new sign-in, a **new** account); `account_signed_in` (`{ provider, returning_device }`: an **existing** account signed in, `returning_device` true when it matches `dmv-app:device:last-account`, false on a new phone); `account_switched` (`{ provider }`: in-use account taken over from a phone with progress); `signed_out`; `account_deleted`; `save_prompt_shown` / `save_prompt_dismissed` (`{ moment }`). After a link or sign-in, **`setUserId(uid)`** (the pseudonymous Firebase uid) and user property `account_state = 'linked'`, so the same person is recognized across phones and visits; on sign-out `setUserId(null)` and `account_state = 'anonymous'`. The instance ID is **not** reset on sign-out (so a repeat user on the same phone isn't counted as new); it's reset with `resetAnalyticsData()` **only on delete**. The privacy review confirms `setUserId`. | Yes (reset on delete; review of `setUserId`) |
+| 16 | Orphaned anonymous users | **No cleanup now** (confirmed 2026-11-22): dev holds only the developer's own test users, and there's no prod use yet. Every install does sign in anonymously (`AuthProvider`), so prod will create anonymous users; with D3 only an account switch from a phone with progress leaves one behind. A policy for those stays a Phase 8 item. | No |
+| 17 | Platforms for this slice | **iOS is tested and shipped with this slice** (decided 2026-11-22: most teens use iPhones, and the App Store is the publishing priority). The repo has never built for iOS (`ios/` isn't generated; development is on Windows with no Mac), so the slice starts with an **iOS bring-up** (below): Apple Developer Program membership, EAS Build for a dev client on a physical iPhone, the Firebase iOS app, and Sign in with Apple. Done means the device test passes on both an iPhone and Android. | Yes (account owner, earlier slices on iOS) |
 | 18 | Apple token revoke on delete | As ph-9-us-9/10: the client gets a fresh Apple authorization code and calls `revokeToken` **before** `deleteAccount`; if the revoke fails, nothing is deleted and the user is told to try again. | No |
 | 19 | `deleteAccount` retry after a lost response | **`auth/user-not-found` from `deleteUser` counts as success**, and the recursive delete of an empty path is a no-op, so a retry after a dropped response returns `{ deleted: true }` instead of `internal`. The caller's ID token stays valid for a short while after the Auth user is gone, so the retry still authenticates. Extends ph-9-us-9's idempotency criterion. | Yes |
 | 20 | Rules and data model | **No rule or index changes.** Nothing about the account is stored in Firestore; client deletes under `users/{uid}` stay denied; `deleteAccount` uses the Admin SDK. | No (ph-9-us-9) |
+
+## iOS bring-up (first, D17)
+
+The app has only ever run on Android. Before ph-9-us-9/us-10 can be device-tested on an iPhone:
+1. **Apple Developer Program** membership (paid; individual or organization is still open), the
+   App ID `com.slatestack.dmv` with the **Sign in with Apple** capability, and the test iPhone
+   registered for development builds.
+2. **Firebase iOS app** in `dmv-app-dev` for that bundle ID; `GoogleService-Info.plist` into
+   `firebase-config/dev/` (gitignored, like the Android file; `app.config.ts` already points at
+   it).
+3. **EAS Build** (`docs/phase-0-plan.md` Section D; no Mac needed): an `eas.json` `development`
+   profile with `expo-dev-client`, building the iOS dev client in the cloud and installing it
+   on the iPhone through internal distribution. `ios/` stays ungenerated in the repo (CNG; README
+   "Known gap"), unless a Mac becomes available.
+4. **Smoke pass of Slices 1–5 on the iPhone** (drafted, still open): onboarding, a baseline
+   section with force-quit and resume, flashcards, a mini-quiz, a timed practice test with the
+   app backgrounded. Anything that breaks is fixed in this slice before the sign-in work, since
+   it would otherwise block the Slice 6 device test.
+5. README: the iOS build and install steps.
+
+This is the biggest risk in the slice (account approval time, first iOS run), so it starts first
+and can run in parallel with the `deleteAccount` backend work.
 
 ## Backend (ph-9-us-9)
 
@@ -138,8 +164,9 @@ is a Must (`prd.md` Section 5), and Apple requires in-app account deletion once 
   `google-services.json` into `firebase-config/dev/` so it carries the OAuth client. Record the
   web client ID the Google library needs (it's not a secret, but keep it per environment, e.g.
   in `app.config.ts` `extra`).
-- Enable **Apple** when iOS work starts (D17): Services ID, key, team ID in the Firebase console;
-  "Sign in with Apple" capability on the iOS bundle `com.slatestack.dmv`.
+- Enable **Apple** in `dmv-app-dev` (D17): Services ID, key and team ID in the Firebase console,
+  with the capability from the iOS bring-up. Google on iOS also needs the plist's reversed client
+  ID as a URL scheme (the Google library's config plugin).
 - Steps go in the README and, for prod, in `Prod-Launch-Plan.md` section 0 next to "Anonymous
   Authentication enabled".
 
@@ -167,8 +194,9 @@ is a Must (`prd.md` Section 5), and Apple requires in-app account deletion once 
 **Native libraries** (dev-client rebuild; config plugins, no eject — `phase-0-findings.md`):
 `@react-native-google-signin/google-signin` and `expo-apple-authentication` (iOS only). Check both
 against Expo SDK 57 / RN 0.86 and RNFirebase v26 before adding, including which Google sign-in
-API the free version of the library uses on Android. Add their plugins to `app.config.ts`. The
-Android emulator must be a Google Play image for device testing.
+API the free version of the library uses on Android. Add their plugins to `app.config.ts` and
+rebuild both dev clients (Android locally, iOS on EAS). The Android emulator must be a Google
+Play image. Apple's button uses `expo-apple-authentication`'s native button (Apple's design rules).
 
 **`AuthProvider`** (`src/auth/AuthProvider.tsx`):
 - Adds `account` (D10) and a `switching` status (D8) to `AuthState`.
@@ -180,16 +208,22 @@ Android emulator must be a Google Play image for device testing.
   "You need a connection for this".
 - `ensureUserDocument` already handles a signed-in user whose doc exists (switch, new phone).
 
-**`clearLocalData()`** (new, e.g. `src/storage/clearLocalData.ts`, D6/D7/D15): prefix sweep of
-AsyncStorage, `clearDeckCache()`, Firestore cache clear, `resetAnalyticsData()`. Each step is
-independent and logged on failure, so one failing step doesn't skip the rest. In-memory hooks
-(Concept Progress, profile, practice attempts) already reset on uid change; the `switching`
-unmount makes sure of it.
+**Local data** (new, e.g. `src/storage/clearLocalData.ts`, D6/D7/D15), two functions:
+- `keepOnlyUser(uid)`: after a sign-in or switch, removes `dmv-app:` keys that don't carry
+  `:{uid}` (device-level `dmv-app:device:*` keys are kept); `clearDeckCache()`; if `uid` differs
+  from `dmv-app:device:last-account`, clears Firestore's cache; then stores `uid` as the last
+  account.
+- `clearAllLocalData()`: on delete, every `dmv-app:` key, `clearDeckCache()`, Firestore's cache,
+  `resetAnalyticsData()`.
+Each step is independent and logged on failure, so one failing step doesn't skip the rest.
+Sign-out calls neither. In-memory hooks (Concept Progress, profile, practice attempts) already
+reset on uid change; the `switching` unmount makes sure of it.
 
 **Save-progress card** (new shared component, e.g. `src/account/SaveProgressCard.tsx`):
 copy from ph-9-us-10 ("Changing phones? Save your progress so you can pick up where you left
 off."), the official Google button (and Apple on iOS), "Not now", the disclosure line (D14).
-Used on baseline results (below the results, never above the score) and Home (D9). New per-uid
+Used on baseline results (below the results, never above the score) and Home (D9). The same
+provider step (checkbox, buttons, disclosure) is reused on the welcome step and in Settings. New per-uid
 flags in `src/profile/localFlags.ts`: `prompt:baseline-results-dismissed`,
 `home:save-progress-dismissed`. Hidden for linked users. After a link: an inline "Progress saved
 to Google" confirmation, then the card is gone.
@@ -209,10 +243,10 @@ to Home. New account → linked to this uid, note from device test step 9, onboa
   and "Already saved on another phone? Sign in" (same flow), or "Saved with Google/Apple".
 - Test date (unchanged).
 - "Sign out" (linked only): confirm with "You can sign back in any time to get your progress
-  back." → D8 sequence → onboarding.
+  back." → D8 sequence → onboarding. Nothing on the phone is cleared (D6).
 - "Delete my data" (everyone): first confirm explains what goes (progress, tests, test date, and
   the sign-in if linked); second confirm "This can't be undone" → (Apple: revoke, D18) →
-  `deleteAccount` → on success, local `signOut()` → `clearLocalData()` → anonymous sign-in →
+  `deleteAccount` → on success, local `signOut()` → `clearAllLocalData()` → anonymous sign-in →
   onboarding. On failure: "We couldn't finish deleting your data. Try again." with retry; nothing
   claims success early and local data is kept until the server confirms.
 - Privacy link (D14).
@@ -223,29 +257,31 @@ to Home. New account → linked to this uid, note from device test step 9, onboa
 ## Relationship to Slice 5b
 
 - **5b-1 is complete** (2026-11-22). Its carry-forward (`dmv-app:practice-mode:{uid}`) is covered
-  by D6's prefix sweep.
-- **5b-2 is not built; its draft spec is
+  by D6 (removed when someone else signs in, and on delete).
+- **5b-2 is not built; its spec (reviewed 2026-11-22) is
   `2026-11-22-slice-5b2-missed-questions-progress-design.md`** (ph-4-us-5 missed questions and
   card-performance recording, ph-4-us-7 latest score vs baseline, Home test card). Slice 6
   doesn't depend on it, and 5b-2 doesn't depend on Slice 6. How the overlaps are handled there:
   - Its recorded set of test IDs is `dmv-app:card-perf-recorded:{uid}`, so D6 clears it.
   - Its missed-questions list is built from `testAttempts`, so it comes back on a new phone; the
     weighted flashcard order (local card performance) doesn't (D5).
-  - It proposes adding Home's weak-spots card (its D13). Without it, ph-9-us-6 can't close "in
-    full" in this slice as `build-order.md` says.
+  - It adds Home's weak-spots card (its D13), so ph-9-us-6 can close in full here.
   - Both slices add to Home; ph-9-us-7's order puts "Save your progress" last.
-- Recommendation: build 5b-2 first, as `build-order.md` implies, so Slice 6 protects the full
-  set of progress and its device test covers it. Either order works.
+- **5b-2 is built first** (confirmed 2026-11-22). The iOS bring-up can start while 5b-2 is being
+  built, since it touches no app code.
 
 ## Carry-forwards closed by this slice
 
+The carry-forwards all said "on sign-out". With D6 they apply **when a different person signs
+in, and on delete**, not on sign-out itself.
+
 | Carry-forward | From | Covered by |
 |---------------|------|------------|
-| `clearDeckCache()` on sign-out | Slice 4a, ph-2-us-12, `flashcardCache.ts` | `clearLocalData()` |
-| Reset last-opened topic and Concept Progress on sign-out | Slice 4a, ph-2-us-12, ph-9-us-7 | Prefix sweep; uid-change reset + `switching` unmount |
-| Clear `card-perf` keys and the saved deck pass | Slice 4b, ph-2-us-6 | Prefix sweep |
-| Clear the saved practice session | Slice 5a | Prefix sweep (`active-test:*`, including the legacy key) |
-| Clear `dmv-app:practice-mode:{uid}` | Slice 5b-1, ph-3-us-9 decision 8 | Prefix sweep |
+| `clearDeckCache()` | Slice 4a, ph-2-us-12, `flashcardCache.ts` | `keepOnlyUser`, `clearAllLocalData` |
+| Reset last-opened topic and Concept Progress | Slice 4a, ph-2-us-12, ph-9-us-7 | Key sweep; uid-change reset + `switching` unmount |
+| Clear `card-perf` keys and the saved deck pass | Slice 4b, ph-2-us-6 | Key sweep |
+| Clear the saved practice session | Slice 5a | Key sweep (`active-test:*`, including the legacy key) |
+| Clear `dmv-app:practice-mode:{uid}` | Slice 5b-1, ph-3-us-9 decision 8 | Key sweep |
 | Welcome step "Sign in" link | ph-9-us-3, `WelcomeScreen.tsx` | Welcome step above |
 | Settings account state, sign-out, "Delete my data" | ph-9-us-7, `SettingsScreen.tsx` | Settings above |
 
@@ -254,12 +290,12 @@ Stale comments to update when built: `flashcardCache.ts` ("for sign-out once Sli
 
 ## Story and doc updates
 
-When device-tested: ph-9-us-9 and ph-9-us-10 Complete (with Apple parts noted as untested on
-device, D17); parents ph-9-us-8 and ph-9-us-6 Complete; ph-9-us-7 Complete apart from cards owned
-by later phases. Record D3, D5, D9, D16 in ph-9-us-10 and D19 in ph-9-us-9; update the Phase 9
-summary's open items (providers confirmed or not). Update `build-order.md` with status and the
-Apple device-test open item; `Prod-Launch-Plan.md` with prod provider setup, release SHA
-fingerprints and the privacy policy URL; `prd.md` Section 9 once providers are confirmed.
+When device-tested on an iPhone and Android: ph-9-us-9 and ph-9-us-10 Complete; parents ph-9-us-8 and ph-9-us-6 Complete; ph-9-us-7 Complete apart from cards owned
+by later phases. Record D3, D5, D6 (changes ph-9-us-10's "clear local data on sign-out" criterion),
+D9, D14 and D15 in ph-9-us-10, and D19 in ph-9-us-9; update the Phase 9 summary's open items
+(providers confirmed). Update `build-order.md` with status and the iOS bring-up; `Prod-Launch-Plan.md` with prod provider setup, release SHA
+fingerprints, the Firebase iOS app for prod and the privacy policy URL; `prd.md` Section 9
+(providers decided: Google + Apple).
 `CLAUDE.md` if `test:functions` gains the Auth emulator.
 
 ## Left to the builder
@@ -269,9 +305,11 @@ fingerprints and the privacy policy URL; `prd.md` Section 9 once providers are c
   is held between "in use" and "Use that account" (re-requesting the provider sheet is
   acceptable if the credential can't be reused).
 - Whether the "switching" view is a spinner or a short message.
-- Tests: `deleteAccount` cases above in `npm run test:functions`; `clearLocalData` (only
-  `dmv-app:` keys removed, one failing step doesn't stop the others) and account-state derivation
+- Tests: `deleteAccount` cases above in `npm run test:functions`; `keepOnlyUser` (other
+  uids' keys removed, the same uid's and device keys kept, cache cleared only for a different
+  account) and `clearAllLocalData` (one failing step doesn't stop the others) and account-state derivation
   in `npm run test:app`; save card visibility and dismissal per moment, the in-use sheet, cancel
   with no error, offline message, Settings for anonymous vs linked, delete success/failure/retry
-  and the two confirms in `npm run test:components` (auth and Google sign-in mocked). Sign-in
+  and the two confirms, the checkbox gating the buttons, and the analytics events (new vs
+returning) in `npm run test:components` (auth, Google and Apple sign-in mocked). Sign-in
   flows themselves are covered by the manual device test above.
