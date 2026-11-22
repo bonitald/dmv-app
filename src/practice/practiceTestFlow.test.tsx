@@ -159,6 +159,29 @@ test('already-exists shows the saved attempt', async () => {
   expect(await getActiveSession('u1', 'practice')).toBeNull();
 });
 
+const recorded = async () => JSON.parse((await AsyncStorage.getItem('dmv-app:card-perf-recorded:u1')) ?? '[]');
+const rowHistory = async () => JSON.parse((await AsyncStorage.getItem('dmv-app:card-perf:u1:row')) ?? 'null');
+
+test('a graded test feeds card performance once (Slice 5b-2)', async () => {
+  (scoreTest as jest.Mock).mockResolvedValue(graded());
+  await renderFlow();
+  await screen.findByText('Question 1');
+  await submitAll(2);
+  await screen.findByText('1 of 2 correct');
+  await waitFor(async () => expect(await recorded()).toEqual(['t1']));
+  expect((await rowHistory()).cards.q2).toMatchObject({ graded: 1, missed: 1 });
+});
+
+test('already-exists records the saved attempt once', async () => {
+  (scoreTest as jest.Mock).mockRejectedValue(new CallableError('already-exists', 'already-exists', 'scored'));
+  mockAttempt = { status: 'ready', data: { type: 'practice', ...graded([true, false]) } };
+  await renderFlow();
+  await submitAll(2);
+  await screen.findByText('1 of 2 correct');
+  await waitFor(async () => expect(await recorded()).toEqual(['t1']));
+  expect((await rowHistory()).cards.q1).toMatchObject({ graded: 1, missed: 0 });
+});
+
 test.each([
   [new CallableError('offline', 'unavailable', 'net'), 'No connection'],
   [new CallableError('unknown', 'internal', 'boom'), 'Something went wrong'],
