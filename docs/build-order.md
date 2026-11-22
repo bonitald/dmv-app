@@ -264,7 +264,12 @@ compares the latest score with the baseline. Home shows "Take a practice test" /
 
 Home card: "Take a practice test" / latest score.
 
-**Status:** not started.
+**Status: Code complete (2026-11-22), device test pending.** Built in a cloud session on
+`feat/missed-questions-progress` following the plan; the Android emulator device test (spec steps
+1–8) hasn't been run. App only: no functions, rules or index changes. Tests: app 270, components
+292, functions 136, rules 58, tsc clean. Also added Home's weak-spots card (spec D13), so Home has
+every card except Slice 6's save progress and Phase 6's driving summary. The 5b review
+carry-forwards below are done (`recordTestResults`).
 
 **Carry-forwards from the 5b review.**
 - Practice and baseline results that feed card performance must not overwrite a topic's

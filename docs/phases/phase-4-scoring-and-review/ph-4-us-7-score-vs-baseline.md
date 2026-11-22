@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-7
 **Layer:** Parent
-**Status:** Not Started
+**Status:** In Progress (code complete 2026-11-22 (Slice 5b-2), device test pending)
 
 ## Story
 As a teen user,
@@ -55,6 +55,13 @@ So that I can tell whether my studying is paying off.
 - [ ] Add a pure `baselineScore(baselineReview)` helper, unit-tested.
 - [ ] Add the comparison line to practice results.
 - [ ] Add the summary card to the Progress tab with its empty and in-progress states.
+
+## Decisions (Slice 5b-2, 2026-11-22)
+- Latest practice test vs baseline on the Progress tab and Home; practice results compare the
+  test being shown (spec D10/D11). Whole percentage points; "+16 points", "same as your
+  baseline", or a neutral "Keep going" line when lower.
+- Home's test card becomes "Take a practice test" with the latest score once the baseline is
+  done (D12).
 
 ## Questions
 - Compare against the **latest** test (assumed) or the average of the last few? Latest is

@@ -3,7 +3,7 @@
 **ID:** ph-9-us-7
 **Layer:** Frontend
 **Parent:** ph-9-us-6
-**Status:** In Progress (Slice 1 part complete 2026-09-25; "Continue learning" card complete 2026-10-10 in Slice 4a; remaining cards land in Slices 2–6)
+**Status:** In Progress (Slice 1 part complete 2026-09-25; "Continue learning" card complete 2026-10-10 in Slice 4a; practice test card and weak spots code complete 2026-11-22 in Slice 5b-2, device test pending; save progress is Slice 6, driving summary Phase 6)
 
 ## Story
 As a teen user,

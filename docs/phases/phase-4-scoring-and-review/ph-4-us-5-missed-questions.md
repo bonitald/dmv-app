@@ -2,7 +2,7 @@
 
 **ID:** ph-4-us-5
 **Layer:** Parent
-**Status:** Not Started
+**Status:** In Progress (code complete 2026-11-22 (Slice 5b-2), device test pending)
 
 ## Story
 As a teen user,
@@ -72,6 +72,17 @@ them too.
 - [ ] Build the missed-questions screen with topic groups and links.
 - [ ] Call ph-2-us-6's `recordQuizResults` for practice tests and the completed baseline
   (`baselineReview`) when results arrive.
+
+## Decisions (Slice 5b-2, 2026-11-22)
+- The list is built from the newest 30 attempts of every type in Firestore (live, offline cache),
+  so it comes back on a new phone (spec D1). A question leaves it after one right answer (D2).
+- The baseline counts through its final attempt's `baselineReview` only (D3).
+- Practice and baseline results feed card performance only when graded in that session (fresh
+  result or the `already-exists` recovery), once per test ID
+  (`dmv-app:card-perf-recorded:{uid}`, newest 50), never on reopen, and never touch a topic's
+  `lastQuizMissedIds` or saved deck pass. No backfill of earlier tests (D4–D6).
+- A missed question opens on its own in Review (`questionId` param, D8). Entry points: a row on
+  the Practice tab and "Go over missed questions" on practice and baseline results (D7).
 
 ## Questions
 - Reading only the last 30 attempts means a question missed long ago and never seen again could
