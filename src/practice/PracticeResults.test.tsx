@@ -3,6 +3,10 @@ import type { Topic } from '../topics/topicsData';
 import type { PracticeOutcome } from './practiceData';
 import { PracticeResults } from './PracticeResults';
 
+let mockBaseline: unknown = { status: 'none' };
+jest.mock('../progress/useBaselineScore', () => ({ useBaselineScore: () => mockBaseline }));
+beforeEach(() => { mockBaseline = { status: 'none' }; });
+
 const topic = (chunkId: string, order: number): Topic => ({
   chunkId, title: `Title ${chunkId}`, description: '', order, approvedQuestionCount: 5,
 } as Topic);
@@ -97,4 +101,19 @@ test('Go over missed questions shows only when wired, and opens the list (ph-4-u
   await render(<PracticeResults outcome={outcome(20)} topics={[]} {...handlers()} onOpenMissed={onOpenMissed} />);
   await fireEvent.press(screen.getByText('Go over missed questions'));
   expect(onOpenMissed).toHaveBeenCalled();
+});
+
+test('compares this test with the baseline (ph-4-us-7)', async () => {
+  mockBaseline = { status: 'ready', percent: 60 };
+  await render(<PracticeResults outcome={outcome(19)} topics={[]} {...handlers()} />);
+  expect(screen.getByText('Baseline 60% → This test 76% · +16 points')).toBeTruthy();
+});
+
+test('baseline in progress invites finishing it; none or unknown shows nothing', async () => {
+  mockBaseline = { status: 'in-progress' };
+  await render(<PracticeResults outcome={outcome(19)} topics={[]} {...handlers()} />);
+  expect(screen.getByText("Finish your baseline to see how far you've come.")).toBeTruthy();
+  mockBaseline = { status: 'unknown' };
+  await render(<PracticeResults outcome={outcome(19)} topics={[]} {...handlers()} />);
+  expect(screen.queryByText(/Baseline|Finish your baseline/)).toBeNull();
 });

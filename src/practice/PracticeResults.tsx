@@ -3,6 +3,8 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { colors, spacing, typography } from '../theme/tokens';
 import type { Topic } from '../topics/topicsData';
+import { compareToBaseline, comparisonLine } from '../progress/scoreComparison';
+import { useBaselineScore } from '../progress/useBaselineScore';
 import {
   leftOutLine,
   passLine,
@@ -39,6 +41,9 @@ export function PracticeResults({
   const { shown, moreCount } = topicsToWorkOn(outcome.perTopic, topics);
   const leftOut = leftOutLine(outcome);
   const timedOut = timedOutLine(outcome);
+  const baseline = useBaselineScore();
+  const comparison =
+    baseline.status === 'ready' ? compareToBaseline(baseline.percent, outcome.correctCount, outcome.totalCount) : null;
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
@@ -51,6 +56,11 @@ export function PracticeResults({
         {passLine(outcome)}
       </Text>
       {leftOut ? <Text style={[typography.small, styles.muted]}>{leftOut}</Text> : null}
+      {comparison ? (
+        <Text style={typography.body}>{comparisonLine(comparison, 'This test')}</Text>
+      ) : baseline.status === 'in-progress' ? (
+        <Text style={[typography.body, styles.muted]}>Finish your baseline to see how far you've come.</Text>
+      ) : null}
 
       <Text style={typography.h2}>Topics to work on</Text>
       {shown.length === 0 ? (

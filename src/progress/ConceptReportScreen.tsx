@@ -17,6 +17,7 @@ import {
   type Strength,
 } from './conceptStrength';
 import { useConceptEvidence } from './useConceptEvidence';
+import { ScoreSummaryCard } from './ScoreSummaryCard';
 
 // ph-4-us-6: the Progress tab's concept report. Every topic as strong / shaky / likely gap
 // (or Got it / Missed it from the baseline alone), with what it's based on, sortable so the
@@ -79,6 +80,7 @@ export function ConceptReportScreen() {
       ListHeaderComponent={
         <View style={styles.header}>
           {notice}
+          <ScoreSummaryCard />
           <Text style={[typography.body, styles.muted]}>A rough guide from your quizzes, practice tests and baseline.</Text>
           <View style={styles.sort} accessibilityRole="radiogroup">
             {(['handbook', 'needs-work'] as const).map((value) => (

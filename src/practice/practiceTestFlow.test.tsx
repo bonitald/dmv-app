@@ -12,6 +12,7 @@ import { PRACTICE_CACHE_WARNING, getActiveSession, saveAnswers, startSession } f
 import { PracticeTestScreen, TIME_UP_RETRY_NOTICE } from './PracticeTestScreen';
 import { startPracticeTest } from './startPracticeTest';
 
+jest.mock('../progress/useBaselineScore', () => ({ useBaselineScore: () => ({ status: 'none' }) }));
 jest.mock('@react-native-firebase/app', () => ({ getApp: jest.fn() }));
 jest.mock('../auth/AuthProvider', () => ({ useAuth: () => ({ status: 'ready', uid: 'u1' }) }));
 jest.mock('../api/callables', () => ({ assembleTest: jest.fn(), scoreTest: jest.fn() }));
