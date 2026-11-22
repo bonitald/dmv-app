@@ -23,7 +23,7 @@ function str(value: unknown): string | null {
   return typeof value === 'string' ? value : null;
 }
 
-function toItem(raw: unknown): ReviewItem | null {
+export function toReviewItem(raw: unknown): ReviewItem | null {
   if (typeof raw !== 'object' || raw === null) return null;
   const q = raw as Record<string, unknown>;
   if (typeof q.questionId !== 'string') return null;
@@ -61,7 +61,7 @@ export function toReviewItems(attempt: Record<string, unknown> | undefined): Rev
   if (!attempt) return null;
   const source = attempt.type === 'baseline' ? attempt.baselineReview : attempt.perQuestion;
   if (!Array.isArray(source)) return null;
-  return source.map(toItem).filter((item): item is ReviewItem => item !== null);
+  return source.map(toReviewItem).filter((item): item is ReviewItem => item !== null);
 }
 
 /** Wrong or skipped. Removed questions aren't counted either way. */
