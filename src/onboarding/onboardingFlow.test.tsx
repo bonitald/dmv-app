@@ -157,11 +157,12 @@ describe('Home (ph-9-us-7 / ph-9-us-5)', () => {
     expect(screen.getByText('Section 2 of 3. Pick up where you left off.')).toBeTruthy();
   });
 
-  test('the test card shows Baseline done once it is complete', async () => {
+  test('the test card offers a practice test once the baseline is complete (Slice 5b-2)', async () => {
     mockProfile = { onboarding: { choice: 'baseline' }, testDate: null };
     mockBaselineProgress = { status: 'complete', version: 'v1' };
     await render(<RootNavigator initialRoute="Main" />);
-    expect(await screen.findByText('Baseline done')).toBeTruthy();
+    expect(await screen.findByText('Take a practice test')).toBeTruthy();
+    expect(screen.queryByText('Baseline done')).toBeNull();
   });
 
   test('shows the countdown for a saved date', async () => {
