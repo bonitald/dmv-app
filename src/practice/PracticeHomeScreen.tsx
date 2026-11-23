@@ -13,6 +13,8 @@ import { attemptDateLabel, passed, type PracticeOutcome } from './practiceData';
 import { startPracticeTest } from './startPracticeTest';
 import { isExpired, remainingSeconds, TIMED_TEST_LIMIT_SEC } from './timing';
 import { usePracticeAttempts } from './usePracticeAttempts';
+import { latestMisses } from '../review/missedQuestions';
+import { useRecentAttempts } from '../review/useRecentAttempts';
 
 // ph-3-us-4 / ph-4-us-1: the Practice tab. Start a test, resume or discard the one saved on the
 // phone, and reopen the results of recent tests. The saved session is re-read on every focus so
@@ -22,6 +24,7 @@ export function PracticeHomeScreen() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { uid } = useAuth();
   const attempts = usePracticeAttempts();
+  const recent = useRecentAttempts();
   const [saved, setSaved] = useState<ActiveSession | null>(null);
   const [readAt, setReadAt] = useState(() => Date.now());
   const [mode, setMode] = useState<TestMode>('untimed');
@@ -155,6 +158,8 @@ export function PracticeHomeScreen() {
       />
       <Text style={[typography.small, styles.muted]}>Based on the Colorado Driver Handbook.</Text>
 
+      <MissedRow recent={recent} onPress={() => navigation.navigate('MissedQuestions')} />
+
       <Text style={[typography.h2, styles.sectionTitle]} accessibilityRole="header">
         Recent tests
       </Text>
@@ -172,6 +177,18 @@ export function PracticeHomeScreen() {
         ))
       )}
     </ScrollView>
+  );
+}
+
+/** ph-4-us-5: hidden until there's a graded attempt; no number while the attempts load. */
+function MissedRow({ recent, onPress }: { recent: ReturnType<typeof useRecentAttempts>; onPress: () => void }) {
+  if (recent.status !== 'ready' || recent.attempts.length === 0) return null;
+  const count = latestMisses(recent.attempts).length;
+  const label = count === 0 ? 'Missed questions · none right now' : `Missed questions · ${count}`;
+  return (
+    <Card onPress={onPress} accessibilityLabel={label}>
+      <Text style={typography.bodySemibold}>{label}</Text>
+    </Card>
   );
 }
 

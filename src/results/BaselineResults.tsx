@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
 import type { PerQuestionResult } from '../api/types';
@@ -26,18 +26,30 @@ export function BaselineResults({
   review,
   testId,
   onDone,
+  onReviewReady,
 }: {
   /** Right after submit: the final section's baselineReview. Null when reopened later. */
   review: PerQuestionResult[] | null;
   /** The final attempt to load (and to open in Review), e.g. baseline-v1-3. */
   testId: string;
   onDone: () => void;
+  /** Called once with the 45 graded questions when they're available (Slice 5b-2: only passed
+   *  when the baseline was just graded, so its results feed card performance). */
+  onReviewReady?: (baselineReview: PerQuestionResult[]) => void;
 }) {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   // No read when the results are already in memory.
   const attempt = useTestAttempt(review ? null : testId);
   const topics = useTopics();
   const attemptData = attempt.status === 'ready' ? attempt.data : undefined;
+  const reportedRef = useRef(false);
+  useEffect(() => {
+    if (reportedRef.current || !onReviewReady) return;
+    const raw = review ?? attemptData?.baselineReview;
+    if (!Array.isArray(raw)) return;
+    reportedRef.current = true;
+    onReviewReady(raw as PerQuestionResult[]);
+  }, [review, attemptData, onReviewReady]);
   const items = useMemo(
     () =>
       review
@@ -98,6 +110,11 @@ export function BaselineResults({
           label="Review answers"
           variant="secondary"
           onPress={() => navigation.navigate('Review', { testId })}
+        />
+        <Button
+          label="Go over missed questions"
+          variant="secondary"
+          onPress={() => navigation.navigate('MissedQuestions')}
         />
       </View>
 

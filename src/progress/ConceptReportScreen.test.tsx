@@ -4,6 +4,7 @@ import type { EvidenceState } from './useConceptEvidence';
 import { toReportRows } from './conceptStrength';
 
 const mockNavigate = jest.fn();
+jest.mock('./ScoreSummaryCard', () => ({ ScoreSummaryCard: () => null }));
 jest.mock('@react-navigation/native', () => ({
   ...jest.requireActual('@react-navigation/native'),
   useNavigation: () => ({ navigate: mockNavigate }),

@@ -4,6 +4,7 @@ import { PracticeResultsScreen } from './PracticeResultsScreen';
 
 const mockNavigate = jest.fn();
 const mockGoBack = jest.fn();
+jest.mock('../progress/useBaselineScore', () => ({ useBaselineScore: () => ({ status: 'none' }) }));
 jest.mock('@react-navigation/native', () => ({
   useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
   useRoute: () => ({ params: { testId: 't1' } }),

@@ -9,10 +9,14 @@ import { getLastOpenedTopic } from '../profile/localFlags';
 import { colors, radius, spacing, typography } from '../theme/tokens';
 import { useTopics } from '../topics/useTopics';
 import { TestDateCard } from './TestDateCard';
+import { WeakSpotsCard } from './WeakSpotsCard';
+import { usePracticeAttempts } from '../practice/usePracticeAttempts';
+import { compareToBaseline, sinceBaselineLine } from '../progress/scoreComparison';
+import { useBaselineScore } from '../progress/useBaselineScore';
 
 // ph-9-us-7: Home only shows and links. Each card reads its own data and renders only once its
 // feature exists, so Home fills in slice by slice (docs/build-order.md). Order, top to bottom:
-// countdown, test card, study card, then (later) weak spots, driving summary, save progress.
+// countdown, test card, study card, weak spots, then (later) driving summary, save progress.
 // Both route cards always show, whichever route was picked at onboarding.
 export function HomeScreen() {
   return (
@@ -20,12 +24,14 @@ export function HomeScreen() {
       <TestDateCard />
       <TestCard />
       <StudyCard />
+      <WeakSpotsCard />
     </ScrollView>
   );
 }
 
-// ph-3-us-13: Start / Resume / Done from users/{uid}/baseline/progress. Slice 5 swaps in
-// practice tests once the baseline is done.
+// ph-3-us-13: Start / Resume from users/{uid}/baseline/progress. Once the baseline is done it
+// becomes the practice test card with the latest score and the change since the baseline
+// (Slice 5b-2, ph-4-us-7). Baseline results stay reachable from the Progress tab and Recent tests.
 function TestCard() {
   const navigation = useNavigation();
   const progress = useBaselineProgress();
@@ -42,17 +48,7 @@ function TestCard() {
       />
     );
   }
-  if (progress.status === 'complete') {
-    return (
-      <RouteCard
-        icon="checkmark-circle-outline"
-        eyebrow="BASELINE"
-        title="Baseline done"
-        body="See your score and what to work on first."
-        onPress={open}
-      />
-    );
-  }
+  if (progress.status === 'complete') return <PracticeCard />;
   return (
     <RouteCard
       icon="clipboard-outline"
@@ -111,6 +107,30 @@ function StudyCard() {
       title="Learn concept by concept"
       body="Flashcards and a quick quiz for each part of the handbook."
       onPress={openList}
+    />
+  );
+}
+
+function PracticeCard() {
+  const navigation = useNavigation();
+  const practice = usePracticeAttempts();
+  const baseline = useBaselineScore();
+  const latest = practice.status === 'ready' ? practice.attempts[0] : undefined;
+  let body = '25 questions, like the real test.';
+  if (latest) {
+    const percent = Math.round((latest.correctCount / Math.max(1, latest.totalCount)) * 100);
+    const comparison =
+      baseline.status === 'ready' ? compareToBaseline(baseline.percent, latest.correctCount, latest.totalCount) : null;
+    const since = comparison ? sinceBaselineLine(comparison) : null;
+    body = `Latest: ${latest.correctCount} of ${latest.totalCount} (${percent}%)${since ? ` · ${since}` : ''}`;
+  }
+  return (
+    <RouteCard
+      icon="document-text-outline"
+      eyebrow="PRACTICE TESTS"
+      title="Take a practice test"
+      body={body}
+      onPress={() => navigation.navigate('Main', { screen: 'PracticeTests' })}
     />
   );
 }

@@ -3,7 +3,7 @@ import { Alert, ActivityIndicator, StyleSheet, View } from 'react-native';
 import { usePreventRemove } from '@react-navigation/native';
 import { assembleTest, scoreTest } from '../api/callables';
 import { toCallableError } from '../api/callableErrors';
-import type { QuizQuestion, TimingSubmission } from '../api/types';
+import type { PerQuestionResult, QuizQuestion, TimingSubmission } from '../api/types';
 import { useAuth } from '../auth/AuthProvider';
 import { NoConnection } from '../components/NoConnection';
 import { openConcept } from '../navigation/openConcept';
@@ -13,6 +13,7 @@ import { toAnswerList, type Answers } from '../quiz/answers';
 import { QuizRunner, type SubmitState } from '../quiz/QuizRunner';
 import { PRACTICE_CACHE_WARNING, endSession, getActiveSession, saveAnswers, startSession } from '../quiz/quizSession';
 import { useTestAttempt } from '../review/useTestAttempt';
+import { recordTestResults } from '../study/cardPerformance';
 import { colors } from '../theme/tokens';
 import { getPracticeMode } from '../profile/localFlags';
 import { useTopics } from '../topics/useTopics';
@@ -158,6 +159,8 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
         finish();
         await endSession(uid, 'practice', phase.testId);
         setPhase({ kind: 'results', outcome: fromPracticeScore(result) });
+        // Slice 5b-2: graded now, so it feeds flashcard order (once; see recordTestResults).
+        void recordTestResults(uid, result.testId, result.perQuestion);
       } catch (raw) {
         const error = toCallableError(raw);
         if (error.kind === 'already-exists') {
@@ -231,6 +234,7 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
         if (uid) void startPracticeTest(navigation, uid, 'replace');
       }}
       onBack={() => navigation.popTo('Main', { screen: 'PracticeTests' })}
+      onOpenMissed={() => navigation.navigate('MissedQuestions')}
     />
     );
 
@@ -276,7 +280,7 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
       );
     }
     case 'recovering':
-      return <Recovered testId={phase.testId} render={results} />;
+      return <Recovered uid={uid} testId={phase.testId} render={results} />;
     case 'results':
       return results(phase.outcome);
     case 'offline':
@@ -296,9 +300,25 @@ export function PracticeTestScreen({ navigation, route }: RootStackScreenProps<'
 }
 
 /** Reads the saved attempt after `already-exists` and shows its results. */
-function Recovered({ testId, render }: { testId: string; render: (o: PracticeOutcome) => React.ReactElement }) {
+function Recovered({
+  uid,
+  testId,
+  render,
+}: {
+  uid: string | null;
+  testId: string;
+  render: (o: PracticeOutcome) => React.ReactElement;
+}) {
   const attempt = useTestAttempt(testId);
   const outcome = attempt.status === 'ready' ? fromPracticeAttempt(testId, attempt.data) : null;
+  // Graded just now (the response was lost), so it still feeds flashcard order, once.
+  const perQuestion = attempt.status === 'ready' ? attempt.data?.perQuestion : undefined;
+  const recordedRef = useRef(false);
+  useEffect(() => {
+    if (recordedRef.current || !uid || !outcome || !Array.isArray(perQuestion)) return;
+    recordedRef.current = true;
+    void recordTestResults(uid, testId, perQuestion as PerQuestionResult[]);
+  }, [uid, testId, outcome, perQuestion]);
   if (outcome) return render(outcome);
   if (attempt.status === 'error' || attempt.status === 'ready') {
     return (

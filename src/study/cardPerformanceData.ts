@@ -30,22 +30,36 @@ export function gradedByTopic(perQuestion: PerQuestionResult[]): Map<string, Per
   return out;
 }
 
-/** One quiz's graded results for one topic, added to that topic's history. */
-export function applyQuizResults(history: TopicHistory, results: PerQuestionResult[]): TopicHistory {
-  const cards = { ...history.cards };
-  const missedIds: string[] = [];
+function applyToCards(cards: Record<string, CardHistory>, results: PerQuestionResult[]): Record<string, CardHistory> {
+  const next = { ...cards };
   for (const q of results) {
     const correct = q.correct === true;
-    const prev = cards[q.questionId] ?? { graded: 0, missed: 0, correctStreak: 0, lastCorrect: false };
-    cards[q.questionId] = {
+    const prev = next[q.questionId] ?? { graded: 0, missed: 0, correctStreak: 0, lastCorrect: false };
+    next[q.questionId] = {
       graded: prev.graded + 1,
       missed: prev.missed + (correct ? 0 : 1),
       correctStreak: correct ? prev.correctStreak + 1 : 0,
       lastCorrect: correct,
     };
-    if (!correct) missedIds.push(q.questionId);
   }
-  return { cards, lastQuizMissedIds: missedIds };
+  return next;
+}
+
+/** One quiz's graded results for one topic, added to that topic's history. */
+export function applyQuizResults(history: TopicHistory, results: PerQuestionResult[]): TopicHistory {
+  return {
+    cards: applyToCards(history.cards, results),
+    lastQuizMissedIds: results.filter((q) => q.correct !== true).map((q) => q.questionId),
+  };
+}
+
+/**
+ * Slice 5b-2 (ph-4-us-5): a practice test's or the baseline's results for one topic. Updates the
+ * per-card history only: `lastQuizMissedIds` stays mini-quiz-driven (Review Again and reopening
+ * a not-passed topic show the last quiz's misses, not a practice test's).
+ */
+export function applyTestResults(history: TopicHistory, results: PerQuestionResult[]): TopicHistory {
+  return { cards: applyToCards(history.cards, results), lastQuizMissedIds: history.lastQuizMissedIds };
 }
 
 function isCardHistory(value: unknown): value is CardHistory {

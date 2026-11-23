@@ -1,6 +1,7 @@
 import type { PerQuestionResult } from '../api/types';
 import {
   applyQuizResults,
+  applyTestResults,
   cardHistory,
   gradedByTopic,
   NO_HISTORY,
@@ -71,4 +72,23 @@ test.each([null, '', 'not json', '{"cards":5}', '[]', '{"cards":{"q1":{"graded":
 test('parseTopicHistory round-trips', () => {
   const h = applyQuizResults(NO_HISTORY, [r('q1', false)]);
   expect(parseTopicHistory(JSON.stringify(h))).toEqual(h);
+});
+
+test('applyTestResults updates card counts like a quiz', () => {
+  const results = [r('q1', false), r('q2', true)];
+  expect(applyTestResults(NO_HISTORY, results).cards).toEqual(applyQuizResults(NO_HISTORY, results).cards);
+});
+
+test('applyTestResults keeps lastQuizMissedIds', () => {
+  const h = applyQuizResults(NO_HISTORY, [r('q1', false)]);
+  const next = applyTestResults(h, [r('q2', false)]);
+  expect(next.lastQuizMissedIds).toEqual(['q1']);
+  expect(cardHistory(next, 'q2')).toMatchObject({ graded: 1, missed: 1 });
+});
+
+test('applyTestResults: a right answer after a miss starts a streak and keeps the miss count', () => {
+  const h = applyQuizResults(NO_HISTORY, [r('q1', false)]);
+  expect(cardHistory(applyTestResults(h, [r('q1', true)]), 'q1')).toEqual({
+    graded: 2, missed: 1, correctStreak: 1, lastCorrect: true,
+  });
 });

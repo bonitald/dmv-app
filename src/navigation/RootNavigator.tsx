@@ -15,6 +15,7 @@ import { PracticeHomeScreen } from '../practice/PracticeHomeScreen';
 import { PracticeResultsScreen } from '../practice/PracticeResultsScreen';
 import { HomeScreen } from '../home/HomeScreen';
 import { ReviewScreen } from '../review/ReviewScreen';
+import { MissedQuestionsScreen } from '../review/MissedQuestionsScreen';
 import { FlashcardScreen } from '../study/FlashcardScreen';
 import { ConceptListScreen } from '../study/ConceptListScreen';
 import { ConceptReportScreen } from '../progress/ConceptReportScreen';
@@ -197,6 +198,7 @@ export function RootNavigator({ initialRoute }: { initialRoute: InitialRoute }) 
         <RootStack.Screen name="MiniQuiz" component={MiniQuizScreen} options={{ title: 'Mini-quiz' }} />
         <RootStack.Screen name="PracticeTest" component={PracticeTestScreen} options={{ title: 'Practice test' }} />
         <RootStack.Screen name="PracticeResults" component={PracticeResultsScreen} options={{ title: 'Results' }} />
+        <RootStack.Screen name="MissedQuestions" component={MissedQuestionsScreen} options={{ title: 'Missed questions' }} />
         <RootStack.Screen
           name="TestDateEditor"
           component={TestDateEditorScreen}

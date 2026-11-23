@@ -41,11 +41,11 @@ function ready(perQuestion: unknown[], type = 'practice') {
 }
 
 const Stack = createNativeStackNavigator();
-async function renderReview() {
+async function renderReview(params: { testId: string; questionId?: string } = { testId: 't1' }) {
   return render(
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Review" component={ReviewScreen} initialParams={{ testId: 't1' }} />
+        <Stack.Screen name="Review" component={ReviewScreen} initialParams={params} />
         <Stack.Screen name="Flashcards">{() => <Text>Flashcards screen</Text>}</Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
@@ -156,4 +156,28 @@ test('offline with nothing cached: no connection with retry', async () => {
   expect(screen.getByText('No connection')).toBeTruthy();
   await fireEvent.press(screen.getByText('Try again'));
   expect(mockRetry).toHaveBeenCalled();
+});
+
+test('with a questionId, only that question shows, with no pager or toggle (ph-4-us-5)', async () => {
+  ready([q('q1'), q('q2', { choice: 'b', correct: false })]);
+  await renderReview({ testId: 't1', questionId: 'q2' });
+  expect(await screen.findByText('Text q2')).toBeTruthy();
+  expect(screen.queryByText('Text q1')).toBeNull();
+  expect(screen.queryByLabelText('Missed only')).toBeNull();
+  expect(screen.queryByText('Next')).toBeNull();
+  expect(screen.getByText('Back')).toBeTruthy();
+  expect(screen.getByText('From the handbook: Right of way')).toBeTruthy();
+});
+
+test('with a questionId no longer in the attempt, says so', async () => {
+  ready([q('q1')]);
+  await renderReview({ testId: 't1', questionId: 'gone' });
+  expect(await screen.findByText("This question isn't in that test any more.")).toBeTruthy();
+});
+
+test('with a questionId from an old attempt, the text fallback shows', async () => {
+  ready([q('q1', { text: undefined, choices: undefined, choice: 'b', correct: false })]);
+  await renderReview({ testId: 't1', questionId: 'q1' });
+  expect(await screen.findByText('Question text unavailable')).toBeTruthy();
+  expect(screen.getByText('Your answer: b')).toBeTruthy();
 });

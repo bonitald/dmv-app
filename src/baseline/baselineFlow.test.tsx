@@ -277,6 +277,35 @@ test('all right: no "Start with what you missed"; Review answers opens the final
   });
 });
 
+const recordedIds = async () => JSON.parse((await AsyncStorage.getItem('dmv-app:card-perf-recorded:u1')) ?? '[]');
+
+test('finishing the baseline feeds card performance once (Slice 5b-2)', async () => {
+  await finishWith(reviewOf(30));
+  await screen.findByText('67%');
+  await waitFor(async () => expect(await recordedIds()).toEqual(['baseline-v1-3']));
+  expect(JSON.parse((await AsyncStorage.getItem('dmv-app:card-perf:u1:c40')) as string).cards.r40).toMatchObject({ missed: 1 });
+});
+
+test('already-exists on the last section records the saved attempt', async () => {
+  mockProgress = { status: 'in-progress', currentSection: 3, totalSections: 3 };
+  mockStart.mockResolvedValueOnce(sectionOf(3));
+  mockScore.mockRejectedValueOnce(new CallableError('already-exists', 'already-exists', 'scored'));
+  mockAttempt = { status: 'ready', data: { type: 'baseline', perQuestion: [], baselineReview: reviewOf(30) } };
+  await renderFlow();
+  await screen.findByText('Section 3 of 3');
+  await answerAllAndSubmit(3);
+  await screen.findByText('67%');
+  await waitFor(async () => expect(await recordedIds()).toEqual(['baseline-v1-3']));
+});
+
+test('reopening a completed baseline does not record it', async () => {
+  mockProgress = { status: 'complete', version: 'v1' };
+  mockAttempt = { status: 'ready', data: { type: 'baseline', perQuestion: [], baselineReview: reviewOf(30) } };
+  await renderFlow();
+  await screen.findByText('67%');
+  expect(await recordedIds()).toEqual([]);
+});
+
 test('if progress cannot be read, the server decides: the section loads instead of a blank screen', async () => {
   mockProgress = { status: 'error' };
   mockStart.mockResolvedValueOnce(sectionOf(2));

@@ -4,6 +4,7 @@ import { useNavigation, usePreventRemove } from '@react-navigation/native';
 import { getApp } from '@react-native-firebase/app';
 import { getAnalytics, logEvent } from '@react-native-firebase/analytics';
 import { scoreTest, startOrResumeBaseline } from '../api/callables';
+import { recordTestResults } from '../study/cardPerformance';
 import { toCallableError } from '../api/callableErrors';
 import type { BaselineSection, PerQuestionResult } from '../api/types';
 import { useAuth } from '../auth/AuthProvider';
@@ -34,7 +35,9 @@ type Phase =
    * `review` is the final section's baselineReview when it was just graded; otherwise the
    * results load from the final attempt, `testId` (null until progress reports the version).
    */
-  | { kind: 'complete'; review: PerQuestionResult[] | null; testId: string | null }
+  /** `justGraded`: the final section was graded in this session, so its results feed card
+   *  performance once (Slice 5b-2). False when results are only reopened. */
+  | { kind: 'complete'; review: PerQuestionResult[] | null; testId: string | null; justGraded: boolean }
   | { kind: 'unavailable' }
   | { kind: 'offline' }
   | { kind: 'error' };
@@ -94,7 +97,7 @@ export function BaselineScreen() {
       const error = toCallableError(raw);
       if (error.kind === 'already-exists') {
         // Finished elsewhere (or progress was stale): progress will report the version shortly.
-        setPhase({ kind: 'complete', review: null, testId: null });
+        setPhase({ kind: 'complete', review: null, testId: null, justGraded: false });
         return;
       }
       if (error.kind === 'failed-precondition') {
@@ -128,7 +131,7 @@ export function BaselineScreen() {
     if (decidedRef.current || progress.status === 'loading') return;
     decidedRef.current = true;
     if (progress.status === 'complete') {
-      setPhase({ kind: 'complete', review: null, testId: finalBaselineTestId(progress.version) });
+      setPhase({ kind: 'complete', review: null, testId: finalBaselineTestId(progress.version), justGraded: false });
     } else if (progress.status === 'not-started') {
       setPhase({ kind: 'intro' });
     } else {
@@ -180,7 +183,7 @@ export function BaselineScreen() {
           totalSections: section.totalSections,
         });
       } else {
-        setPhase({ kind: 'complete', review: baselineReview, testId: section.testId });
+        setPhase({ kind: 'complete', review: baselineReview, testId: section.testId, justGraded: true });
       }
     },
     [phase, uid, isOnline]
@@ -249,7 +252,16 @@ export function BaselineScreen() {
         progress.status === 'complete' ? progress.version : progress.status === 'error' ? 'v1' : null;
       const testId = phase.testId ?? (version ? finalBaselineTestId(version) : null);
       if (!testId) return <View style={styles.blank} />;
-      return <BaselineResults review={phase.review} testId={testId} onDone={goHome} />;
+      return (
+        <BaselineResults
+          review={phase.review}
+          testId={testId}
+          onDone={goHome}
+          onReviewReady={
+            phase.justGraded && uid ? (review) => void recordTestResults(uid, testId, review) : undefined
+          }
+        />
+      );
     }
     case 'unavailable':
       return <BaselineUnavailable onDone={goHome} />;
