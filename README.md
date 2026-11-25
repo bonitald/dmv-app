@@ -37,6 +37,10 @@ so the native project picks up the right file — the copy `expo prebuild` drops
 `android/app/google-services.json` (and the iOS equivalent) is itself gitignored, since it's
 a straight copy of the same environment-specific keys.
 
+On iOS, the React Native Firebase config plugin disables Firebase's Swift Package Manager
+integration. This keeps Firebase dependencies on CocoaPods, avoiding the SPM/static-linkage
+conflict during `pod install`.
+
 ## Native project directories (`ios/`, `android/`)
 
 This project uses the CNG (Continuous Native Generation) workflow: `ios/` and `android/` are
@@ -74,8 +78,32 @@ module/config plugin):
 
 ```
 npm run android   # expo run:android — requires Android Studio SDK + a JDK on PATH
-npm run ios       # expo run:ios — requires macOS + Xcode; not runnable from this Windows repo
+npm run ios       # expo run:ios — requires macOS + Xcode
 ```
+
+### iOS simulator (macOS)
+
+Before the first build, make sure the development Firebase file exists at
+`firebase-config/dev/GoogleService-Info.plist`. Xcode and CocoaPods must also be installed.
+
+List available simulators, then boot one if it is not already running:
+
+```
+xcrun simctl list devices available
+xcrun simctl boot "iPhone 17 Pro"
+xcrun simctl bootstatus booted -b
+```
+
+Build, install, and launch the app on that simulator:
+
+```
+npm run ios -- --device "iPhone 17 Pro"
+```
+
+The first native build can take several minutes while Xcode compiles React Native and Firebase.
+This command runs Expo prebuild and CocoaPods as needed, then starts Metro and opens the app.
+The iOS script sets `USE_FRAMEWORKS=dynamic`, which is required for this project's
+React Native Firebase CocoaPods setup.
 
 Once a dev client build is installed on the device/emulator, subsequent iteration can use:
 

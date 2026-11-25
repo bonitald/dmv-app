@@ -48,7 +48,14 @@ const config: ExpoConfig = {
     favicon: './assets/favicon.png',
   },
   plugins: [
-    '@react-native-firebase/app',
+    [
+      '@react-native-firebase/app',
+      {
+        ios: {
+          disableSPM: true,
+        },
+      },
+    ],
     '@react-native-firebase/analytics',
     '@react-native-firebase/auth',
     'expo-font',
